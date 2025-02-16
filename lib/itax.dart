@@ -110,9 +110,9 @@ class _ItaxPageState extends State<ItaxPage> {
     });
   }
 
-  Future<void> fetchmainpgData() async {
+  Future<void> fetchmainpgData(String biometricId) async {
     try {
-      DatabaseEvent event = await bioRef.child('maindata').child(biometricIdController.text).once();
+      DatabaseEvent event = await bioRef.child('maindata').child(biometricId).once();
       DataSnapshot snapshot = event.snapshot;
 
       if (snapshot.exists) {
@@ -157,25 +157,25 @@ class _ItaxPageState extends State<ItaxPage> {
     }
   }
 
-  Future<Map<String, Map<String?, dynamic>>> fetchAllMonthData() async {
+  Future<Map<String, Map<String?, dynamic>>> fetchAllMonthData(String biometricId) async {
     List<String> months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sept', 'oct', 'nov', 'dec'];
     Map<String, Map<String?, dynamic>> allMonthData = {};
 
     for (String month in months) {
-      Map<String?, dynamic> data = await fetchMonthData(month);
+      Map<String?, dynamic> data = await fetchMonthData(month, biometricId);
       allMonthData[month] = data;
     }
 
     return allMonthData;
   }
 
-  Future<Map<String?, dynamic>> fetchMonthData(String month) async {
+  Future<Map<String?, dynamic>> fetchMonthData(String month, String biometricId) async {
     try {
 
       DatabaseEvent event = await bioRef
           .child('monthdata')
           .child(month)
-          .child(biometricIdController.text)
+          .child(biometricId)
           .once();
 
       DataSnapshot snapshot = event.snapshot;
@@ -227,9 +227,9 @@ class _ItaxPageState extends State<ItaxPage> {
 
 
 
-  Future<void> fetcharrearData() async {
+  Future<void> fetcharrearData(String biometricId) async {
     try {
-      DatabaseEvent event = await bioRef.child('arreardata').child(biometricIdController.text).once();
+      DatabaseEvent event = await bioRef.child('arreardata').child(biometricId).once();
       DataSnapshot snapshot = event.snapshot;
 
       if (snapshot.exists) {
@@ -274,9 +274,9 @@ class _ItaxPageState extends State<ItaxPage> {
     }
   }
 
-  Future<void> fetchdedData() async {
+  Future<void> fetchdedData(String biometricId) async {
     try {
-      DatabaseEvent event = await bioRef.child('deddata').child(biometricIdController.text).once();
+      DatabaseEvent event = await bioRef.child('deddata').child(biometricId).once();
       DataSnapshot snapshot = event.snapshot;
 
       if (snapshot.exists) {
@@ -319,9 +319,9 @@ class _ItaxPageState extends State<ItaxPage> {
       }
     }
   }
-  Future<void> fetchitaxData() async {
+  Future<void> fetchitaxData(String biometricId) async {
     try {
-      DatabaseEvent event = await bioRef.child('itfdata').child(biometricIdController.text).once();
+      DatabaseEvent event = await bioRef.child('itfdata').child(biometricId).once();
       DataSnapshot snapshot = event.snapshot;
 
       if (snapshot.exists) {
@@ -366,6 +366,7 @@ class _ItaxPageState extends State<ItaxPage> {
   }
 
   Future<void> updateitax(
+      String? biometricId,
         int varBpgross,
         int varDagross,
         int varHragross,
@@ -410,7 +411,7 @@ class _ItaxPageState extends State<ItaxPage> {
         int varTotaldedgross,
         int varNetsalarygross
       ) async{
-    if (biometricIdController.text.isEmpty) {
+    if (biometricId == null) {
       if (mounted) {
         showDialog(
           context: context,
@@ -429,8 +430,8 @@ class _ItaxPageState extends State<ItaxPage> {
       return;
     }
     try {
-      await bioRef.child('itfdata').child(biometricIdController.text).update({
-        'biometricid': biometricIdController.text,
+      await bioRef.child('itfdata').child(biometricId).update({
+        'biometricid': biometricId,
         'tb': varBpgross,
         'tda': varDagross,
         'thra': varHragross,
@@ -523,79 +524,60 @@ class _ItaxPageState extends State<ItaxPage> {
                   constraints: BoxConstraints(maxWidth: maxWidth), // Limiting max width
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Space out elements evenly
-                        children: [
-                          Expanded(
-                            flex: 2, // TextField gets more space
-                            child: Padding(
+                      Center(
+                        child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: isWideScreen? 600 : 400),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: _buildTextField('BiometricID', biometricIdController),
                             ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  createExcel();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isWideScreen ? 32.0 : 24.0,
-                                    vertical: isWideScreen ? 16.0 : 12.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(isWideScreen ? 16.0 : 12.0),
-                                  ),
-                                  elevation: isWideScreen ? 10.0 : 8.0,
-                                ),
-                                child: Text(
-                                  "EXPORT",
-                                  style: TextStyle(
-                                    fontSize: isWideScreen ? 20.0 : 18.0,
-                                    fontWeight: FontWeight.bold,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  child: ElevatedButton(
+                                    onPressed: createExcel,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blueAccent,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                      elevation: 8.0,
+                                    ),
+                                    child: const Text(
+                                      "EXPORT",
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  child: ElevatedButton(
+                                    onPressed: exportAll,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blueAccent,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                      elevation: 8.0,
+                                    ),
+                                    child: const Text(
+                                      "EXPORT ALL",
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Add the second button's action here
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isWideScreen ? 32.0 : 24.0,
-                                    vertical: isWideScreen ? 16.0 : 12.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(isWideScreen ? 16.0 : 12.0),
-                                  ),
-                                  elevation: isWideScreen ? 10.0 : 8.0,
-                                ),
-                                child: Text(
-                                  "EXPORT ALL",
-                                  style: TextStyle(
-                                    fontSize: isWideScreen ? 20.0 : 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      Padding(
+                    ),
+                    Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: TextField(
                           controller: searchController,
@@ -711,8 +693,7 @@ class _ItaxPageState extends State<ItaxPage> {
                                     ],
                                   );
                                 },
-                              )
-                                  .toList(),
+                              ).toList(),
                             ),
                           ),
                         ),
@@ -793,10 +774,12 @@ class _ItaxPageState extends State<ItaxPage> {
   }
 
 
-  Future<void> createExcel() async {
+  Future<void> createExcel({String? biometricId}) async {
     setState(() {
       toLoad = true;
     });
+    biometricId = (biometricId == null || biometricId.isEmpty) ? biometricIdController.text : biometricId;
+
 
     final xls.Workbook workbook = xls.Workbook();
     final xls.Worksheet itaxformSheet = workbook.worksheets[0];
@@ -925,10 +908,10 @@ class _ItaxPageState extends State<ItaxPage> {
     specialtotalrowStyle.borders.all.lineStyle = xls.LineStyle.thin;
     specialtotalrowStyle.wrapText = true;
 
-    await fetchmainpgData();
-    Map<String, Map<String?, dynamic>> monthdata = await fetchAllMonthData();
-    await fetchdedData();
-    await fetchdedData();
+    await fetchmainpgData(biometricId);
+    Map<String, Map<String?, dynamic>> monthdata = await fetchAllMonthData(biometricId);
+    await fetchdedData(biometricId);
+    await fetchdedData(biometricId);
 
     marData = monthdata['mar']!;
     aprData = monthdata['apr']!;
@@ -943,10 +926,10 @@ class _ItaxPageState extends State<ItaxPage> {
     janData = monthdata['jan']!;
     febData = monthdata['feb']!;
 
-    await _itaxformPage(itaxformSheet, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
-    await fetchitaxData();
-    await _computationPage(computationSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
-    await _itaxNewPage(itaxnewSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
+    await _itaxformPage(biometricId, itaxformSheet, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
+    await fetchitaxData(biometricId);
+    await _computationPage(biometricId, computationSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
+    await _itaxNewPage(biometricId, itaxnewSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
 
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
@@ -954,12 +937,12 @@ class _ItaxPageState extends State<ItaxPage> {
     if (kIsWeb){
       AnchorElement(
           href: 'data:application/octet-stream;charset=utf-16le;base64,${base64.encode(bytes)}')
-        ..setAttribute('download','${biometricIdController.text}.xlsx')
+        ..setAttribute('download','$biometricId.xlsx')
         ..click();
 
     } else{
       final String path = (await getApplicationSupportDirectory()).path;
-      final String fileName = '$path/${biometricIdController.text}.xlsx';
+      final String fileName = '$path/$biometricId.xlsx';
       final File file = File(fileName);
       await file.writeAsBytes(bytes, flush: true);
       OpenFile.open(fileName);
@@ -971,6 +954,7 @@ class _ItaxPageState extends State<ItaxPage> {
   }
 
   Future<void> _itaxformPage(
+      String? biometricId,
       xls.Worksheet sheet,
       [
         xls.Style? formheaderStyle,
@@ -996,7 +980,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName('B1:K1').columnWidth = 8.89;
 
       sheet.getRangeByName('A2').setValue("BIOMETRIC ID");
-      sheet.getRangeByName('B2').setValue(biometricIdController.text);
+      sheet.getRangeByName('B2').setValue(biometricId);
       sheet.getRangeByName('B2:C2').merge();
 
       sheet.getRangeByName('D2').setValue("NAME");
@@ -2265,49 +2249,50 @@ class _ItaxPageState extends State<ItaxPage> {
 
       // ================================= Update Itax Form total value ==================================
       await updateitax(
-          varBpgross,
-          varDagross,
-          varHragross,
-          varNpagross,
-          varSplpaygross,
-          varConvgross,
-          varPggross,
-          varAnnualgross,
-          varUniformgross,
-          varNursinggross,
-          varTagross,
-          varDaontagross,
-          varMedicalgross,
-          varDirtgross,
-          varWashinggross,
-          varTbgross,
-          varNightgross,
-          varDrivegross,
-          varCyclegross,
-          varPcagross,
-          varNpsempgross,
-          varOthergross,
-          varDaext1gross,
-          varDaext2gross,
-          varDaext3gross,
-          varDaext4gross,
-          varGrossgross,
-          varSalarygross,
-          varIncometaxgross,
-          varGisgross,
-          varGpfgross,
-          varNpsgross,
-          varSlfgross,
-          varSocietygross,
-          varRecoverygross,
-          varWfgross,
-          varOther2gross,
-          varDdext1gross,
-          varDdext2gross,
-          varDdext3gross,
-          varDdext4gross,
-          varTotaldedgross,
-          varNetsalarygross
+        biometricId,
+        varBpgross,
+        varDagross,
+        varHragross,
+        varNpagross,
+        varSplpaygross,
+        varConvgross,
+        varPggross,
+        varAnnualgross,
+        varUniformgross,
+        varNursinggross,
+        varTagross,
+        varDaontagross,
+        varMedicalgross,
+        varDirtgross,
+        varWashinggross,
+        varTbgross,
+        varNightgross,
+        varDrivegross,
+        varCyclegross,
+        varPcagross,
+        varNpsempgross,
+        varOthergross,
+        varDaext1gross,
+        varDaext2gross,
+        varDaext3gross,
+        varDaext4gross,
+        varGrossgross,
+        varSalarygross,
+        varIncometaxgross,
+        varGisgross,
+        varGpfgross,
+        varNpsgross,
+        varSlfgross,
+        varSocietygross,
+        varRecoverygross,
+        varWfgross,
+        varOther2gross,
+        varDdext1gross,
+        varDdext2gross,
+        varDdext3gross,
+        varDdext4gross,
+        varTotaldedgross,
+        varNetsalarygross
       );
 
       //================================== excel formation =================================================
@@ -3283,23 +3268,10 @@ class _ItaxPageState extends State<ItaxPage> {
 
       }
 
-      if((end-2)!=0) {
-        sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").merge();
-        sheet.getRangeByName("${columns[0]}9").setValue("DETAILS OF ALLOWANCES");
-        sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
-        sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
-      } else{
-        sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").merge();
-        sheet.getRangeByName("${columns[0]}9").setValue("ALLOWANCES");
-        sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
-        sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
-      }
-
-      int dstart = end;
-
       if (varSalarygross > 0){
 
         sheet.getRangeByName("${columns[end]}10").setValue("SALARY");
+        sheet.getRangeByName("${columns[end]}10").columnWidth = 10;
         sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
 
         sheet.getRangeByName("${columns[end]}11").setValue(varSalarymar);
@@ -3340,6 +3312,21 @@ class _ItaxPageState extends State<ItaxPage> {
         end+=1;
 
       }
+      if (end!=0){
+        if(end > 2) {
+          sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").merge();
+          sheet.getRangeByName("${columns[0]}9").setValue("DETAILS OF ALLOWANCES");
+          sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
+          sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
+        } else{
+          sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").merge();
+          sheet.getRangeByName("${columns[0]}9").setValue("ALLOWANCES");
+          sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
+          sheet.getRangeByName("${columns[0]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
+        }
+      }
+
+      int dstart = end;
 
       if (varIncometaxgross > 0){
 
@@ -3426,7 +3413,7 @@ class _ItaxPageState extends State<ItaxPage> {
         sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
 
         end+=1;
-
+        
       }
 
       if (varGpfgross > 0){
@@ -3737,17 +3724,18 @@ class _ItaxPageState extends State<ItaxPage> {
         end+=1;
 
       }
-
-      if((dstart - end + 2)!=0) {
-        sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").merge();
-        sheet.getRangeByName("${columns[dstart]}9").setValue("DETAILS OF DEDUCTIONS");
-        sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
-        sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
-      } else{
-        sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").merge();
-        sheet.getRangeByName("${columns[dstart]}9").setValue("DEDUCTIONS");
-        sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
-        sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
+      if (dstart != end ){
+        if((dstart - end) > 2) {
+          sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").merge();
+          sheet.getRangeByName("${columns[dstart]}9").setValue("DETAILS OF DEDUCTIONS");
+          sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
+          sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
+        } else{
+          sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").merge();
+          sheet.getRangeByName("${columns[dstart]}9").setValue("DEDUCTIONS");
+          sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle = commontextStyleBold;
+          sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
+        }
       }
 
     } catch (error) {
@@ -3769,6 +3757,7 @@ class _ItaxPageState extends State<ItaxPage> {
     }
   }
   Future<void> _computationPage(
+      String? biometricId,
       xls.Worksheet sheet,
       [
         xls.Style? otherheaderStyle,
@@ -3785,7 +3774,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B3:B52").rowHeight = 15.60;
 
       sheet.getRangeByName("C1").setValue(mainpgData['name']);
-      sheet.getRangeByName("D1").setValue(biometricIdController.text);
+      sheet.getRangeByName("D1").setValue(biometricId);
       sheet.getRangeByName("C1:D1").cellStyle = commontextStyle!;
 
 
@@ -4063,6 +4052,7 @@ class _ItaxPageState extends State<ItaxPage> {
     }
   }
   Future<void> _itaxNewPage(
+      String? biometricId,
       xls.Worksheet sheet,
       [
         xls.Style? otherheaderStyle,
@@ -4082,7 +4072,7 @@ class _ItaxPageState extends State<ItaxPage> {
 
 
       sheet.getRangeByName("B1:D1").merge();
-      sheet.getRangeByName("B1").setValue(biometricIdController.text);
+      sheet.getRangeByName("B1").setValue(biometricId);
       sheet.getRangeByName("E1").setValue(mainpgData['name']);
       sheet.getRangeByName("F1").setValue(mainpgData['panno']);
       sheet.getRangeByName("G1").setValue(mainpgData['designation']);
@@ -4374,7 +4364,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B36:G36").merge();
       sheet.getRangeByName("B36:G36").cellStyle = commontextStyle;
       sheet.getRangeByName("B36").setFormula(
-          r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$29, " is to be recovered as Income Tax for the total income of ₹ ",$G$3," from Sh./Smt./Ms ",' + "\"${mainpgData['name']}\"" + r'," working as ",'+ "\"${mainpgData['designation']}\"" + r'," in ",$B$33, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
+          r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$29, " is to be recovered as Income Tax for the total income of ₹ ",$G$3," from Sh./Smt./Ms ",' "\"${mainpgData['name']}\"" r'," working as ",'"\"${mainpgData['designation']}\"" r'," in ",$B$33, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
       );
       sheet.getRangeByName("B36:G36").rowHeight = 40.20;
 
@@ -4431,9 +4421,39 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B45:G45").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
       sheet.getRangeByName("G35:G45").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
 
-
-
     }catch (error) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Error"),
+            content: Text("Failed: \n$error"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> exportAll() async{
+    try{
+      List<String> biometricIds = filteredData.keys.toList();
+      String inputId = biometricIdController.text.trim();
+
+      int startIndex = (inputId.isNotEmpty && biometricIds.contains(inputId))
+          ? biometricIds.indexOf(inputId)
+          : 0;
+
+      for (int i = startIndex; i < biometricIds.length; i++) {
+        await createExcel(biometricId: biometricIds[i]);
+      }
+
+    } catch (error) {
       if (mounted) {
         showDialog(
           context: context,
