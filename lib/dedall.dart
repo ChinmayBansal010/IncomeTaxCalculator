@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ItaxAllPage extends StatefulWidget {
-  const ItaxAllPage({super.key});
+class DedAllPage extends StatefulWidget {
+  const DedAllPage({super.key});
 
   @override
-  State<ItaxAllPage> createState() => _ItaxAllPageState();
+  State<DedAllPage> createState() => _DedAllPageState();
 }
 
-class _ItaxAllPageState extends State<ItaxAllPage> {
+class _DedAllPageState extends State<DedAllPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

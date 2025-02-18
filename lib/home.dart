@@ -4,7 +4,7 @@ import 'main_data.dart';
 import 'da.dart';
 import 'month_data.dart';
 import 'itax.dart';
-import 'itaxall.dart';
+import 'dedall.dart';
 import 'arrear_data.dart';
 import 'deduction_data.dart';
 import 'tax.dart';
@@ -119,11 +119,11 @@ class _HomePageState extends State<HomePage> {
       case "ITAX FORM":
         Navigator.push(context, MaterialPageRoute(builder: (context) => const ItaxPage()));
         break;
-      case "ITAX EXPORT":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ItaxAllPage()));
+      // case "DED ALL":
+      //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DedAllPage()));
         break;
-      case "TAX EXPORT":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const TaxPage()));
+      // case "TAX EXPORT":
+      //   Navigator.push(context, MaterialPageRoute(builder: (context) => const TaxPage()));
         break;
       case "CALC":
         Navigator.push(context, MaterialPageRoute(builder: (context) => const CalcArrearPage()));
