@@ -133,7 +133,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   final atccd2Controller = TextEditingController();
   final totalsavController = TextEditingController();
   final maxsavController = TextEditingController();
-  late String htypeController;
+  late String htypeController = 'SELF';
   final rentController = TextEditingController();
   final ext3Controller = TextEditingController();
   final ext4Controller = TextEditingController();
@@ -726,6 +726,11 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   Future<void> _saveData() async {
     if (biometricIdController.text.isEmpty) {
       _showDialog("Error", "Biometric ID cannot be blank.");
+      return;
+    }
+
+    if (htypeController == 'RENT' && rentController.text.isEmpty){
+      _showDialog("Error", "RENT CANNONT BE BLANK WHEN HOUSE TYPE IS RENT");
       return;
     }
 

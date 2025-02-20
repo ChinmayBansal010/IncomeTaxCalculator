@@ -318,7 +318,7 @@ class _MainAddPageState extends State<MainAddPage> {
         '80ccd2':'0',
         'totalsav':'0',
         'maxsav':'0',
-        'htype':'',
+        'htype':'SELF',
         'rent':'0',
         'ext3':'0',
         'ext4':'0',

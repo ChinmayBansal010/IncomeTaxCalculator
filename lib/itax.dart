@@ -4249,7 +4249,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varTg = (int.tryParse(itfData['tgross']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("G3").setValue(varTg);
 
-      int varIfhp = int.tryParse(dedData['hlp']?.toString() ?? '0') ?? 0;
+      int varIfhp = int.tryParse(dedData['rent']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("G4").setValue(varIfhp);
 
       int varAtee = int.tryParse(dedData['80ee']?.toString() ?? '0') ?? 0;
