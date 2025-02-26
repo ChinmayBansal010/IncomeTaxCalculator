@@ -4,7 +4,6 @@ import 'main_data.dart';
 import 'da.dart';
 import 'month_data.dart';
 import 'itax.dart';
-import 'dedall.dart';
 import 'arrear_data.dart';
 import 'deduction_data.dart';
 import 'tax.dart';
@@ -20,39 +19,51 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: [
-            const Icon(Icons.home, size: 24, color: Colors.black),
-            const SizedBox(width: 8),
-            const Text('HOME', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
+          children: const [
+            Icon(Icons.home, size: 24, color: Colors.black),
+            SizedBox(width: 8),
+            Text('HOME', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ],
         ),
         backgroundColor: Colors.blue,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/bg.jpg"), // Add your background image here
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: _buildResponsiveGrid(context),
-                ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/bg.jpg"), // Background image
+                fit: BoxFit.cover,
               ),
-            ],
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: _buildResponsiveGrid(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.5),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -76,7 +87,6 @@ class _HomePageState extends State<HomePage> {
       "ARREAR",
       "DEDUCTION",
       "ITAX FORM",
-      "ITAX EXPORT",
       "TAX EXPORT",
       "CALC",
       "EXPORT ALL",
@@ -99,7 +109,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _navigateToPage(String label, BuildContext context) {
+  Future<void> _navigateToPage(String label, BuildContext context) async{
     switch (label) {
       case "MAIN":
         Navigator.push(context, MaterialPageRoute(builder: (context) => const MainDataPage()));
@@ -119,11 +129,18 @@ class _HomePageState extends State<HomePage> {
       case "ITAX FORM":
         Navigator.push(context, MaterialPageRoute(builder: (context) => const ItaxPage()));
         break;
-      // case "DED ALL":
-      //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DedAllPage()));
-        break;
-      // case "TAX EXPORT":
-      //   Navigator.push(context, MaterialPageRoute(builder: (context) => const TaxPage()));
+      case "TAX EXPORT":
+        setState(() => _isLoading = true);
+        try {
+          await createExcel(); // Call the async Excel export function
+        } catch (e) {
+          if (!mounted) return; // Check if widget is still in the tree
+          _showErrorSnackbar(e.toString());
+        } finally {
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
+        }
         break;
       case "CALC":
         Navigator.push(context, MaterialPageRoute(builder: (context) => const CalcArrearPage()));
@@ -140,6 +157,22 @@ class _HomePageState extends State<HomePage> {
   Widget _createMenuButton(String label, VoidCallback onPressed) {
     return HoverButton(label: label, onPressed: onPressed);
   }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Failed: $message'),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {}, // Optionally handle 'OK' action
+        ),
+      ),
+    );
+  }
+
 }
 
 class HoverButton extends StatefulWidget {

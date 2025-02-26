@@ -577,7 +577,10 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
           ),
           onChanged: (value) {
             setState(() {
-              controller.text = value;
+              controller.value = TextEditingValue(
+                  text: value,
+                  selection: TextSelection.collapsed(offset: value.length),
+              );
             });
           },
         ),
