@@ -35,7 +35,7 @@ class DeductionUpdatePage extends StatefulWidget {
   final String relief;
   final String atee;
   final String rpaid;
-  final String taexem;
+  final String convcontuniform;
   final String other;
   final String atccd2;
   final String totalsav;
@@ -79,7 +79,7 @@ class DeductionUpdatePage extends StatefulWidget {
     required this.relief,
     required this.atee,
     required this.rpaid,
-    required this.taexem,
+    required this.convcontuniform,
     required this.other,
     required this.atccd2,
     required this.totalsav,
@@ -128,8 +128,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   final reliefController = TextEditingController();
   final ateeController = TextEditingController();
   final rpaidController = TextEditingController();
-  final taexemController = TextEditingController();
-  final otherController = TextEditingController();
+  // final convcontuniformController = TextEditingController();
+  // final otherController = TextEditingController();
   final atccd2Controller = TextEditingController();
   final totalsavController = TextEditingController();
   final maxsavController = TextEditingController();
@@ -164,18 +164,16 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
 
 
   Future<void> _initializeData() async {
-    if (widget.gis == '0' || widget.gpf == '0' || widget.atccd1 == '0' || widget.atccd2 == '0' || widget.taexem == '0') {
-      await Future.wait(months.map((month) => fetchMonthData(month)));
-    }
+    await Future.wait(months.map((month) => fetchMonthData(month)));
 
     await fetchArrData();
 
     setState(() {
-      taexemController.text = widget.taexem == '0' ? taxexem.toString() : widget.taexem;
-      atccd1Controller.text = widget.atccd1 == '0' ? atccd1.toString() : widget.atccd1;
-      gpfController.text = widget.gpf == '0' ? gpf.toString() : widget.gpf;
-      gisController.text = widget.gis == '0' ? gis.toString() : widget.gis;
-      atccd2Controller.text = widget.atccd2 == '0' ? atccd2.toString() : widget.atccd2;
+      // convcontuniformController.text = convcontuniform.toString();
+      atccd1Controller.text = atccd1.toString();
+      gpfController.text = gpf.toString();
+      gisController.text = gis.toString();
+      atccd2Controller.text = atccd2.toString();
     });
 
     biometricIdController.text = widget.biometricId;
@@ -206,7 +204,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     reliefController.text = widget.relief;
     ateeController.text = widget.atee;
     rpaidController.text = widget.rpaid;
-    otherController.text = widget.other;
+    // convcontuniformController.text = widget.convcontuniform;
+    // otherController.text = widget.other;
     totalsavController.text = widget.totalsav;
     maxsavController.text = widget.maxsav;
     htypeController = widget.htype;
@@ -217,15 +216,10 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
 
     if (mounted) {
       setState(() {
-        isLoading = false; // Data has been initialized
+        isLoading = false;
       });
-       // Dismiss the loading dialog
     }
   }
-
-
-  // Reference to Firebase Database
-
 
   @override
   void dispose() {
@@ -260,8 +254,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     reliefController.dispose();
     ateeController.dispose();
     rpaidController.dispose();
-    taexemController.dispose();
-    otherController.dispose();
+    // convcontuniformController.dispose();
+    // otherController.dispose();
     atccd2Controller.dispose();
     totalsavController.dispose();
     maxsavController.dispose();
@@ -468,8 +462,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                     _buildTextBox(label: "80U", controller: atuController),
                     _buildTextBox(label: "80E", controller: ateController),
                     _buildTextBox(label: "80EE", controller: ateeController),
-                    _buildTextBox(label: "CONVEYANCE & CONTIGENCY", controller: taexemController),
-                    _buildTextBox(label: "OTHER", controller: otherController),
                   ],
                 ),
               ),
@@ -776,8 +768,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         'relief': reliefController.text,
         '80ee': ateeController.text,
         'rpaid': rpaidController.text,
-        'taexem': taexemController.text,
-        'other': otherController.text,
+        // 'convcontuniform': convcontuniformController.text,
+        // 'other': otherController.text,
         '80ccd2': atccd2Controller.text,
         'totalsav': totalsavController.text,
         'maxsav': maxsavController.text,

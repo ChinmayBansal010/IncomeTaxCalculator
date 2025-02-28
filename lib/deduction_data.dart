@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/deduction/deduction_save.dart';
+import 'package:incometax/deduction/deduction_all.dart';
 import 'shared.dart';
 
 class DeductionPage extends StatefulWidget {
@@ -81,11 +82,69 @@ class _DeductionPageState extends State<DeductionPage> {
     super.dispose();
   }
 
+  Future<void> _dedall() async{
+    List<String> sortedBiometricIds = biometricData.keys.toList()..sort();
+    for (int index = 0; index < sortedBiometricIds.length; index++){
+      String biometricId = sortedBiometricIds[index];
+      Map<String, dynamic> details = biometricData[biometricId]!;
+      shouldRefetch = true;
+
+      WidgetsFlutterBinding.ensureInitialized();
+
+
+      final DeductionAllPage processor = DeductionAllPage(
+        biometricId: biometricId,
+        name: details['name'] ?? '',
+        hrr: details['hrr'] ?? '',
+        oname: details['oname'] ?? '',
+        opan: details['opan'] ?? '',
+        po: details['po'] ?? '0',
+        ppf: details['ppf'] ?? '0',
+        lic: details['lic'] ?? '0',
+        hlp: details['hlp'] ?? '0',
+        hli: details['hli'] ?? '0',
+        atg: details['atg'] ?? '0',
+        tution: details['tution'] ?? '0',
+        cea: details['cea'] ?? '0',
+        fd: details['fd'] ?? '0',
+        nsc: details['nsc'] ?? '0',
+        atc: details['atc'] ?? '0',
+        ulip: details['ulip'] ?? '0',
+        atccd1: details['atccd1'] ?? '0',
+        gpf: details['gpf'] ?? '0',
+        gis: details['gis'] ?? '0',
+        elss: details['elss'] ?? '0',
+        ssy: details['ssy'] ?? '0',
+        atccdnps: details['atccdnps'] ?? '0',
+        atd: details['atd'] ?? '0',
+        atdp: details['atdp'] ?? '0',
+        atdps: details['atdps'] ?? '0',
+        atu: details['atu'] ?? '0',
+        ate: details['ate'] ?? '0',
+        relief: details['relief'] ?? '0',
+        atee: details['atee'] ?? '0',
+        rpaid: details['rpaid'] ?? '0',
+        taexem: details['taexem'] ?? '0',
+        other: details['other'] ?? '0',
+        atccd2: details['atccd2'] ?? '0',
+        totalsav: details['totalsav'] ?? '0',
+        maxsav: details['maxsav'] ?? '0',
+        htype: details['htype'] ?? 'SELF',
+        rent: details['rent'] ?? '0',
+        ext3: details['ext3'] ?? '0',
+        ext4: details['ext4'] ?? '0',
+        ext5: details['ext5'] ?? '0',
+      );
+      await processor.initializeData();
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double padding = 16.0; // Standard padding
-    double fontSize = screenWidth > 600 ? 18 : 14; // Font size adjustment
+    final double padding = 16.0;
+    double fontSize = screenWidth > 600 ? 18 : 14;
     double maxWidth = screenWidth > 600 ? 600 : screenWidth - 2 * padding;
 
     return Scaffold(
@@ -191,7 +250,7 @@ class _DeductionPageState extends State<DeductionPage> {
                                         relief: details['relief'] ?? '0',
                                         atee: details['80ee'] ?? '0',
                                         rpaid: details['rpaid'] ?? '0',
-                                        taexem: details['taexem'] ?? '',
+                                        convcontuniform: details['taexem'] ?? '',
                                         other: details['other'] ?? '0',
                                         atccd2: details['80ccd2'] ?? '',
                                         totalsav: details['totalsav'] ?? '0',
@@ -205,10 +264,12 @@ class _DeductionPageState extends State<DeductionPage> {
                                     ),
                                   );
                                   if (result == true) {
-                                    setState(() {
-                                      isLoading = true;
-                                      shouldRefetch = true;
-                                    });
+                                    if (mounted){
+                                      setState(() {
+                                        isLoading = true;
+                                        shouldRefetch = true;
+                                      });
+                                    }
                                     bioRef = _dbRef.child(sharedData.userPlace).child('deddata');
                                     fetchData();
                                     searchController.addListener(_filterData);
@@ -240,6 +301,47 @@ class _DeductionPageState extends State<DeductionPage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          setState(() {
+            isLoading = true;
+          });
+          try{
+            await _dedall();
+          } catch (error) {
+            _showDialog("ERROR",error.toString());
+          } finally{
+            setState(() {
+              isLoading = true;
+              shouldRefetch = true;
+            });
+            bioRef = _dbRef.child(sharedData.userPlace).child('maindata');
+            fetchData();
+            searchController.addListener(_filterData);
+          }
+        },
+        child: Icon(Icons.add),
+      ),
     );
+  }
+
+  void _showDialog(String title, String content) {
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      });
+    }
   }
 }
