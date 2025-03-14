@@ -34,8 +34,8 @@ class DeductionAllPage {
   final String relief;
   final String atee;
   final String rpaid;
-  // final String convcontuniform;
-  // final String other;
+  final String convcontuniform;
+  final String other;
   final String atccd2;
   final String totalsav;
   final String maxsav;
@@ -77,8 +77,8 @@ class DeductionAllPage {
     required this.relief,
     required this.atee,
     required this.rpaid,
-    // required this.convcontuniform,
-    // required this.other,
+    required this.convcontuniform,
+    required this.other,
     required this.atccd2,
     required this.totalsav,
     required this.maxsav,
@@ -121,8 +121,8 @@ class DeductionAllPage {
   final reliefController = TextEditingController();
   final ateeController = TextEditingController();
   final rpaidController = TextEditingController();
-  // final convcontuniformController = TextEditingController();
-  // final otherController = TextEditingController();
+  final convcontuniformController = TextEditingController();
+  final otherController = TextEditingController();
   final atccd2Controller = TextEditingController();
   final totalsavController = TextEditingController();
   final maxsavController = TextEditingController();
@@ -132,7 +132,7 @@ class DeductionAllPage {
   final ext4Controller = TextEditingController();
   final ext5Controller = TextEditingController();
 
-  int gis2 = 0, gpf2 = 0, atccd12 = 0, atccd22 = 0, convcontuniform2 = 0;
+  int gis2 = 0, gpf2 = 0, atccd12 = 0, atccd22 = 0, taexem2 = 0;
   bool isCea = false;
   bool isLoading = true;
   bool shouldRefetch = true;
@@ -150,7 +150,7 @@ class DeductionAllPage {
     await fetchArrData();
     debugPrint("initialization called");
 
-    // convcontuniformController.text = convcontuniform2.toString();
+    convcontuniformController.text = taexem2.toString();
     atccd1Controller.text = atccd12.toString();
     gpfController.text = gpf2.toString();
     gisController.text = gis2.toString();
@@ -185,8 +185,8 @@ class DeductionAllPage {
     reliefController.text = relief;
     ateeController.text = atee;
     rpaidController.text = rpaid;
-    // convcontuniformController.text = convcontuniform
-    // otherController.text = other;
+    // convcontuniformController.text = taexem2;
+    otherController.text = other;
     totalsavController.text = totalsav;
     maxsavController.text = maxsav;
     htypeController = htype;
@@ -213,6 +213,9 @@ class DeductionAllPage {
         final npa = int.tryParse(monthData['npa'] ?? '0') ?? 0;
         final gisValue = int.tryParse(monthData['gis'] ?? '0') ?? 0;
         final gpfValue = int.tryParse(monthData['gpf'] ?? '0') ?? 0;
+        final drive = int.tryParse(monthData['drive'] ?? '0') ?? 0;
+        final conv = int.tryParse(monthData['conv'] ?? '0') ?? 0;
+        final uniform = int.tryParse(monthData['uniform'] ?? '0') ?? 0;
 
         // Update fields conditionally
         if (nps > 0) {
@@ -222,6 +225,7 @@ class DeductionAllPage {
         gis2 += gisValue;
         gpf2 += gpfValue;
         atccd12 += nps;
+        taexem2 += drive+conv+uniform;
 
       }
     } catch (e) {
@@ -287,6 +291,8 @@ class DeductionAllPage {
         'relief': reliefController.text,
         '80ee': ateeController.text,
         'rpaid': rpaidController.text,
+        'taexem': convcontuniformController.text,
+        'other': otherController.text,
         '80ccd2': atccd2Controller.text,
         'totalsav': totalsavController.text,
         'maxsav': maxsavController.text,
@@ -296,7 +302,6 @@ class DeductionAllPage {
         'ext4': ext4Controller.text,
         'ext5': ext5Controller.text,
       });
-
     } catch (error) {
       return;
     }
@@ -304,7 +309,7 @@ class DeductionAllPage {
   }
 
   Future<void> _validateValue() async{
-    if (htypeController == 'SELF' && (int.tryParse(hliController.text) ?? 0)> 200000) {
+    if ((int.tryParse(hliController.text) ?? 0)> 200000) {
       hliController.text = '200000';
     } else if ((int.tryParse(atccdnpsController.text) ?? 0) > 50000) {
       atccdnpsController.text = '50000';

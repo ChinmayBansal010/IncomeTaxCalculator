@@ -128,8 +128,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   final reliefController = TextEditingController();
   final ateeController = TextEditingController();
   final rpaidController = TextEditingController();
-  // final convcontuniformController = TextEditingController();
-  // final otherController = TextEditingController();
+  final convcontuniformController = TextEditingController();
+  final otherController = TextEditingController();
   final atccd2Controller = TextEditingController();
   final totalsavController = TextEditingController();
   final maxsavController = TextEditingController();
@@ -169,7 +169,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     await fetchArrData();
 
     setState(() {
-      // convcontuniformController.text = convcontuniform.toString();
+      convcontuniformController.text = taxexem.toString();
       atccd1Controller.text = atccd1.toString();
       gpfController.text = gpf.toString();
       gisController.text = gis.toString();
@@ -204,8 +204,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     reliefController.text = widget.relief;
     ateeController.text = widget.atee;
     rpaidController.text = widget.rpaid;
-    // convcontuniformController.text = widget.convcontuniform;
-    // otherController.text = widget.other;
+    convcontuniformController.text = widget.convcontuniform;
+    otherController.text = widget.other;
     totalsavController.text = widget.totalsav;
     maxsavController.text = widget.maxsav;
     htypeController = widget.htype;
@@ -254,12 +254,12 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     reliefController.dispose();
     ateeController.dispose();
     rpaidController.dispose();
-    // convcontuniformController.dispose();
-    // otherController.dispose();
+    convcontuniformController.dispose();
+    otherController.dispose();
     atccd2Controller.dispose();
     totalsavController.dispose();
     maxsavController.dispose();
-    // htypeControllerose();
+    // htypeController.dispose();
     rentController.dispose();
     ext3Controller.dispose();
     ext4Controller.dispose();
@@ -287,6 +287,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         final gpfValue = int.tryParse(monthData['gpf'] ?? '0') ?? 0;
         final drive = int.tryParse(monthData['drive'] ?? '0') ?? 0;
         final conv = int.tryParse(monthData['conv'] ?? '0') ?? 0;
+        final uniform = int.tryParse(monthData['uniform'] ?? '0') ?? 0;
 
         // Update fields conditionally
         if (nps > 0) {
@@ -296,7 +297,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         gis += gisValue;
         gpf += gpfValue;
         atccd1 += nps;
-        taxexem += drive + conv;
+        taxexem += drive + conv + uniform;
 
       } else {
         if (mounted) {
@@ -448,10 +449,10 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                     SizedBox(height: 10,width: 10,),
 
                     _buildTextBox(label: "80CCD(2) NPS EMPLOYER", controller: atccd2Controller),
-
-                    _buildDropdown('SELECT HOUSE TYPE', htypeController, ['','SELF','RENT']),
-
-                    _buildTextBox(label: "RENT RECIEVED", controller: rentController),
+                    //
+                    // _buildDropdown('SELECT HOUSE TYPE', htypeController, ['','SELF','RENT']),
+                    //
+                    // _buildTextBox(label: "RENT RECIEVED", controller: rentController),
                     _buildTextBox(label: "HOUSING LOAN INETREST", controller: hliController),
                     _buildTextBox(label: "80G", controller: atgController),
                     _buildTextBox(label: "CEA", controller: ceaController),
@@ -462,6 +463,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                     _buildTextBox(label: "80U", controller: atuController),
                     _buildTextBox(label: "80E", controller: ateController),
                     _buildTextBox(label: "80EE", controller: ateeController),
+                    _buildTextBox(label: "CONVEYANCE & CONTIGENCY & UNIFORM", controller: convcontuniformController),
+                    _buildTextBox(label: "OTHER", controller: otherController),
                   ],
                 ),
               ),
@@ -642,61 +645,61 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     );
   }
 
-  Widget _buildDropdown(String label, String? value, List<String> items) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isWideScreen = screenWidth > 600;
-
-    // Define a fixed width for the dropdown (you can adjust this value)
-    double dropdownWidth = isWideScreen ? 500.0 : screenWidth - 32.0;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: isWideScreen ? 32.0 : 16.0),
-      child: SizedBox(
-        width: dropdownWidth,  // Set the width of the dropdown container
-        child: DropdownButtonFormField<String?>(
-          value: value,
-          onChanged: (String? newValue) {
-            setState(() {
-              htypeController = newValue!;
-              // Recalculate isEnabled every time htypeController changes
-              isEnabled = htypeController != 'SELF';
-            });
-          },
-          decoration: InputDecoration(
-            labelText: label,
-            labelStyle: TextStyle(fontSize: isWideScreen ? 22.0 : 18.0, fontWeight: FontWeight.bold, color: Colors.black87),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 25),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.blueGrey, width: 3),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.blueAccent, width: 4),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.blueGrey, width: 3),
-            ),
-          ),
-          items: items.map<DropdownMenuItem<String?>>((String value) {
-            return DropdownMenuItem<String?>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
+  // Widget _buildDropdown(String label, String? value, List<String> items) {
+  //   double screenWidth = MediaQuery.of(context).size.width;
+  //   bool isWideScreen = screenWidth > 600;
+  //
+  //   // Define a fixed width for the dropdown (you can adjust this value)
+  //   double dropdownWidth = isWideScreen ? 500.0 : screenWidth - 32.0;
+  //
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 8, horizontal: isWideScreen ? 32.0 : 16.0),
+  //     child: SizedBox(
+  //       width: dropdownWidth,  // Set the width of the dropdown container
+  //       child: DropdownButtonFormField<String?>(
+  //         value: value,
+  //         onChanged: (String? newValue) {
+  //           setState(() {
+  //             htypeController = newValue!;
+  //             // Recalculate isEnabled every time htypeController changes
+  //             isEnabled = htypeController != 'SELF';
+  //           });
+  //         },
+  //         decoration: InputDecoration(
+  //           labelText: label,
+  //           labelStyle: TextStyle(fontSize: isWideScreen ? 22.0 : 18.0, fontWeight: FontWeight.bold, color: Colors.black87),
+  //           filled: true,
+  //           fillColor: Colors.white,
+  //           contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 25),
+  //           border: OutlineInputBorder(
+  //             borderRadius: BorderRadius.circular(12),
+  //             borderSide: BorderSide(color: Colors.blueGrey, width: 3),
+  //           ),
+  //           focusedBorder: OutlineInputBorder(
+  //             borderRadius: BorderRadius.circular(12),
+  //             borderSide: BorderSide(color: Colors.blueAccent, width: 4),
+  //           ),
+  //           enabledBorder: OutlineInputBorder(
+  //             borderRadius: BorderRadius.circular(12),
+  //             borderSide: BorderSide(color: Colors.blueGrey, width: 3),
+  //           ),
+  //         ),
+  //         items: items.map<DropdownMenuItem<String?>>((String value) {
+  //           return DropdownMenuItem<String?>(
+  //             value: value,
+  //             child: Text(value),
+  //           );
+  //         }).toList(),
+  //       ),
+  //     ),
+  //   );
+  // }
 
 
   bool _validateValue(TextEditingController controller, String value) {
     final parsedValue = int.tryParse(value);
 
-    if (controller == hliController && htypeController == 'SELF' && parsedValue != null && parsedValue > 200000) {
+    if (controller == hliController && parsedValue != null && parsedValue > 200000) {
       controller.text = '200000';
       _showDialog("Excess","Value exceeds 200000");
       return false;
@@ -721,10 +724,10 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       return;
     }
 
-    if (htypeController == 'RENT' && rentController.text.isEmpty){
-      _showDialog("Error", "RENT CANNONT BE BLANK WHEN HOUSE TYPE IS RENT");
-      return;
-    }
+    // if (htypeController == 'RENT' && rentController.text.isEmpty){
+    //   _showDialog("Error", "RENT CANNONT BE BLANK WHEN HOUSE TYPE IS RENT");
+    //   return;
+    // }
 
     if (ceaController.text == '0' && isCea) {
       _showDialog("Error", "CEA cannot be blank when tuition fees are present.");
@@ -768,8 +771,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         'relief': reliefController.text,
         '80ee': ateeController.text,
         'rpaid': rpaidController.text,
-        // 'convcontuniform': convcontuniformController.text,
-        // 'other': otherController.text,
+        'taexem': convcontuniformController.text,
+        'other': otherController.text,
         '80ccd2': atccd2Controller.text,
         'totalsav': totalsavController.text,
         'maxsav': maxsavController.text,

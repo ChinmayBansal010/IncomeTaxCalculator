@@ -373,8 +373,10 @@ class _ItaxPageState extends State<ItaxPage> {
         int varHragross,
         int varNpagross,
         int varSplpaygross,
+        int varConvgross,
         int varPggross,
         int varAnnualgross,
+        int varUniformgross,
         int varNursinggross,
         int varTagross,
         int varDaontagross,
@@ -383,6 +385,7 @@ class _ItaxPageState extends State<ItaxPage> {
         int varWashinggross,
         int varTbgross,
         int varNightgross,
+        int varDrivegross,
         int varCyclegross,
         int varPcagross,
         int varNpsempgross,
@@ -434,8 +437,10 @@ class _ItaxPageState extends State<ItaxPage> {
         'thra': varHragross,
         'tnpa': varNpagross,
         'tsplpay': varSplpaygross,
+        'tconv': varConvgross,
         'tpg': varPggross,
         'tannual': varAnnualgross,
+        'tuniform': varUniformgross,
         'tnursing': varNursinggross,
         'tta': varTagross,
         'tdaonta': varDaontagross,
@@ -444,6 +449,7 @@ class _ItaxPageState extends State<ItaxPage> {
         'twashing': varWashinggross,
         'ttb': varTbgross,
         'tnight': varNightgross,
+        'tdrive': varDrivegross,
         'tcycle': varCyclegross,
         'tpca': varPcagross,
         'tnpsemp': varNpsempgross,
@@ -1195,8 +1201,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHramar = int.tryParse(marData['hra']?.toString() ?? '0') ?? 0;
       int varNpamar = int.tryParse(marData['npa']?.toString() ?? '0') ?? 0;
       int varSplpaymar = int.tryParse(marData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvmar = int.tryParse(marData['conv']?.toString() ?? '0') ?? 0;
       int varPgmar = int.tryParse(marData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualmar = int.tryParse(marData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformmar = int.tryParse(marData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingmar = int.tryParse(marData['nursing']?.toString() ?? '0') ?? 0;
       int varTamar = int.tryParse(marData['ta']?.toString() ?? '0') ?? 0;
       int varDaontamar = int.tryParse(marData['daonta']?.toString() ?? '0') ?? 0;
@@ -1205,6 +1213,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingmar = int.tryParse(marData['washing']?.toString() ?? '0') ?? 0;
       int varTbmar = int.tryParse(marData['tb']?.toString() ?? '0') ?? 0;
       int varNightmar = int.tryParse(marData['night']?.toString() ?? '0') ?? 0;
+      int varDrivemar = int.tryParse(marData['drive']?.toString() ?? '0') ?? 0;
       int varCyclemar = int.tryParse(marData['cycle']?.toString() ?? '0') ?? 0;
       int varPcamar = int.tryParse(marData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempmar = 0;
@@ -1222,9 +1231,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3mar = int.tryParse(marData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4mar = int.tryParse(marData['daext4']?.toString() ?? '0') ?? 0;
       int varSalarymar = [
-        varBpmar, varDamar, varHramar, varNpamar, varSplpaymar, varPgmar,
-        varAnnualmar, varNursingmar, varTamar, varDaontamar, varMedicalmar,
-        varDirtmar, varWashingmar, varTbmar, varNightmar, varCyclemar,
+        varBpmar, varDamar, varHramar, varNpamar, varSplpaymar, varConvmar, varPgmar,
+        varAnnualmar, varUniformmar, varNursingmar, varTamar, varDaontamar, varMedicalmar,
+        varDirtmar, varWashingmar, varTbmar, varNightmar, varDrivemar, varCyclemar,
         varPcamar, varNpsempmar, varOthermar, varDaext1mar, varDaext2mar, varDaext3mar, varDaext4mar,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxmar = int.tryParse(marData['incometax']?.toString() ?? '0') ?? 0;
@@ -1249,8 +1258,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraapr = int.tryParse(aprData['hra']?.toString() ?? '0') ?? 0;
       int varNpaapr = int.tryParse(aprData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayapr = int.tryParse(aprData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvapr = int.tryParse(aprData['conv']?.toString() ?? '0') ?? 0;
       int varPgapr = int.tryParse(aprData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualapr = int.tryParse(aprData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformapr = int.tryParse(aprData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingapr = int.tryParse(aprData['nursing']?.toString() ?? '0') ?? 0;
       int varTaapr = int.tryParse(aprData['ta']?.toString() ?? '0') ?? 0;
       int varDaontaapr = int.tryParse(aprData['daonta']?.toString() ?? '0') ?? 0;
@@ -1259,6 +1270,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingapr = int.tryParse(aprData['washing']?.toString() ?? '0') ?? 0;
       int varTbapr = int.tryParse(aprData['tb']?.toString() ?? '0') ?? 0;
       int varNightapr = int.tryParse(aprData['night']?.toString() ?? '0') ?? 0;
+      int varDriveapr = int.tryParse(aprData['drive']?.toString() ?? '0') ?? 0;
       int varCycleapr = int.tryParse(aprData['cycle']?.toString() ?? '0') ?? 0;
       int varPcaapr = int.tryParse(aprData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempapr = 0;
@@ -1276,9 +1288,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3apr = int.tryParse(aprData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4apr = int.tryParse(aprData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryapr = [
-        varBpapr, varDaapr, varHraapr, varNpaapr, varSplpayapr, varPgapr,
-        varAnnualapr, varNursingapr, varTaapr, varDaontaapr, varMedicalapr,
-        varDirtapr, varWashingapr, varTbapr, varNightapr, varCycleapr,
+        varBpapr, varDaapr, varHraapr, varNpaapr, varSplpayapr, varConvapr, varPgapr,
+        varAnnualapr, varUniformapr, varNursingapr, varTaapr, varDaontaapr, varMedicalapr,
+        varDirtapr, varWashingapr, varTbapr, varNightapr, varDriveapr, varCycleapr,
         varPcaapr, varNpsempapr, varOtherapr, varDaext1apr, varDaext2apr, varDaext3apr, varDaext4apr,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxapr = int.tryParse(aprData['incometax']?.toString() ?? '0') ?? 0;
@@ -1303,8 +1315,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHramay = int.tryParse(mayData['hra']?.toString() ?? '0') ?? 0;
       int varNpamay = int.tryParse(mayData['npa']?.toString() ?? '0') ?? 0;
       int varSplpaymay = int.tryParse(mayData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvmay = int.tryParse(mayData['conv']?.toString() ?? '0') ?? 0;
       int varPgmay = int.tryParse(mayData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualmay = int.tryParse(mayData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformmay = int.tryParse(mayData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingmay = int.tryParse(mayData['nursing']?.toString() ?? '0') ?? 0;
       int varTamay = int.tryParse(mayData['ta']?.toString() ?? '0') ?? 0;
       int varDaontamay = int.tryParse(mayData['daonta']?.toString() ?? '0') ?? 0;
@@ -1313,6 +1327,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingmay = int.tryParse(mayData['washing']?.toString() ?? '0') ?? 0;
       int varTbmay = int.tryParse(mayData['tb']?.toString() ?? '0') ?? 0;
       int varNightmay = int.tryParse(mayData['night']?.toString() ?? '0') ?? 0;
+      int varDrivemay = int.tryParse(mayData['drive']?.toString() ?? '0') ?? 0;
       int varCyclemay = int.tryParse(mayData['cycle']?.toString() ?? '0') ?? 0;
       int varPcamay = int.tryParse(mayData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempmay = 0;
@@ -1330,9 +1345,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3may = int.tryParse(mayData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4may = int.tryParse(mayData['daext4']?.toString() ?? '0') ?? 0;
       int varSalarymay = [
-        varBpmay, varDamay, varHramay, varNpamay, varSplpaymay, varPgmay,
-        varAnnualmay, varNursingmay, varTamay, varDaontamay, varMedicalmay,
-        varDirtmay, varWashingmay, varTbmay, varNightmay, varCyclemay,
+        varBpmay, varDamay, varHramay, varNpamay, varSplpaymay, varConvmay, varPgmay,
+        varAnnualmay, varUniformmay, varNursingmay, varTamay, varDaontamay, varMedicalmay,
+        varDirtmay, varWashingmay, varTbmay, varNightmay, varDrivemay, varCyclemay,
         varPcamay, varNpsempmay, varOthermay, varDaext1may, varDaext2may, varDaext3may, varDaext4may,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxmay = int.tryParse(mayData['incometax']?.toString() ?? '0') ?? 0;
@@ -1359,8 +1374,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraarrearqtr1 = int.tryParse(arrearData['mmhra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr1 = int.tryParse(arrearData['mmnpa']?.toString() ?? '0') ?? 0;
       int varSplpayarrearqtr1 = int.tryParse('0') ?? 0;
+      int varConvarrearqtr1 = int.tryParse('0') ?? 0;
       int varPgarrearqtr1 = int.tryParse('0') ?? 0;
       int varAnnualarrearqtr1 = int.tryParse('0')?? 0;
+      int varUniformarrearqtr1 = int.tryParse('0')?? 0;
       int varNursingarrearqtr1 = int.tryParse('0') ?? 0;
       int varTaarrearqtr1 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr1 = int.tryParse(arrearData['mmdaonta']?.toString() ?? '0') ?? 0;
@@ -1369,6 +1386,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingarrearqtr1 = int.tryParse('0') ?? 0;
       int varTbarrearqtr1 = int.tryParse('0') ?? 0;
       int varNightarrearqtr1 = int.tryParse('0') ?? 0;
+      int varDrivearrearqtr1 = int.tryParse('0') ?? 0;
       int varCyclearrearqtr1 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr1 = int.tryParse(arrearData['mmpca']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr1 = int.tryParse('0') ?? 0;
@@ -1378,9 +1396,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3arrearqtr1 = int.tryParse('0') ?? 0;
       int varDaext4arrearqtr1 = int.tryParse('0') ?? 0;
       int varSalaryarrearqtr1 = [
-        varBparrearqtr1, varDaarrearqtr1, varHraarrearqtr1, varNpaarrearqtr1, varSplpayarrearqtr1, varPgarrearqtr1,
-        varAnnualarrearqtr1, varNursingarrearqtr1, varTaarrearqtr1, varDaontaarrearqtr1, varMedicalarrearqtr1,
-        varDirtarrearqtr1, varWashingarrearqtr1, varTbarrearqtr1, varNightarrearqtr1, varCyclearrearqtr1,
+        varBparrearqtr1, varDaarrearqtr1, varHraarrearqtr1, varNpaarrearqtr1, varSplpayarrearqtr1, varConvarrearqtr1, varPgarrearqtr1,
+        varAnnualarrearqtr1, varUniformarrearqtr1, varNursingarrearqtr1, varTaarrearqtr1, varDaontaarrearqtr1, varMedicalarrearqtr1,
+        varDirtarrearqtr1, varWashingarrearqtr1, varTbarrearqtr1, varNightarrearqtr1, varDrivearrearqtr1, varCyclearrearqtr1,
         varPcaarrearqtr1, varNpsemparrearqtr1, varOtherarrearqtr1, varDaext1arrearqtr1, varDaext2arrearqtr1, varDaext3arrearqtr1, varDaext4arrearqtr1,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxarrearqtr1 = int.tryParse(arrearData['mmext1']?.toString() ?? '0') ?? 0;
@@ -1405,8 +1423,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraqtr1 = [varHramar, varHraapr, varHramay, varHraarrearqtr1].fold(0, (sum, value) => sum + value);
       int varNpaqtr1 = [varNpamar, varNpaapr, varNpamay, varNpaarrearqtr1].fold(0, (sum, value) => sum + value);
       int varSplpayqtr1 = [varSplpaymar, varSplpayapr, varSplpaymay, varSplpayarrearqtr1].fold(0, (sum, value) => sum + value);
+      int varConvqtr1 = [varConvmar, varConvapr, varConvmay, varConvarrearqtr1].fold(0, (sum, value) => sum + value);
       int varPgqtr1 = [varPgmar, varPgapr, varPgmay, varPgarrearqtr1].fold(0, (sum, value) => sum + value);
       int varAnnualqtr1 = [varAnnualmar, varAnnualapr, varAnnualmay, varAnnualarrearqtr1].fold(0, (sum, value) => sum + value);
+      int varUniformqtr1 = [varUniformmar, varUniformapr, varUniformmay, varUniformarrearqtr1].fold(0, (sum, value) => sum + value);
       int varNursingqtr1 = [varNursingmar, varNursingapr, varNursingmay, varNursingarrearqtr1].fold(0, (sum, value) => sum + value);
       int varTaqtr1 = [varTamar, varTaapr, varTamay, varTaarrearqtr1].fold(0, (sum, value) => sum + value);
       int varDaontaqtr1 = [varDaontamar, varDaontaapr, varDaontamay, varDaontaarrearqtr1].fold(0, (sum, value) => sum + value);
@@ -1415,6 +1435,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingqtr1 = [varWashingmar, varWashingapr, varWashingmay, varWashingarrearqtr1].fold(0, (sum, value) => sum + value);
       int varTbqtr1 = [varTbmar, varTbapr, varTbmay, varTbarrearqtr1].fold(0, (sum, value) => sum + value);
       int varNightqtr1 = [varNightmar, varNightapr, varNightmay, varNightarrearqtr1].fold(0, (sum, value) => sum + value);
+      int varDriveqtr1 = [varDrivemar, varDriveapr, varDrivemay, varDrivearrearqtr1].fold(0, (sum, value) => sum + value);
       int varCycleqtr1 = [varCyclemar, varCycleapr, varCyclemay, varCyclearrearqtr1].fold(0, (sum, value) => sum + value);
       int varPcaqtr1 = [varPcamar, varPcaapr, varPcamay, varPcaarrearqtr1].fold(0, (sum, value) => sum + value);
       int varNpsempqtr1 = [varNpsempmar, varNpsempapr, varNpsempmay, varNpsemparrearqtr1].fold(0, (sum, value) => sum + value);
@@ -1423,9 +1444,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext2qtr1 = [varDaext2mar, varDaext2apr, varDaext2may, varDaext2arrearqtr1].fold(0, (sum, value) => sum + value);
       int varDaext3qtr1 = [varDaext3mar, varDaext3apr, varDaext3may, varDaext3arrearqtr1].fold(0, (sum, value) => sum + value);
       int varDaext4qtr1 = [varDaext4mar, varDaext4apr, varDaext4may, varDaext4arrearqtr1].fold(0, (sum, value) => sum + value);
-      int varSalaryqtr1 = [varBpqtr1, varDaqtr1, varHraqtr1, varNpaqtr1, varSplpayqtr1, varPgqtr1,
-        varAnnualqtr1, varNursingqtr1, varTaqtr1, varDaontaqtr1, varMedicalqtr1,
-        varDirtqtr1, varWashingqtr1, varTbqtr1, varNightqtr1, varCycleqtr1,
+      int varSalaryqtr1 = [varBpqtr1, varDaqtr1, varHraqtr1, varNpaqtr1, varSplpayqtr1, varConvqtr1, varPgqtr1,
+        varAnnualqtr1, varUniformqtr1, varNursingqtr1, varTaqtr1, varDaontaqtr1, varMedicalqtr1,
+        varDirtqtr1, varWashingqtr1, varTbqtr1, varNightqtr1, varDriveqtr1, varCycleqtr1,
         varPcaqtr1, varNpsempqtr1, varOtherqtr1, varDaext1qtr1, varDaext2qtr1, varDaext3qtr1, varDaext4qtr1,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxqtr1 = [varIncometaxmar, varIncometaxapr, varIncometaxmay, varIncometaxarrearqtr1].fold(0, (sum, value) => sum + value);
@@ -1450,8 +1471,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHrajun = int.tryParse(junData['hra']?.toString() ?? '0') ?? 0;
       int varNpajun = int.tryParse(junData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayjun = int.tryParse(junData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvjun = int.tryParse(junData['conv']?.toString() ?? '0') ?? 0;
       int varPgjun = int.tryParse(junData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualjun = int.tryParse(junData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformjun = int.tryParse(junData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingjun = int.tryParse(junData['nursing']?.toString() ?? '0') ?? 0;
       int varTajun = int.tryParse(junData['ta']?.toString() ?? '0') ?? 0;
       int varDaontajun = int.tryParse(junData['daonta']?.toString() ?? '0') ?? 0;
@@ -1460,6 +1483,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingjun = int.tryParse(junData['washing']?.toString() ?? '0') ?? 0;
       int varTbjun = int.tryParse(junData['tb']?.toString() ?? '0') ?? 0;
       int varNightjun = int.tryParse(junData['night']?.toString() ?? '0') ?? 0;
+      int varDrivejun = int.tryParse(junData['drive']?.toString() ?? '0') ?? 0;
       int varCyclejun = int.tryParse(junData['cycle']?.toString() ?? '0') ?? 0;
       int varPcajun = int.tryParse(junData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempjun = 0;
@@ -1477,9 +1501,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3jun = int.tryParse(junData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4jun = int.tryParse(junData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryjun = [
-        varBpjun, varDajun, varHrajun, varNpajun, varSplpayjun, varPgjun,
-        varAnnualjun, varNursingjun, varTajun, varDaontajun, varMedicaljun,
-        varDirtjun, varWashingjun, varTbjun, varNightjun, varCyclejun,
+        varBpjun, varDajun, varHrajun, varNpajun, varSplpayjun, varConvjun, varPgjun,
+        varAnnualjun, varUniformjun, varNursingjun, varTajun, varDaontajun, varMedicaljun,
+        varDirtjun, varWashingjun, varTbjun, varNightjun, varDrivejun, varCyclejun,
         varPcajun, varNpsempjun, varOtherjun, varDaext1jun, varDaext2jun, varDaext3jun, varDaext4jun,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxjun = int.tryParse(junData['incometax']?.toString() ?? '0') ?? 0;
@@ -1504,8 +1528,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHrajul = int.tryParse(julData['hra']?.toString() ?? '0') ?? 0;
       int varNpajul = int.tryParse(julData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayjul = int.tryParse(julData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvjul = int.tryParse(julData['conv']?.toString() ?? '0') ?? 0;
       int varPgjul = int.tryParse(julData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualjul = int.tryParse(julData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformjul = int.tryParse(julData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingjul = int.tryParse(julData['nursing']?.toString() ?? '0') ?? 0;
       int varTajul = int.tryParse(julData['ta']?.toString() ?? '0') ?? 0;
       int varDaontajul = int.tryParse(julData['daonta']?.toString() ?? '0') ?? 0;
@@ -1514,6 +1540,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingjul = int.tryParse(julData['washing']?.toString() ?? '0') ?? 0;
       int varTbjul = int.tryParse(julData['tb']?.toString() ?? '0') ?? 0;
       int varNightjul = int.tryParse(julData['night']?.toString() ?? '0') ?? 0;
+      int varDrivejul = int.tryParse(julData['drive']?.toString() ?? '0') ?? 0;
       int varCyclejul = int.tryParse(julData['cycle']?.toString() ?? '0') ?? 0;
       int varPcajul = int.tryParse(julData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempjul = 0;
@@ -1531,9 +1558,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3jul = int.tryParse(julData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4jul = int.tryParse(julData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryjul = [
-        varBpjul, varDajul, varHrajul, varNpajul, varSplpayjul, varPgjul,
-        varAnnualjul, varNursingjul, varTajul, varDaontajul, varMedicaljul,
-        varDirtjul, varWashingjul, varTbjul, varNightjul, varCyclejul,
+        varBpjul, varDajul, varHrajul, varNpajul, varSplpayjul, varConvjul, varPgjul,
+        varAnnualjul, varUniformjul, varNursingjul, varTajul, varDaontajul, varMedicaljul,
+        varDirtjul, varWashingjul, varTbjul, varNightjul, varDrivejul, varCyclejul,
         varPcajul, varNpsempjul, varOtherjul, varDaext1jul, varDaext2jul, varDaext3jul, varDaext4jul,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxjul = int.tryParse(julData['incometax']?.toString() ?? '0') ?? 0;
@@ -1558,8 +1585,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraaug = int.tryParse(augData['hra']?.toString() ?? '0') ?? 0;
       int varNpaaug = int.tryParse(augData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayaug = int.tryParse(augData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvaug = int.tryParse(augData['conv']?.toString() ?? '0') ?? 0;
       int varPgaug = int.tryParse(augData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualaug = int.tryParse(augData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformaug = int.tryParse(augData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingaug = int.tryParse(augData['nursing']?.toString() ?? '0') ?? 0;
       int varTaaug = int.tryParse(augData['ta']?.toString() ?? '0') ?? 0;
       int varDaontaaug = int.tryParse(augData['daonta']?.toString() ?? '0') ?? 0;
@@ -1568,6 +1597,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingaug = int.tryParse(augData['washing']?.toString() ?? '0') ?? 0;
       int varTbaug = int.tryParse(augData['tb']?.toString() ?? '0') ?? 0;
       int varNightaug = int.tryParse(augData['night']?.toString() ?? '0') ?? 0;
+      int varDriveaug = int.tryParse(augData['drive']?.toString() ?? '0') ?? 0;
       int varCycleaug = int.tryParse(augData['cycle']?.toString() ?? '0') ?? 0;
       int varPcaaug = int.tryParse(augData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempaug = 0;
@@ -1585,9 +1615,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3aug = int.tryParse(augData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4aug = int.tryParse(augData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryaug = [
-        varBpaug, varDaaug, varHraaug, varNpaaug, varSplpayaug, varPgaug,
-        varAnnualaug, varNursingaug, varTaaug, varDaontaaug, varMedicalaug,
-        varDirtaug, varWashingaug, varTbaug, varNightaug, varCycleaug,
+        varBpaug, varDaaug, varHraaug, varNpaaug, varSplpayaug, varConvaug, varPgaug,
+        varAnnualaug, varUniformaug, varNursingaug, varTaaug, varDaontaaug, varMedicalaug,
+        varDirtaug, varWashingaug, varTbaug, varNightaug, varDriveaug, varCycleaug,
         varPcaaug, varNpsempaug, varOtheraug, varDaext1aug, varDaext2aug, varDaext3aug, varDaext4aug,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxaug = int.tryParse(augData['incometax']?.toString() ?? '0') ?? 0;
@@ -1614,8 +1644,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraarrearqtr2 = int.tryParse(arrearData['jahra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr2 = int.tryParse(arrearData['janpa']?.toString() ?? '0') ?? 0;
       int varSplpayarrearqtr2 = int.tryParse('0') ?? 0;
+      int varConvarrearqtr2 = int.tryParse('0') ?? 0;
       int varPgarrearqtr2 = int.tryParse('0') ?? 0;
       int varAnnualarrearqtr2 = int.tryParse('0')?? 0;
+      int varUniformarrearqtr2 = int.tryParse('0')?? 0;
       int varNursingarrearqtr2 = int.tryParse('0') ?? 0;
       int varTaarrearqtr2 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr2 = int.tryParse(arrearData['jadaonta']?.toString() ?? '0') ?? 0;
@@ -1624,6 +1656,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingarrearqtr2 = int.tryParse('0') ?? 0;
       int varTbarrearqtr2 = int.tryParse('0') ?? 0;
       int varNightarrearqtr2 = int.tryParse('0') ?? 0;
+      int varDrivearrearqtr2 = int.tryParse('0') ?? 0;
       int varCyclearrearqtr2 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr2 = int.tryParse(arrearData['japca']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr2 = int.tryParse('0') ?? 0;
@@ -1633,9 +1666,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3arrearqtr2 = int.tryParse('0') ?? 0;
       int varDaext4arrearqtr2 = int.tryParse('0') ?? 0;
       int varSalaryarrearqtr2 = [
-        varBparrearqtr2, varDaarrearqtr2, varHraarrearqtr2, varNpaarrearqtr2, varSplpayarrearqtr2, varPgarrearqtr2,
-        varAnnualarrearqtr2, varNursingarrearqtr2, varTaarrearqtr2, varDaontaarrearqtr2, varMedicalarrearqtr2,
-        varDirtarrearqtr2, varWashingarrearqtr2, varTbarrearqtr2, varNightarrearqtr2, varCyclearrearqtr2,
+        varBparrearqtr2, varDaarrearqtr2, varHraarrearqtr2, varNpaarrearqtr2, varSplpayarrearqtr2, varConvarrearqtr2, varPgarrearqtr2,
+        varAnnualarrearqtr2, varUniformarrearqtr2, varNursingarrearqtr2, varTaarrearqtr2, varDaontaarrearqtr2, varMedicalarrearqtr2,
+        varDirtarrearqtr2, varWashingarrearqtr2, varTbarrearqtr2, varNightarrearqtr2, varDrivearrearqtr2, varCyclearrearqtr2,
         varPcaarrearqtr2, varNpsemparrearqtr2, varOtherarrearqtr2, varDaext1arrearqtr2, varDaext2arrearqtr2, varDaext3arrearqtr2, varDaext4arrearqtr2,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxarrearqtr2 = int.tryParse(arrearData['jaext1']?.toString() ?? '0') ?? 0;
@@ -1660,8 +1693,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraqtr2 = [varHrajun, varHrajul, varHraaug, varHraarrearqtr2].fold(0, (sum, value) => sum + value);
       int varNpaqtr2 = [varNpajun, varNpajul, varNpaaug, varNpaarrearqtr2].fold(0, (sum, value) => sum + value);
       int varSplpayqtr2 = [varSplpayjun, varSplpayjul, varSplpayaug, varSplpayarrearqtr2].fold(0, (sum, value) => sum + value);
+      int varConvqtr2 = [varConvjun, varConvjul, varConvaug, varConvarrearqtr2].fold(0, (sum, value) => sum + value);
       int varPgqtr2 = [varPgjun, varPgjul, varPgaug, varPgarrearqtr2].fold(0, (sum, value) => sum + value);
       int varAnnualqtr2 = [varAnnualjun, varAnnualjul, varAnnualaug, varAnnualarrearqtr2].fold(0, (sum, value) => sum + value);
+      int varUniformqtr2 = [varUniformjun, varUniformjul, varUniformaug, varUniformarrearqtr2].fold(0, (sum, value) => sum + value);
       int varNursingqtr2 = [varNursingjun, varNursingjul, varNursingaug, varNursingarrearqtr2].fold(0, (sum, value) => sum + value);
       int varTaqtr2 = [varTajun, varTajul, varTaaug, varTaarrearqtr2].fold(0, (sum, value) => sum + value);
       int varDaontaqtr2 = [varDaontajun, varDaontajul, varDaontaaug, varDaontaarrearqtr2].fold(0, (sum, value) => sum + value);
@@ -1670,6 +1705,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingqtr2 = [varWashingjun, varWashingjul, varWashingaug, varWashingarrearqtr2].fold(0, (sum, value) => sum + value);
       int varTbqtr2 = [varTbjun, varTbjul, varTbaug, varTbarrearqtr2].fold(0, (sum, value) => sum + value);
       int varNightqtr2 = [varNightjun, varNightjul, varNightaug, varNightarrearqtr2].fold(0, (sum, value) => sum + value);
+      int varDriveqtr2 = [varDrivejun, varDrivejul, varDriveaug, varDrivearrearqtr2].fold(0, (sum, value) => sum + value);
       int varCycleqtr2 = [varCyclejun, varCyclejul, varCycleaug, varCyclearrearqtr2].fold(0, (sum, value) => sum + value);
       int varPcaqtr2 = [varPcajun, varPcajul, varPcaaug, varPcaarrearqtr2].fold(0, (sum, value) => sum + value);
       int varNpsempqtr2 = [varNpsempjun, varNpsempjul, varNpsempaug, varNpsemparrearqtr2].fold(0, (sum, value) => sum + value);
@@ -1678,9 +1714,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext2qtr2 = [varDaext2jun, varDaext2jul, varDaext2aug, varDaext2arrearqtr2].fold(0, (sum, value) => sum + value);
       int varDaext3qtr2 = [varDaext3jun, varDaext3jul, varDaext3aug, varDaext3arrearqtr2].fold(0, (sum, value) => sum + value);
       int varDaext4qtr2 = [varDaext4jun, varDaext4jul, varDaext4aug, varDaext4arrearqtr2].fold(0, (sum, value) => sum + value);
-      int varSalaryqtr2 = [varBpqtr2, varDaqtr2, varHraqtr2, varNpaqtr2, varSplpayqtr2, varPgqtr2,
-        varAnnualqtr2, varNursingqtr2, varTaqtr2, varDaontaqtr2, varMedicalqtr2,
-        varDirtqtr2, varWashingqtr2, varTbqtr2, varNightqtr2, varCycleqtr2,
+      int varSalaryqtr2 = [varBpqtr2, varDaqtr2, varHraqtr2, varNpaqtr2, varSplpayqtr2, varConvqtr2, varPgqtr2,
+        varAnnualqtr2, varUniformqtr2, varNursingqtr2, varTaqtr2, varDaontaqtr2, varMedicalqtr2,
+        varDirtqtr2, varWashingqtr2, varTbqtr2, varNightqtr2, varDriveqtr2, varCycleqtr2,
         varPcaqtr2, varNpsempqtr2, varOtherqtr2, varDaext1qtr2, varDaext2qtr2, varDaext3qtr2, varDaext4qtr2,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxqtr2 = [varIncometaxjun, varIncometaxjul, varIncometaxaug, varIncometaxarrearqtr2].fold(0, (sum, value) => sum + value);
@@ -1705,8 +1741,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHrasept = int.tryParse(septData['hra']?.toString() ?? '0') ?? 0;
       int varNpasept = int.tryParse(septData['npa']?.toString() ?? '0') ?? 0;
       int varSplpaysept = int.tryParse(septData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvsept = int.tryParse(septData['conv']?.toString() ?? '0') ?? 0;
       int varPgsept = int.tryParse(septData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualsept = int.tryParse(septData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformsept = int.tryParse(septData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingsept = int.tryParse(septData['nursing']?.toString() ?? '0') ?? 0;
       int varTasept = int.tryParse(septData['ta']?.toString() ?? '0') ?? 0;
       int varDaontasept = int.tryParse(septData['daonta']?.toString() ?? '0') ?? 0;
@@ -1715,6 +1753,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingsept = int.tryParse(septData['washing']?.toString() ?? '0') ?? 0;
       int varTbsept = int.tryParse(septData['tb']?.toString() ?? '0') ?? 0;
       int varNightsept = int.tryParse(septData['night']?.toString() ?? '0') ?? 0;
+      int varDrivesept = int.tryParse(septData['drive']?.toString() ?? '0') ?? 0;
       int varCyclesept = int.tryParse(septData['cycle']?.toString() ?? '0') ?? 0;
       int varPcasept = int.tryParse(septData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempsept = 0;
@@ -1732,9 +1771,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3sept = int.tryParse(septData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4sept = int.tryParse(septData['daext4']?.toString() ?? '0') ?? 0;
       int varSalarysept = [
-        varBpsept, varDasept, varHrasept, varNpasept, varSplpaysept, varPgsept,
-        varAnnualsept, varNursingsept, varTasept, varDaontasept, varMedicalsept,
-        varDirtsept, varWashingsept, varTbsept, varNightsept, varCyclesept,
+        varBpsept, varDasept, varHrasept, varNpasept, varSplpaysept, varConvsept, varPgsept,
+        varAnnualsept, varUniformsept, varNursingsept, varTasept, varDaontasept, varMedicalsept,
+        varDirtsept, varWashingsept, varTbsept, varNightsept, varDrivesept, varCyclesept,
         varPcasept, varNpsempsept, varOthersept, varDaext1sept, varDaext2sept, varDaext3sept, varDaext4sept,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxsept = int.tryParse(septData['incometax']?.toString() ?? '0') ?? 0;
@@ -1759,8 +1798,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraoct = int.tryParse(octData['hra']?.toString() ?? '0') ?? 0;
       int varNpaoct = int.tryParse(octData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayoct = int.tryParse(octData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvoct = int.tryParse(octData['conv']?.toString() ?? '0') ?? 0;
       int varPgoct = int.tryParse(octData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualoct = int.tryParse(octData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformoct = int.tryParse(octData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingoct = int.tryParse(octData['nursing']?.toString() ?? '0') ?? 0;
       int varTaoct = int.tryParse(octData['ta']?.toString() ?? '0') ?? 0;
       int varDaontaoct = int.tryParse(octData['daonta']?.toString() ?? '0') ?? 0;
@@ -1769,6 +1810,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingoct = int.tryParse(octData['washing']?.toString() ?? '0') ?? 0;
       int varTboct = int.tryParse(octData['tb']?.toString() ?? '0') ?? 0;
       int varNightoct = int.tryParse(octData['night']?.toString() ?? '0') ?? 0;
+      int varDriveoct = int.tryParse(octData['drive']?.toString() ?? '0') ?? 0;
       int varCycleoct = int.tryParse(octData['cycle']?.toString() ?? '0') ?? 0;
       int varPcaoct = int.tryParse(octData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempoct = 0;
@@ -1786,9 +1828,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3oct = int.tryParse(octData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4oct = int.tryParse(octData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryoct = [
-        varBpoct, varDaoct, varHraoct, varNpaoct, varSplpayoct, varPgoct,
-        varAnnualoct, varNursingoct, varTaoct, varDaontaoct, varMedicaloct,
-        varDirtoct, varWashingoct, varTboct, varNightoct, varCycleoct,
+        varBpoct, varDaoct, varHraoct, varNpaoct, varSplpayoct, varConvoct, varPgoct,
+        varAnnualoct, varUniformoct, varNursingoct, varTaoct, varDaontaoct, varMedicaloct,
+        varDirtoct, varWashingoct, varTboct, varNightoct, varDriveoct, varCycleoct,
         varPcaoct, varNpsempoct, varOtheroct, varDaext1oct, varDaext2oct, varDaext3oct, varDaext4oct,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxoct = int.tryParse(octData['incometax']?.toString() ?? '0') ?? 0;
@@ -1813,8 +1855,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHranov = int.tryParse(novData['hra']?.toString() ?? '0') ?? 0;
       int varNpanov = int.tryParse(novData['npa']?.toString() ?? '0') ?? 0;
       int varSplpaynov = int.tryParse(novData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvnov = int.tryParse(novData['conv']?.toString() ?? '0') ?? 0;
       int varPgnov = int.tryParse(novData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualnov = int.tryParse(novData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformnov = int.tryParse(novData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingnov = int.tryParse(novData['nursing']?.toString() ?? '0') ?? 0;
       int varTanov = int.tryParse(novData['ta']?.toString() ?? '0') ?? 0;
       int varDaontanov = int.tryParse(novData['daonta']?.toString() ?? '0') ?? 0;
@@ -1823,6 +1867,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingnov = int.tryParse(novData['washing']?.toString() ?? '0') ?? 0;
       int varTbnov = int.tryParse(novData['tb']?.toString() ?? '0') ?? 0;
       int varNightnov = int.tryParse(novData['night']?.toString() ?? '0') ?? 0;
+      int varDrivenov = int.tryParse(novData['drive']?.toString() ?? '0') ?? 0;
       int varCyclenov = int.tryParse(novData['cycle']?.toString() ?? '0') ?? 0;
       int varPcanov = int.tryParse(novData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempnov = 0;
@@ -1840,9 +1885,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3nov = int.tryParse(novData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4nov = int.tryParse(novData['daext4']?.toString() ?? '0') ?? 0;
       int varSalarynov = [
-        varBpnov, varDanov, varHranov, varNpanov, varSplpaynov, varPgnov,
-        varAnnualnov, varNursingnov, varTanov, varDaontanov, varMedicalnov,
-        varDirtnov, varWashingnov, varTbnov, varNightnov, varCyclenov,
+        varBpnov, varDanov, varHranov, varNpanov, varSplpaynov, varConvnov, varPgnov,
+        varAnnualnov, varUniformnov, varNursingnov, varTanov, varDaontanov, varMedicalnov,
+        varDirtnov, varWashingnov, varTbnov, varNightnov, varDrivenov, varCyclenov,
         varPcanov, varNpsempnov, varOthernov, varDaext1nov, varDaext2nov, varDaext3nov, varDaext4nov,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxnov = int.tryParse(novData['incometax']?.toString() ?? '0') ?? 0;
@@ -1861,16 +1906,16 @@ class _ItaxPageState extends State<ItaxPage> {
       int varTotaldednov = int.tryParse(novData['totalded']?.toString() ?? '0') ?? 0;
       int varNetsalarynov = int.tryParse(novData['netsalary']?.toString() ?? '0') ?? 0;
 
-
-
       // ============================= arrearqtr3 ==============================
       int varBparrearqtr3 = int.tryParse('0') ?? 0;
       int varDaarrearqtr3 = int.tryParse(arrearData['snda']?.toString() ?? '0') ?? 0;
       int varHraarrearqtr3 = int.tryParse(arrearData['snhra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr3 = int.tryParse(arrearData['snnpa']?.toString() ?? '0') ?? 0;
       int varSplpayarrearqtr3 = int.tryParse('0') ?? 0;
+      int varConvarrearqtr3 = int.tryParse('0') ?? 0;
       int varPgarrearqtr3 = int.tryParse('0') ?? 0;
       int varAnnualarrearqtr3 = int.tryParse('0')?? 0;
+      int varUniformarrearqtr3 = int.tryParse('0')?? 0;
       int varNursingarrearqtr3 = int.tryParse('0') ?? 0;
       int varTaarrearqtr3 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr3 = int.tryParse(arrearData['sndaonta']?.toString() ?? '0') ?? 0;
@@ -1879,6 +1924,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingarrearqtr3 = int.tryParse('0') ?? 0;
       int varTbarrearqtr3 = int.tryParse('0') ?? 0;
       int varNightarrearqtr3 = int.tryParse('0') ?? 0;
+      int varDrivearrearqtr3 = int.tryParse('0') ?? 0;
       int varCyclearrearqtr3 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr3 = int.tryParse(arrearData['snpca']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr3 = int.tryParse('0') ?? 0;
@@ -1888,9 +1934,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3arrearqtr3 = int.tryParse('0') ?? 0;
       int varDaext4arrearqtr3 = int.tryParse('0') ?? 0;
       int varSalaryarrearqtr3 = [
-        varBparrearqtr3, varDaarrearqtr3, varHraarrearqtr3, varNpaarrearqtr3, varSplpayarrearqtr3, varPgarrearqtr3,
-        varAnnualarrearqtr3, varNursingarrearqtr3, varTaarrearqtr3, varDaontaarrearqtr3, varMedicalarrearqtr3,
-        varDirtarrearqtr3, varWashingarrearqtr3, varTbarrearqtr3, varNightarrearqtr3, varCyclearrearqtr3,
+        varBparrearqtr3, varDaarrearqtr3, varHraarrearqtr3, varNpaarrearqtr3, varSplpayarrearqtr3, varConvarrearqtr3, varPgarrearqtr3,
+        varAnnualarrearqtr3, varUniformarrearqtr3, varNursingarrearqtr3, varTaarrearqtr3, varDaontaarrearqtr3, varMedicalarrearqtr3,
+        varDirtarrearqtr3, varWashingarrearqtr3, varTbarrearqtr3, varNightarrearqtr3, varDrivearrearqtr3, varCyclearrearqtr3,
         varPcaarrearqtr3, varNpsemparrearqtr3, varOtherarrearqtr3, varDaext1arrearqtr3, varDaext2arrearqtr3, varDaext3arrearqtr3, varDaext4arrearqtr3,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxarrearqtr3 = int.tryParse(arrearData['snext1']?.toString() ?? '0') ?? 0;
@@ -1915,8 +1961,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraqtr3 = [varHrasept, varHraoct, varHranov, varHraarrearqtr3].fold(0, (sum, value) => sum + value);
       int varNpaqtr3 = [varNpasept, varNpaoct, varNpanov, varNpaarrearqtr3].fold(0, (sum, value) => sum + value);
       int varSplpayqtr3 = [varSplpaysept, varSplpayoct, varSplpaynov, varSplpayarrearqtr3].fold(0, (sum, value) => sum + value);
+      int varConvqtr3 = [varConvsept, varConvoct, varConvnov, varConvarrearqtr3].fold(0, (sum, value) => sum + value);
       int varPgqtr3 = [varPgsept, varPgoct, varPgnov, varPgarrearqtr3].fold(0, (sum, value) => sum + value);
       int varAnnualqtr3 = [varAnnualsept, varAnnualoct, varAnnualnov, varAnnualarrearqtr3].fold(0, (sum, value) => sum + value);
+      int varUniformqtr3 = [varUniformsept, varUniformoct, varUniformnov, varUniformarrearqtr3].fold(0, (sum, value) => sum + value);
       int varNursingqtr3 = [varNursingsept, varNursingoct, varNursingnov, varNursingarrearqtr3].fold(0, (sum, value) => sum + value);
       int varTaqtr3 = [varTasept, varTaoct, varTanov, varTaarrearqtr3].fold(0, (sum, value) => sum + value);
       int varDaontaqtr3 = [varDaontasept, varDaontaoct, varDaontanov, varDaontaarrearqtr3].fold(0, (sum, value) => sum + value);
@@ -1925,6 +1973,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingqtr3 = [varWashingsept, varWashingoct, varWashingnov, varWashingarrearqtr3].fold(0, (sum, value) => sum + value);
       int varTbqtr3 = [varTbsept, varTboct, varTbnov, varTbarrearqtr3].fold(0, (sum, value) => sum + value);
       int varNightqtr3 = [varNightsept, varNightoct, varNightnov, varNightarrearqtr3].fold(0, (sum, value) => sum + value);
+      int varDriveqtr3 = [varDrivesept, varDriveoct, varDrivenov, varDrivearrearqtr3].fold(0, (sum, value) => sum + value);
       int varCycleqtr3 = [varCyclesept, varCycleoct, varCyclenov, varCyclearrearqtr3].fold(0, (sum, value) => sum + value);
       int varPcaqtr3 = [varPcasept, varPcaoct, varPcanov, varPcaarrearqtr3].fold(0, (sum, value) => sum + value);
       int varNpsempqtr3 = [varNpsempsept, varNpsempoct, varNpsempnov, varNpsemparrearqtr3].fold(0, (sum, value) => sum + value);
@@ -1933,9 +1982,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext2qtr3 = [varDaext2sept, varDaext2oct, varDaext2nov, varDaext2arrearqtr3].fold(0, (sum, value) => sum + value);
       int varDaext3qtr3 = [varDaext3sept, varDaext3oct, varDaext3nov, varDaext3arrearqtr3].fold(0, (sum, value) => sum + value);
       int varDaext4qtr3 = [varDaext4sept, varDaext4oct, varDaext4nov, varDaext4arrearqtr3].fold(0, (sum, value) => sum + value);
-      int varSalaryqtr3 = [varBpqtr3, varDaqtr3, varHraqtr3, varNpaqtr3, varSplpayqtr3, varPgqtr3,
-        varAnnualqtr3, varNursingqtr3, varTaqtr3, varDaontaqtr3, varMedicalqtr3,
-        varDirtqtr3, varWashingqtr3, varTbqtr3, varNightqtr3, varCycleqtr3,
+      int varSalaryqtr3 = [varBpqtr3, varDaqtr3, varHraqtr3, varNpaqtr3, varSplpayqtr3, varConvqtr3, varPgqtr3,
+        varAnnualqtr3, varUniformqtr3, varNursingqtr3, varTaqtr3, varDaontaqtr3, varMedicalqtr3,
+        varDirtqtr3, varWashingqtr3, varTbqtr3, varNightqtr3, varDriveqtr3, varCycleqtr3,
         varPcaqtr3, varNpsempqtr3, varOtherqtr3, varDaext1qtr3, varDaext2qtr3, varDaext3qtr3, varDaext4qtr3,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxqtr3 = [varIncometaxsept, varIncometaxoct, varIncometaxnov, varIncometaxarrearqtr3].fold(0, (sum, value) => sum + value);
@@ -1960,8 +2009,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHradec = int.tryParse(decData['hra']?.toString() ?? '0') ?? 0;
       int varNpadec = int.tryParse(decData['npa']?.toString() ?? '0') ?? 0;
       int varSplpaydec = int.tryParse(decData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvdec = int.tryParse(decData['conv']?.toString() ?? '0') ?? 0;
       int varPgdec = int.tryParse(decData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualdec = int.tryParse(decData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformdec = int.tryParse(decData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingdec = int.tryParse(decData['nursing']?.toString() ?? '0') ?? 0;
       int varTadec = int.tryParse(decData['ta']?.toString() ?? '0') ?? 0;
       int varDaontadec = int.tryParse(decData['daonta']?.toString() ?? '0') ?? 0;
@@ -1970,6 +2021,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingdec = int.tryParse(decData['washing']?.toString() ?? '0') ?? 0;
       int varTbdec = int.tryParse(decData['tb']?.toString() ?? '0') ?? 0;
       int varNightdec = int.tryParse(decData['night']?.toString() ?? '0') ?? 0;
+      int varDrivedec = int.tryParse(decData['drive']?.toString() ?? '0') ?? 0;
       int varCycledec = int.tryParse(decData['cycle']?.toString() ?? '0') ?? 0;
       int varPcadec = int.tryParse(decData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempdec = 0;
@@ -1986,9 +2038,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3dec = int.tryParse(decData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4dec = int.tryParse(decData['daext4']?.toString() ?? '0') ?? 0;
       int varSalarydec = [
-        varBpdec, varDadec, varHradec, varNpadec, varSplpaydec, varPgdec,
-        varAnnualdec, varNursingdec, varTadec, varDaontadec, varMedicaldec,
-        varDirtdec, varWashingdec, varTbdec, varNightdec, varCycledec,
+        varBpdec, varDadec, varHradec, varNpadec, varSplpaydec, varConvdec, varPgdec,
+        varAnnualdec, varUniformdec, varNursingdec, varTadec, varDaontadec, varMedicaldec,
+        varDirtdec, varWashingdec, varTbdec, varNightdec, varDrivedec, varCycledec,
         varPcadec, varNpsempdec, varOtherdec, varDaext1dec, varDaext2dec, varDaext3dec, varDaext4dec,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxdec = int.tryParse(decData['incometax']?.toString() ?? '0') ?? 0;
@@ -2013,8 +2065,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHrajan = int.tryParse(janData['hra']?.toString() ?? '0') ?? 0;
       int varNpajan = int.tryParse(janData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayjan = int.tryParse(janData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvjan = int.tryParse(janData['conv']?.toString() ?? '0') ?? 0;
       int varPgjan = int.tryParse(janData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualjan = int.tryParse(janData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformjan = int.tryParse(janData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingjan = int.tryParse(janData['nursing']?.toString() ?? '0') ?? 0;
       int varTajan = int.tryParse(janData['ta']?.toString() ?? '0') ?? 0;
       int varDaontajan = int.tryParse(janData['daonta']?.toString() ?? '0') ?? 0;
@@ -2023,6 +2077,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingjan = int.tryParse(janData['washing']?.toString() ?? '0') ?? 0;
       int varTbjan = int.tryParse(janData['tb']?.toString() ?? '0') ?? 0;
       int varNightjan = int.tryParse(janData['night']?.toString() ?? '0') ?? 0;
+      int varDrivejan = int.tryParse(janData['drive']?.toString() ?? '0') ?? 0;
       int varCyclejan = int.tryParse(janData['cycle']?.toString() ?? '0') ?? 0;
       int varPcajan = int.tryParse(janData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempjan = 0;
@@ -2040,9 +2095,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3jan = int.tryParse(janData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4jan = int.tryParse(janData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryjan = [
-        varBpjan, varDajan, varHrajan, varNpajan, varSplpayjan, varPgjan,
-        varAnnualjan, varNursingjan, varTajan, varDaontajan, varMedicaljan,
-        varDirtjan, varWashingjan, varTbjan, varNightjan, varCyclejan,
+        varBpjan, varDajan, varHrajan, varNpajan, varSplpayjan, varConvjan, varPgjan,
+        varAnnualjan, varUniformjan, varNursingjan, varTajan, varDaontajan, varMedicaljan,
+        varDirtjan, varWashingjan, varTbjan, varNightjan, varDrivejan, varCyclejan,
         varPcajan, varNpsempjan, varOtherjan, varDaext1jan, varDaext2jan, varDaext3jan, varDaext4jan,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxjan = int.tryParse(janData['incometax']?.toString() ?? '0') ?? 0;
@@ -2067,8 +2122,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHrafeb = int.tryParse(febData['hra']?.toString() ?? '0') ?? 0;
       int varNpafeb = int.tryParse(febData['npa']?.toString() ?? '0') ?? 0;
       int varSplpayfeb = int.tryParse(febData['splpay']?.toString() ?? '0') ?? 0;
+      int varConvfeb = int.tryParse(febData['conv']?.toString() ?? '0') ?? 0;
       int varPgfeb = int.tryParse(febData['pg']?.toString() ?? '0') ?? 0;
       int varAnnualfeb = int.tryParse(febData['annual']?.toString() ?? '0') ?? 0;
+      int varUniformfeb = int.tryParse(febData['uniform']?.toString() ?? '0') ?? 0;
       int varNursingfeb = int.tryParse(febData['nursing']?.toString() ?? '0') ?? 0;
       int varTafeb = int.tryParse(febData['ta']?.toString() ?? '0') ?? 0;
       int varDaontafeb = int.tryParse(febData['daonta']?.toString() ?? '0') ?? 0;
@@ -2077,6 +2134,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingfeb = int.tryParse(febData['washing']?.toString() ?? '0') ?? 0;
       int varTbfeb = int.tryParse(febData['tb']?.toString() ?? '0') ?? 0;
       int varNightfeb = int.tryParse(febData['night']?.toString() ?? '0') ?? 0;
+      int varDrivefeb = int.tryParse(febData['drive']?.toString() ?? '0') ?? 0;
       int varCyclefeb = int.tryParse(febData['cycle']?.toString() ?? '0') ?? 0;
       int varPcafeb = int.tryParse(febData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempfeb = 0;
@@ -2093,9 +2151,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3feb = int.tryParse(febData['daext3']?.toString() ?? '0') ?? 0;
       int varDaext4feb = int.tryParse(febData['daext4']?.toString() ?? '0') ?? 0;
       int varSalaryfeb = [
-        varBpfeb, varDafeb, varHrafeb, varNpafeb, varSplpayfeb, varPgfeb,
-        varAnnualfeb, varNursingfeb, varTafeb, varDaontafeb, varMedicalfeb,
-        varDirtfeb, varWashingfeb, varTbfeb, varNightfeb, varCyclefeb,
+        varBpfeb, varDafeb, varHrafeb, varNpafeb, varSplpayfeb, varConvfeb, varPgfeb,
+        varAnnualfeb, varUniformfeb, varNursingfeb, varTafeb, varDaontafeb, varMedicalfeb,
+        varDirtfeb, varWashingfeb, varTbfeb, varNightfeb, varDrivefeb, varCyclefeb,
         varPcafeb, varNpsempfeb, varOtherfeb, varDaext1feb, varDaext2feb, varDaext3feb, varDaext4feb,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxfeb = int.tryParse(febData['incometax']?.toString() ?? '0') ?? 0;
@@ -2122,8 +2180,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraarrearqtr4 = int.tryParse(arrearData['dfhra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr4 = int.tryParse(arrearData['dfnpa']?.toString() ?? '0') ?? 0;
       int varSplpayarrearqtr4 = int.tryParse('0') ?? 0;
+      int varConvarrearqtr4 = int.tryParse('0') ?? 0;
       int varPgarrearqtr4 = int.tryParse('0') ?? 0;
       int varAnnualarrearqtr4 = int.tryParse('0')?? 0;
+      int varUniformarrearqtr4 = int.tryParse('0')?? 0;
       int varNursingarrearqtr4 = int.tryParse('0') ?? 0;
       int varTaarrearqtr4 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr4 = int.tryParse(arrearData['dfdaonta']?.toString() ?? '0') ?? 0;
@@ -2132,6 +2192,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingarrearqtr4 = int.tryParse('0') ?? 0;
       int varTbarrearqtr4 = int.tryParse('0') ?? 0;
       int varNightarrearqtr4 = int.tryParse('0') ?? 0;
+      int varDrivearrearqtr4 = int.tryParse('0') ?? 0;
       int varCyclearrearqtr4 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr4 = int.tryParse(arrearData['dfpca']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr4 = int.tryParse('0') ?? 0;
@@ -2141,9 +2202,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext3arrearqtr4 = int.tryParse('0') ?? 0;
       int varDaext4arrearqtr4 = int.tryParse('0') ?? 0;
       int varSalaryarrearqtr4 = [
-        varBparrearqtr4, varDaarrearqtr4, varHraarrearqtr4, varNpaarrearqtr4, varSplpayarrearqtr4, varPgarrearqtr4,
-        varAnnualarrearqtr4, varNursingarrearqtr4, varTaarrearqtr4, varDaontaarrearqtr4, varMedicalarrearqtr4,
-        varDirtarrearqtr4, varWashingarrearqtr4, varTbarrearqtr4, varNightarrearqtr4, varCyclearrearqtr4,
+        varBparrearqtr4, varDaarrearqtr4, varHraarrearqtr4, varNpaarrearqtr4, varSplpayarrearqtr4, varConvarrearqtr4, varPgarrearqtr4,
+        varAnnualarrearqtr4, varUniformarrearqtr4, varNursingarrearqtr4, varTaarrearqtr4, varDaontaarrearqtr4, varMedicalarrearqtr4,
+        varDirtarrearqtr4, varWashingarrearqtr4, varTbarrearqtr4, varNightarrearqtr4, varDrivearrearqtr4, varCyclearrearqtr4,
         varPcaarrearqtr4, varNpsemparrearqtr4, varOtherarrearqtr4, varDaext1arrearqtr4, varDaext2arrearqtr4, varDaext3arrearqtr4, varDaext4arrearqtr4,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxarrearqtr4 = int.tryParse(arrearData['dfext1']?.toString() ?? '0') ?? 0;
@@ -2174,8 +2235,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHraqtr4 = [varHradec, varHrajan, varHrafeb, varHraarrearqtr4].fold(0, (sum, value) => sum + value);
       int varNpaqtr4 = [varNpadec, varNpajan, varNpafeb, varNpaarrearqtr4].fold(0, (sum, value) => sum + value);
       int varSplpayqtr4 = [varSplpaydec, varSplpayjan, varSplpayfeb, varSplpayarrearqtr4].fold(0, (sum, value) => sum + value);
+      int varConvqtr4 = [varConvdec, varConvjan, varConvfeb, varConvarrearqtr4].fold(0, (sum, value) => sum + value);
       int varPgqtr4 = [varPgdec, varPgjan, varPgfeb, varPgarrearqtr4].fold(0, (sum, value) => sum + value);
       int varAnnualqtr4 = [varAnnualdec, varAnnualjan, varAnnualfeb, varAnnualarrearqtr4].fold(0, (sum, value) => sum + value);
+      int varUniformqtr4 = [varUniformdec, varUniformjan, varUniformfeb, varUniformarrearqtr4].fold(0, (sum, value) => sum + value);
       int varNursingqtr4 = [varNursingdec, varNursingjan, varNursingfeb, varNursingarrearqtr4].fold(0, (sum, value) => sum + value);
       int varTaqtr4 = [varTadec, varTajan, varTafeb, varTaarrearqtr4].fold(0, (sum, value) => sum + value);
       int varDaontaqtr4 = [varDaontadec, varDaontajan, varDaontafeb, varDaontaarrearqtr4].fold(0, (sum, value) => sum + value);
@@ -2184,6 +2247,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashingqtr4 = [varWashingdec, varWashingjan, varWashingfeb, varWashingarrearqtr4].fold(0, (sum, value) => sum + value);
       int varTbqtr4 = [varTbdec, varTbjan, varTbfeb, varTbarrearqtr4].fold(0, (sum, value) => sum + value);
       int varNightqtr4 = [varNightdec, varNightjan, varNightfeb, varNightarrearqtr4].fold(0, (sum, value) => sum + value);
+      int varDriveqtr4 = [varDrivedec, varDrivejan, varDrivefeb, varDrivearrearqtr4].fold(0, (sum, value) => sum + value);
       int varCycleqtr4 = [varCycledec, varCyclejan, varCyclefeb, varCyclearrearqtr4].fold(0, (sum, value) => sum + value);
       int varPcaqtr4 = [varPcadec, varPcajan, varPcafeb, varPcaarrearqtr4].fold(0, (sum, value) => sum + value);
       int varNpsempqtr4 = [varNpsempdec, varNpsempjan, varNpsempfeb, varNpsemparrearqtr4].fold(0, (sum, value) => sum + value);
@@ -2192,9 +2256,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext2qtr4 = [varDaext2dec, varDaext2jan, varDaext2feb, varDaext2arrearqtr4].fold(0, (sum, value) => sum + value);
       int varDaext3qtr4 = [varDaext3dec, varDaext3jan, varDaext3feb, varDaext3arrearqtr4].fold(0, (sum, value) => sum + value);
       int varDaext4qtr4 = [varDaext4dec, varDaext4jan, varDaext4feb, varDaext4arrearqtr4].fold(0, (sum, value) => sum + value);
-      int varSalaryqtr4 = [varBpqtr4, varDaqtr4, varHraqtr4, varNpaqtr4, varSplpayqtr4, varPgqtr4,
-        varAnnualqtr4, varNursingqtr4, varTaqtr4, varDaontaqtr4, varMedicalqtr4,
-        varDirtqtr4, varWashingqtr4, varTbqtr4, varNightqtr4, varCycleqtr4,
+      int varSalaryqtr4 = [varBpqtr4, varDaqtr4, varHraqtr4, varNpaqtr4, varSplpayqtr4, varConvqtr4, varPgqtr4,
+        varAnnualqtr4, varUniformqtr4, varNursingqtr4, varTaqtr4, varDaontaqtr4, varMedicalqtr4,
+        varDirtqtr4, varWashingqtr4, varTbqtr4, varNightqtr4, varDriveqtr4, varCycleqtr4,
         varPcaqtr4, varNpsempqtr4, varOtherqtr4, varDaext1qtr4, varDaext2qtr4, varDaext3qtr4, varDaext4qtr4,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxqtr4 = [varIncometaxdec, varIncometaxjan, varIncometaxfeb, varIncometaxarrearqtr4].fold(0, (sum, value) => sum + value);
@@ -2219,8 +2283,10 @@ class _ItaxPageState extends State<ItaxPage> {
       int varHragross = [varHraqtr1, varHraqtr2, varHraqtr3, varHraqtr4].fold(0, (sum, value) => sum + value);
       int varNpagross = [varNpaqtr1, varNpaqtr2, varNpaqtr3, varNpaqtr4].fold(0, (sum, value) => sum + value);
       int varSplpaygross = [varSplpayqtr1, varSplpayqtr2, varSplpayqtr3, varSplpayqtr4].fold(0, (sum, value) => sum + value);
+      int varConvgross = [varConvqtr1, varConvqtr2, varConvqtr3, varConvqtr4].fold(0, (sum, value) => sum + value);
       int varPggross = [varPgqtr1, varPgqtr2, varPgqtr3, varPgqtr4].fold(0, (sum, value) => sum + value);
       int varAnnualgross = [varAnnualqtr1, varAnnualqtr2, varAnnualqtr3, varAnnualqtr4].fold(0, (sum, value) => sum + value);
+      int varUniformgross = [varUniformqtr1, varUniformqtr2, varUniformqtr3, varUniformqtr4].fold(0, (sum, value) => sum + value);
       int varNursinggross = [varNursingqtr1, varNursingqtr2, varNursingqtr3, varNursingqtr4].fold(0, (sum, value) => sum + value);
       int varTagross = [varTaqtr1, varTaqtr2, varTaqtr3, varTaqtr4].fold(0, (sum, value) => sum + value);
       int varDaontagross = [varDaontaqtr1, varDaontaqtr2, varDaontaqtr3, varDaontaqtr4].fold(0, (sum, value) => sum + value);
@@ -2229,6 +2295,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWashinggross = [varWashingqtr1, varWashingqtr2, varWashingqtr3, varWashingqtr4].fold(0, (sum, value) => sum + value);
       int varTbgross = [varTbqtr1, varTbqtr2, varTbqtr3, varTbqtr4].fold(0, (sum, value) => sum + value);
       int varNightgross = [varNightqtr1, varNightqtr2, varNightqtr3, varNightqtr4].fold(0, (sum, value) => sum + value);
+      int varDrivegross = [varDriveqtr1, varDriveqtr2, varDriveqtr3, varDriveqtr4].fold(0, (sum, value) => sum + value);
       int varCyclegross = [varCycleqtr1, varCycleqtr2, varCycleqtr3, varCycleqtr4].fold(0, (sum, value) => sum + value);
       int varPcagross = [varPcaqtr1, varPcaqtr2, varPcaqtr3, varPcaqtr4].fold(0, (sum, value) => sum + value);
       int varNpsempgross = [varNpsempqtr1, varNpsempqtr2, varNpsempqtr3, varNpsempqtr4].fold(0, (sum, value) => sum + value);
@@ -2237,9 +2304,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDaext2gross = [varDaext2qtr1, varDaext2qtr2, varDaext2qtr3, varDaext2qtr4].fold(0, (sum, value) => sum + value);
       int varDaext3gross = [varDaext3qtr1, varDaext3qtr2, varDaext3qtr3, varDaext3qtr4].fold(0, (sum, value) => sum + value);
       int varDaext4gross = [varDaext4qtr1, varDaext4qtr2, varDaext4qtr3, varDaext4qtr4].fold(0, (sum, value) => sum + value);
-      int varSalarygross = [varBpgross, varDagross, varHragross, varNpagross, varSplpaygross, varPggross,
-        varAnnualgross, varNursinggross, varTagross, varDaontagross, varMedicalgross,
-        varDirtgross, varWashinggross, varTbgross, varNightgross, varCyclegross,
+      int varSalarygross = [varBpgross, varDagross, varHragross, varNpagross, varSplpaygross, varConvgross, varPggross,
+        varAnnualgross, varUniformgross, varNursinggross, varTagross, varDaontagross, varMedicalgross,
+        varDirtgross, varWashinggross, varTbgross, varNightgross, varDrivegross, varCyclegross,
         varPcagross, varNpsempgross, varOthergross, varDaext1gross, varDaext2gross, varDaext3gross, varDaext4gross,
       ].fold(0, (sum, value) => sum + value);
       int varIncometaxgross = [varIncometaxqtr1, varIncometaxqtr2, varIncometaxqtr3, varIncometaxqtr4].fold(0, (sum, value) => sum + value);
@@ -2266,8 +2333,10 @@ class _ItaxPageState extends State<ItaxPage> {
         varHragross,
         varNpagross,
         varSplpaygross,
+        varConvgross,
         varPggross,
         varAnnualgross,
+        varUniformgross,
         varNursinggross,
         varTagross,
         varDaontagross,
@@ -2276,6 +2345,7 @@ class _ItaxPageState extends State<ItaxPage> {
         varWashinggross,
         varTbgross,
         varNightgross,
+        varDrivegross,
         varCyclegross,
         varPcagross,
         varNpsempgross,
@@ -2527,6 +2597,50 @@ class _ItaxPageState extends State<ItaxPage> {
 
       }
 
+      if (varConvgross > 0){
+
+        sheet.getRangeByName("${columns[end]}10").setValue("CONVEYANCE");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varConvmar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varConvapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varConvmay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varConvarrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varConvqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varConvjun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varConvjul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varConvaug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varConvarrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varConvqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varConvsept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varConvoct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varConvnov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varConvarrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varConvqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varConvdec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varConvjan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varConvfeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varConvarrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varConvqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varConvgross);
+
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15','20','25','32'];
+        for (String cols in qtrcolumns){
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end+=1;
+
+      }
+
       if (varPggross > 0){
 
         sheet.getRangeByName("${columns[end]}10").setValue("PG");
@@ -2599,6 +2713,50 @@ class _ItaxPageState extends State<ItaxPage> {
         sheet.getRangeByName("${columns[end]}31").setValue('0');
         sheet.getRangeByName("${columns[end]}32").setValue(varAnnualqtr4);
         sheet.getRangeByName("${columns[end]}33").setValue(varAnnualgross);
+
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15','20','25','32'];
+        for (String cols in qtrcolumns){
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end+=1;
+
+      }
+
+      if (varUniformgross > 0){
+
+        sheet.getRangeByName("${columns[end]}10").setValue("UNIFORM");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varUniformmar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varUniformapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varUniformmay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varUniformarrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varUniformqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varUniformjun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varUniformjul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varUniformaug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varUniformarrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varUniformqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varUniformsept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varUniformoct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varUniformnov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varUniformarrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varUniformqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varUniformdec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varUniformjan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varUniformfeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varUniformarrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varUniformqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varUniformgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
         sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
@@ -2951,6 +3109,50 @@ class _ItaxPageState extends State<ItaxPage> {
         sheet.getRangeByName("${columns[end]}31").setValue('0');
         sheet.getRangeByName("${columns[end]}32").setValue(varNightqtr4);
         sheet.getRangeByName("${columns[end]}33").setValue(varNightgross);
+
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15','20','25','32'];
+        for (String cols in qtrcolumns){
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end+=1;
+
+      }
+
+      if (varDrivegross > 0){
+
+        sheet.getRangeByName("${columns[end]}10").setValue("CONTIGENCY");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varDrivemar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varDriveapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varDrivemay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varDrivearrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varDriveqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varDrivejun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varDrivejul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varDriveaug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varDrivearrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varDriveqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varDrivesept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varDriveoct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varDrivenov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varDrivearrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varDriveqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varDrivedec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varDrivejan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varDrivefeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varDrivearrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varDriveqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varDrivegross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
         sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
@@ -3682,7 +3884,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("C8").setValue("PATIENT CARE ALLOWANCE(WITH ARREAR)");
       sheet.getRangeByName("C9").setValue("TA & DA ON TA(WITH ARREAR)");
       sheet.getRangeByName("C10").setValue("NPS EMPLOYER (14%)");
-      sheet.getRangeByName("C11").setValue("OTHER");
+      sheet.getRangeByName("C11").setValue("OTHER & UNIFORM,CONTIGENCY,CONVEYANCE ALLOWANCE");
 
       sheet.getRangeByName("B12:C12").merge();
       sheet.getRangeByName("B12").setValue("TOTAL GROSS SALARY");
@@ -3757,7 +3959,8 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B48").setValue("DEDUCTION FOR HANDICAPPED PERSON U/S 80U");
       sheet.getRangeByName("B49").setValue("80E (EDUCATION LOAN)");
       sheet.getRangeByName("B50").setValue("80EE");
-      sheet.getRangeByName("B51").setValue("OTHER");
+      sheet.getRangeByName("B51").setValue("CONVEYANCE AND CONTIGENCY EXEMPTED");
+      sheet.getRangeByName("B52").setValue("OTHER AND UNIFORM EXEMPTED");
 
 
 
@@ -3775,7 +3978,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("D8").setValue(int.tryParse(itfData['tpca']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D9").setValue((int.tryParse(itfData['tta']?.toString() ??'0') ?? 0) + (int.tryParse(itfData['tdaonta']?.toString() ??'0') ?? 0));
       sheet.getRangeByName("D10").setValue(int.tryParse(itfData['tnpsemp']?.toString() ?? '0') ?? 0);
-      sheet.getRangeByName("D11").setValue(int.tryParse(itfData['tother']?.toString() ?? '0') ?? 0);
+      sheet.getRangeByName("D11").setValue((int.tryParse(itfData['tother']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0));
 
       sheet.getRangeByName("D12").setValue(int.tryParse(itfData['tgross']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D12").cellStyle = commontextStyleBold;
@@ -3841,7 +4044,8 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("D48").setValue(int.tryParse(dedData['80u']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D49").setValue(int.tryParse(dedData['80e']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D50").setValue(int.tryParse(dedData['80ee']?.toString() ?? '0') ?? 0);
-      sheet.getRangeByName("D51").setValue(int.tryParse(dedData['other']?.toString() ?? '0') ?? 0);
+      sheet.getRangeByName("D51").setValue((int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0));
+      sheet.getRangeByName("D52").setValue((int.tryParse(dedData['other']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0));
 
       for (int i = 3; i<=18; i++){
         xls.Range rangeValue = sheet.getRangeByName("D$i");
@@ -3873,18 +4077,18 @@ class _ItaxPageState extends State<ItaxPage> {
         rangeNum.cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
       }
 
-      for (int i = 40; i<=51; i++){
+      for (int i = 40; i<=52; i++){
         xls.Range rangeValue = sheet.getRangeByName("D$i");
         xls.Range rangeNum = sheet.getRangeByName("B$i");
         rangeValue.cellStyle.borders.all.lineStyle = xls.LineStyle.none;
         rangeValue.cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
         rangeValue.cellStyle.borders.left.lineStyle = xls.LineStyle.thin;
-        rangeValue.cellStyle.borders.bottom.lineStyle = i != 51 ? xls.LineStyle.thin : xls.LineStyle.thick;
+        rangeValue.cellStyle.borders.bottom.lineStyle = i != 52 ? xls.LineStyle.thin : xls.LineStyle.thick;
         rangeValue.cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
         rangeNum.cellStyle.borders.all.lineStyle = xls.LineStyle.none;
         rangeNum.cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
         rangeNum.cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
-        rangeNum.cellStyle.borders.bottom.lineStyle = i != 51 ? xls.LineStyle.thin : xls.LineStyle.thick;
+        rangeNum.cellStyle.borders.bottom.lineStyle = i != 52 ? xls.LineStyle.thin : xls.LineStyle.thick;
         rangeNum.cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
       }
       
@@ -3899,10 +4103,10 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("C37").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
       sheet.getRangeByName("C37").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
 
-      sheet.getRangeByName("C51").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
-      sheet.getRangeByName("C51").cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("C51").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("C51").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("C52").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("C52").cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("C52").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("C52").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
 
     } catch (error) {
       if (mounted) {
@@ -4045,55 +4249,57 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("E18").setValue("U/S 80 E(Intt. On Educational Loan)");
       sheet.getRangeByName("E19").setValue("U/S 80G (Donation)");
       sheet.getRangeByName("E20").setValue("CEA");
-      sheet.getRangeByName("E21").setValue("U/S 80 CCD (2)");
-      sheet.getRangeByName("E22").setValue("U/S 80U (Physically Handicapped)");
+      sheet.getRangeByName("E21").setValue("CONVEYANCE & CONTIGENCY EXEMPTED");
+      sheet.getRangeByName("E22").setValue("CONVEYANCE & CONTIGENCY EXEMPTED");
+      sheet.getRangeByName("E23").setValue("U/S 80 CCD (2)");
+      sheet.getRangeByName("E24").setValue("U/S 80U (Physically Handicapped)");
 
-      sheet.getRangeByName("D23").setValue("Total Rs.");
-      sheet.getRangeByName("D23").cellStyle.hAlign = xls.HAlignType.center;
-      sheet.getRangeByName("C24").setValue("Total Deduction");
+      sheet.getRangeByName("D25").setValue("Total Rs.");
+      sheet.getRangeByName("D26").cellStyle.hAlign = xls.HAlignType.center;
+      sheet.getRangeByName("C26").setValue("Total Deduction");
 
 
-      sheet.getRangeByName("C25").setValue("Total Taxable Income (Round off)");
-      sheet.getRangeByName("C25").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C25").rowHeight = 17.40;
+      sheet.getRangeByName("C27").setValue("Total Taxable Income (Round off)");
+      sheet.getRangeByName("C27").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C27").rowHeight = 17.40;
 
-      sheet.getRangeByName("C26:F26").cellStyle.hAlign = xls.HAlignType.center;
-      sheet.getRangeByName("C26").setValue("Rate of Income Table Leviable");
+      sheet.getRangeByName("C28:F28").cellStyle.hAlign = xls.HAlignType.center;
+      sheet.getRangeByName("C28").setValue("Rate of Income Table Leviable");
 
-      sheet.getRangeByName("D27").setValue("Upto Rs. 2,50,000/-                                NIL");
-      sheet.getRangeByName("D28").setValue("Rs. 2,50,001/- To 5,00,000                     5%");
-      sheet.getRangeByName("D29").setValue("Rs. 5,00,001/- To Rs. 10,00,000            10%");
-      sheet.getRangeByName("D30").setValue("EXCEEDING Rs. 15,00,001                       20%");
-      sheet.getRangeByName("D31").setValue("SURCHARGE");
+      sheet.getRangeByName("D29").setValue("Upto Rs. 2,50,000/-                                NIL");
+      sheet.getRangeByName("D30").setValue("Rs. 2,50,001/- To 5,00,000                     5%");
+      sheet.getRangeByName("D31").setValue("Rs. 5,00,001/- To Rs. 10,00,000            10%");
+      sheet.getRangeByName("D32").setValue("EXCEEDING Rs. 15,00,001                       20%");
+      sheet.getRangeByName("D33").setValue("SURCHARGE");
 
-      sheet.getRangeByName("C32").setValue("Tax rebate (Sec.87A):if applicable");
-      sheet.getRangeByName("C33").setValue("Total Tax Liability");
-      sheet.getRangeByName("C33").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C33").rowHeight = 17.40;
-      sheet.getRangeByName("C34").setValue("Education Cess  4%");
-      sheet.getRangeByName("C34").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C34").rowHeight = 17.40;
-      sheet.getRangeByName("C35").setValue("Total Tax Payble Rs.");
+      sheet.getRangeByName("C34").setValue("Tax rebate (Sec.87A):if applicable");
+      sheet.getRangeByName("C35").setValue("Total Tax Liability");
       sheet.getRangeByName("C35").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C35").rowHeight = 17.40;
-      sheet.getRangeByName("C36").setValue("Total Tax Payble round off to the nearest Rs.");
+      sheet.getRangeByName("C36").setValue("Education Cess  4%");
       sheet.getRangeByName("C36").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C36").rowHeight = 17.40;
-      sheet.getRangeByName("C37").setValue("Deduct :-Income Tax already Paid");
-      sheet.getRangeByName("C38").setValue("Net Income Tax Payble");
+      sheet.getRangeByName("C37").setValue("Total Tax Payble Rs.");
+      sheet.getRangeByName("C37").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C37").rowHeight = 17.40;
+      sheet.getRangeByName("C38").setValue("Total Tax Payble round off to the nearest Rs.");
       sheet.getRangeByName("C38").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C39").setValue("Interest, If Any");
-      sheet.getRangeByName("C40").setValue("Relief u/s 89(i)");
-      sheet.getRangeByName("C41").rowHeight = 19.80;
-      sheet.getRangeByName("C41").setValue("Net Income Tax Payble with Interest");
-      sheet.getRangeByName("C41").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C41").cellStyle.fontSize = 14;
-      sheet.getRangeByName("C41").cellStyle.backColor = "#FBD4B4";
-      sheet.getRangeByName("C42").setValue("Excess Paid");
-      sheet.getRangeByName("C42").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C42").rowHeight = 17.40;
+      sheet.getRangeByName("C38").rowHeight = 17.40;
+      sheet.getRangeByName("C39").setValue("Deduct :-Income Tax already Paid");
+      sheet.getRangeByName("C40").setValue("Net Income Tax Payble");
+      sheet.getRangeByName("C40").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C41").setValue("Interest, If Any");
+      sheet.getRangeByName("C42").setValue("Relief u/s 89(i)");
+      sheet.getRangeByName("C43").rowHeight = 19.80;
+      sheet.getRangeByName("C43").setValue("Net Income Tax Payble with Interest");
+      sheet.getRangeByName("C43").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C43").cellStyle.fontSize = 14;
+      sheet.getRangeByName("C43").cellStyle.backColor = "#FBD4B4";
+      sheet.getRangeByName("C44").setValue("Excess Paid");
+      sheet.getRangeByName("C44").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C44").rowHeight = 17.40;
 
-      for (int i = 3; i<=42; i++){
+      for (int i = 3; i<=44; i++){
         sheet.getRangeByName("G$i").cellStyle = commontextStyle;
         sheet.getRangeByName("G$i").cellStyle.backColor = "#EEECE1";
       }
@@ -4101,7 +4307,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varTg = int.tryParse(itfData['tgross']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("G3").setValue(varTg);
 
-      int varIfhp = int.tryParse(dedData['rent']?.toString() ?? '0') ?? 0;
+      int varIfhp = 0;
       sheet.getRangeByName("G4").setValue(varIfhp);
 
       int varBasic = (([
@@ -4158,23 +4364,29 @@ class _ItaxPageState extends State<ItaxPage> {
       int varCea  = int.tryParse(dedData['cea']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("F20").setValue(varCea);
 
+      int varConvDrive  = (int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0) + (int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0);
+      sheet.getRangeByName("F21").setValue(varConvDrive);
+
+      int varUniform  = int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0;
+      sheet.getRangeByName("F22").setValue(varUniform);
+
       int varAtccd2  = int.tryParse(dedData['80ccd2']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("F21").setValue(varAtccd2);
+      sheet.getRangeByName("F23").setValue(varAtccd2);
 
       int varAtu  = int.tryParse(dedData['80u']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("F22").setValue(varAtu);
+      sheet.getRangeByName("F24").setValue(varAtu);
 
       int varTr = varAtd + varAtdp + varAtdps + varAccd1b + varAte + varAtg + varCea + varAtccd2 + varAtu;
-      sheet.getRangeByName("G23").setValue(varTr);
+      sheet.getRangeByName("G25").setValue(varTr);
 
       int varTd = varArp + varHli + varAtee + varSd + varAgg + varTr;
-      sheet.getRangeByName("G24").setValue(varTd);
+      sheet.getRangeByName("G26").setValue(varTd);
 
       int varTti = varTg + varIfhp - varTd ;
       if (varTti < 0){
         varTti = 0;
       }
-      sheet.getRangeByName("G25").setValue(varTti);
+      sheet.getRangeByName("G27").setValue(varTti);
 
       int varT1 = 0;
       int varT2 = 0;
@@ -4192,8 +4404,8 @@ class _ItaxPageState extends State<ItaxPage> {
       bool seniorCitizen = referenceDate.isAfter(dateDiff) || referenceDate.isAtSameMomentAs(dateDiff);
 
       if (seniorCitizen){
-        sheet.getRangeByName("D27").setValue("Upto Rs. 3,00,000/-                                NIL");
-        sheet.getRangeByName("D28").setValue("Rs. 3,00,001/- To 5,00,000                     5%");
+        sheet.getRangeByName("D29").setValue("Upto Rs. 3,00,000/-                                NIL");
+        sheet.getRangeByName("D30").setValue("Rs. 3,00,001/- To 5,00,000                     5%");
         if (varTti > 500000){
           varT2 = 10000;
         } else if (varTti > 300000 && varTti <= 500000){
@@ -4240,38 +4452,38 @@ class _ItaxPageState extends State<ItaxPage> {
         }
       }
 
-      sheet.getRangeByName("G27").setValue(varT1);
-      sheet.getRangeByName("G28").setValue(varT2);
-      sheet.getRangeByName("G29").setValue(varT3);
-      sheet.getRangeByName("G30").setValue(varT4);
-      sheet.getRangeByName("G31").setValue(varT5);
-      sheet.getRangeByName("G32").setValue(varTre);
-      sheet.getRangeByName("G33").setValue(varTtl);
+      sheet.getRangeByName("G29").setValue(varT1);
+      sheet.getRangeByName("G30").setValue(varT2);
+      sheet.getRangeByName("G31").setValue(varT3);
+      sheet.getRangeByName("G32").setValue(varT4);
+      sheet.getRangeByName("G33").setValue(varT5);
+      sheet.getRangeByName("G34").setValue(varTre);
+      sheet.getRangeByName("G35").setValue(varTtl);
       varEc = ((varTtl + varT5) * 0.04).round();
-      sheet.getRangeByName("G34").setValue(varEc);
+      sheet.getRangeByName("G36").setValue(varEc);
       varTtp = varTtl + varEc + varT5;
-      sheet.getRangeByName("G35").setValue(varTtp);
+      sheet.getRangeByName("G37").setValue(varTtp);
       int lastDigit = varTtp % 10;
       int varTtpi = varTtp;
       if (lastDigit > 0){
         varTtpi = varTtp + (10- lastDigit);
       }
-      sheet.getRangeByName("G36").setValue(varTtpi);
+      sheet.getRangeByName("G38").setValue(varTtpi);
 
       int varDeduct = int.tryParse(itfData['tincometax']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G37").setValue(varDeduct);
+      sheet.getRangeByName("G39").setValue(varDeduct);
 
       int varNitp = varTtpi - varDeduct;
       if (varNitp < 0){
         varNitp = 0;
       }
-      sheet.getRangeByName("G38").setValue(varNitp);
+      sheet.getRangeByName("G40").setValue(varNitp);
 
       int varInterest = 0;
-      sheet.getRangeByName("G39").setValue(varInterest);
+      sheet.getRangeByName("G41").setValue(varInterest);
 
       int varRelief = int.tryParse(dedData['relief']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G40").setValue(varRelief);
+      sheet.getRangeByName("G42").setValue(varRelief);
 
       int varNitpi = varTtpi - varDeduct - varRelief + varInterest;
       int varEp = 0;
@@ -4279,19 +4491,19 @@ class _ItaxPageState extends State<ItaxPage> {
         varEp = varNitpi.abs();
         varNitpi = 0;
       }
-      sheet.getRangeByName("G41").rowHeight = 19.80;
-      sheet.getRangeByName("G41").setValue(varNitpi);
-      sheet.getRangeByName("G41").cellStyle.fontSize = 14;
+      sheet.getRangeByName("G43").rowHeight = 19.80;
+      sheet.getRangeByName("G43").setValue(varNitpi);
+      sheet.getRangeByName("G43").cellStyle.fontSize = 14;
 
-      sheet.getRangeByName("G42").setValue(varEp);
+      sheet.getRangeByName("G44").setValue(varEp);
 
       await updateItaxold(
           biometricId,
           varNitpi,
           varEp
       );
-      List<int> excludedNumbers = [3,11,13,23,24,25,35,36,37,38,41,42];
-      for (int i = 3; i<=42; i++){
+      List<int> excludedNumbers = [3,11,13,25,26,27,37,38,39,41,43,44];
+      for (int i = 3; i<=44; i++){
         xls.Range rangeValue = sheet.getRangeByName("G$i");
         xls.Range rangeNum = sheet.getRangeByName("B$i");
         rangeValue.cellStyle = !(excludedNumbers.contains(i))? commontextStyle: commontextStyleBold;
@@ -4308,53 +4520,53 @@ class _ItaxPageState extends State<ItaxPage> {
         rangeNum.cellStyle.borders.bottom.lineStyle = xls.LineStyle.thin;
         rangeNum.cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
       }
-      sheet.getRangeByName("B42:G42").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
-      sheet.getRangeByName("B42:G42").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("G42").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("C42:F42").cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("B42:G42").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("B42").cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("C42:F42").cellStyle.borders.left.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("G41").cellStyle.fontSize = 14;
+      sheet.getRangeByName("B44:G44").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("B44:G44").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("G44").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("C44:F44").cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("B44:G44").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("B44").cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("C44:F44").cellStyle.borders.left.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("G43").cellStyle.fontSize = 14;
 
-      sheet.getRangeByName("G44").setValue("A.O/A.A.O/D.D.O");
-      sheet.getRangeByName("G44").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("G44").cellStyle.hAlign = xls.HAlignType.right;
-      sheet.getRangeByName("G44").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("G46").setValue("A.O/A.A.O/D.D.O");
+      sheet.getRangeByName("G46").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("G46").cellStyle.hAlign = xls.HAlignType.right;
+      sheet.getRangeByName("G46").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
 
-
-      sheet.getRangeByName("B46:G46").merge();
-      sheet.getRangeByName("B46:G46").setValue(sharedData.zone.toUpperCase());
-      sheet.getRangeByName("B46:G46").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("B46:G46").cellStyle.borders.all.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("B46:G46").cellStyle.hAlign = xls.HAlignType.center;
-
-
-      sheet.getRangeByName("B47:D47").merge();
-      sheet.getRangeByName("B47:D47").cellStyle = commontextStyle;
-      sheet.getRangeByName("B47").setValue(mainpgData["panno"]);
-
-      sheet.getRangeByName("E47:G47").merge();
-      sheet.getRangeByName("E47:G47").cellStyle = commontextStyle;
-      sheet.getRangeByName("E47").setValue("Sub: INCOME TAX FOR THE FINANCIAL YEAR 2024-25");
 
       sheet.getRangeByName("B48:G48").merge();
-      sheet.getRangeByName("B48:G48").cellStyle = commontextStyle;
-      sheet.getRangeByName("B48").setFormula(
+      sheet.getRangeByName("B48:G48").setValue(sharedData.zone.toUpperCase());
+      sheet.getRangeByName("B48:G48").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("B48:G48").cellStyle.borders.all.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("B48:G48").cellStyle.hAlign = xls.HAlignType.center;
+
+
+      sheet.getRangeByName("B49:D49").merge();
+      sheet.getRangeByName("B49:D49").cellStyle = commontextStyle;
+      sheet.getRangeByName("B49").setValue(mainpgData["panno"]);
+
+      sheet.getRangeByName("E49:G49").merge();
+      sheet.getRangeByName("E49:G49").cellStyle = commontextStyle;
+      sheet.getRangeByName("E49").setValue("Sub: INCOME TAX FOR THE FINANCIAL YEAR 2024-25");
+
+      sheet.getRangeByName("B51:G51").merge();
+      sheet.getRangeByName("B51:G51").cellStyle = commontextStyle;
+      sheet.getRangeByName("B51").setFormula(
           r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$41, " is to be recovered as Income Tax for the total income of ₹ ",$G$3," from Sh./Smt./Ms ",' "\"${mainpgData['name']}\"" r'," working as ",'"\"${mainpgData['designation']}\"" r'," in ",$B$2, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
       );
-      sheet.getRangeByName("B48:G48").rowHeight = 54.60;
+      sheet.getRangeByName("B51:G51").rowHeight = 54.60;
 
 
-      sheet.getRangeByName("G50").setValue("A.O/A.A.O/D.D.O");
-      sheet.getRangeByName("G50").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("G50").cellStyle.hAlign = xls.HAlignType.right;
-      sheet.getRangeByName("G50").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("G52").setValue("A.O/A.A.O/D.D.O");
+      sheet.getRangeByName("G52").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("G52").cellStyle.hAlign = xls.HAlignType.right;
+      sheet.getRangeByName("G52").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
 
-      sheet.getRangeByName("B47:G50").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
-      sheet.getRangeByName("B47:B50").cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("B50:G50").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("G47:G50").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("B49:G52").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("B49:B52").cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("B52:G52").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("G49:G52").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
 
     }catch (error) {
       if (mounted) {
@@ -4435,8 +4647,8 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("C3").setValue("Total Gross Salary");
       sheet.getRangeByName("C3").cellStyle = commontextStyleBold!;
       sheet.getRangeByName("C3").rowHeight = 17.40;
-      sheet.getRangeByName("C4").setValue("Income From House Property");
-      sheet.getRangeByName("C5").setValue("Income From Other Sources");
+      sheet.getRangeByName("C4").setValue("Conveyance & Contigency Exempted");
+      sheet.getRangeByName("C5").setValue("Uniform Exempted");
       sheet.getRangeByName("C6").setValue("Gross Total Income");
       sheet.getRangeByName("C7").setValue("Housing Loan Interest");
       sheet.getRangeByName("C8").setValue("Standard deducion");
@@ -4502,19 +4714,16 @@ class _ItaxPageState extends State<ItaxPage> {
       int varTg = (int.tryParse(itfData['tgross']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("G3").setValue(varTg);
 
-      int varIfhp = int.tryParse(dedData['rent']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G4").setValue(varIfhp);
+      int varConvDrive = (int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0);
+      sheet.getRangeByName("G4").setValue(varConvDrive);
 
-      int varAtee = int.tryParse(dedData['80ee']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G5").setValue(varAtee);
+      int varUniform = int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0;
+      sheet.getRangeByName("G5").setValue(varUniform);
 
-      int varGti = varTg + varIfhp + varAtee;
+      int varGti = varTg - varConvDrive - varUniform;
       sheet.getRangeByName("G6").setValue(varGti);
 
       int varHli = 0;
-      if (dedData['htype'] == "RENT"){
-        varHli = int.tryParse(dedData['rent']?.toString() ?? '0') ?? 0;
-      }
       sheet.getRangeByName("G7").setValue(varHli);
 
       int varSd = 75000;
