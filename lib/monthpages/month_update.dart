@@ -419,7 +419,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       _buildTextField('SLF', 'slf', slfController),
                       _buildTextField('SOCIETY', 'society', societyController),
                       _buildTextField('RECOVERY', 'recovery', recoveryController),
-                      _buildTextField('WF', 'wf', wfController),
+                      _buildTextField('WIDOW WELFALE FUND', 'wf', wfController),
                       _buildTextField('OTHER', 'other', otherController),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
