@@ -375,7 +375,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       _buildTextField('HRA', 'hra', hraController),
                       _buildTextField('NPA', 'npa', npaController),
                       _buildTextField('SPECIAL PAY', 'splpay', splpayController),
-                      _buildTextField('CONVENIENCE', 'conv', convController),
+                      _buildTextField('CONVEYANCE', 'conv', convController),
                       _buildTextField('PG', 'pg', pgController),
                       _buildTextField('ANNUAL', 'annual', annualController),
                       _buildTextField('UNIFORM', 'uniform', uniformController),
