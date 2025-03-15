@@ -4172,22 +4172,22 @@ class _ItaxPageState extends State<ItaxPage> {
       }
 
       sheet.getRangeByName("B6").setValue(4);
-      sheet.getRangeByName("B6:B23").merge();
-      sheet.getRangeByName("B6:B23").cellStyle.hAlign = xls.HAlignType.center;
+      sheet.getRangeByName("B6:B25").merge();
+      sheet.getRangeByName("B6:B25").cellStyle.hAlign = xls.HAlignType.center;
 
       sheet.getRangeByName("C6:F6").merge();
       sheet.getRangeByName("C6:F6").cellStyle.hAlign = xls.HAlignType.center;
 
       List<String> romanList = ['(i)','(ii)','(iii)','(iv)','(v)'];
-      List<String> letterList = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)'];
+      List<String> letterList = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)'];
 
       for (int i = 0; i <= 3; i++){
         sheet.getRangeByName("C${i+7}").setValue(romanList[i]);
         sheet.getRangeByName("C${i+7}").cellStyle.hAlign = xls.HAlignType.center;
         sheet.getRangeByName("D${i+7}:F${i+7}").merge();
       }
-      sheet.getRangeByName("C10:C23").merge();
-      sheet.getRangeByName("C10:C23").cellStyle.hAlign = xls.HAlignType.center;
+      sheet.getRangeByName("C10:C25").merge();
+      sheet.getRangeByName("C10:C25").cellStyle.hAlign = xls.HAlignType.center;
 
       for (int i = 0; i<=1; i++){
         sheet.getRangeByName("D${i+11}").setValue(letterList[i]);
@@ -4196,36 +4196,35 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("D13:F13").merge();
       sheet.getRangeByName("D13:F13").cellStyle = commontextStyleBold!;
 
-      for (int i = 0; i<=8; i++){
+      for (int i = 0; i<=10; i++){
         sheet.getRangeByName("D${i+14}").setValue(letterList[i]);
         sheet.getRangeByName("D${i+14}").cellStyle.hAlign = xls.HAlignType.center;
       }
 
-      sheet.getRangeByName("D23:F23").merge();
-      sheet.getRangeByName("D23:F23").cellStyle = commontextStyleBold;
-
-
+      sheet.getRangeByName("D25:F25").merge();
+      sheet.getRangeByName("D25:F25").cellStyle = commontextStyleBold;
 
       for (int i = 5; i <= 7; i++){
-        sheet.getRangeByName("B${i+19}").setValue(i);
-        sheet.getRangeByName("B${i+19}").cellStyle.hAlign = xls.HAlignType.center;
-        sheet.getRangeByName("C${i+19}:F${i+19}").merge();
+        sheet.getRangeByName("B${i+21}").setValue(i);
+        sheet.getRangeByName("B${i+21}").cellStyle.hAlign = xls.HAlignType.center;
+        sheet.getRangeByName("C${i+21}:F${i+21}").merge();
       }
 
-      sheet.getRangeByName("B27:B31").merge();
-      sheet.getRangeByName("B27").setValue(8);
-      sheet.getRangeByName("B27:B31").cellStyle.hAlign = xls.HAlignType.center;
+      sheet.getRangeByName("B29:B33").merge();
+      sheet.getRangeByName("B29").setValue(8);
+      sheet.getRangeByName("B29:B33").cellStyle.hAlign = xls.HAlignType.center;
 
       for (int i = 0; i<=4; i++){
-        sheet.getRangeByName("C${i+27}").setValue(romanList[i]);
-        sheet.getRangeByName("C${i+27}").cellStyle.hAlign = xls.HAlignType.center;
-        sheet.getRangeByName("D${i+27}:F${i+27}").merge();
+        sheet.getRangeByName("C${i+29}").setValue(romanList[i]);
+        sheet.getRangeByName("C${i+29}").cellStyle.hAlign = xls.HAlignType.center;
+        sheet.getRangeByName("D${i+29}:F${i+29}").merge();
+        sheet.getRangeByName("D${i+29}:F${i+29}").cellStyle.hAlign = xls.HAlignType.left;
       }
 
       for (int i = 9; i <= 19; i++){
-        sheet.getRangeByName("B${i+23}").setValue(i);
-        sheet.getRangeByName("B${i+23}").cellStyle.hAlign = xls.HAlignType.center;
-        sheet.getRangeByName("C${i+23}:F${i+23}").merge();
+        sheet.getRangeByName("B${i+25}").setValue(i);
+        sheet.getRangeByName("B${i+25}").cellStyle.hAlign = xls.HAlignType.center;
+        sheet.getRangeByName("C${i+25}:F${i+25}").merge();
       }
 
       sheet.getRangeByName("C3").setValue("Total Gross Salary");
@@ -4250,7 +4249,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("E19").setValue("U/S 80G (Donation)");
       sheet.getRangeByName("E20").setValue("CEA");
       sheet.getRangeByName("E21").setValue("CONVEYANCE & CONTIGENCY EXEMPTED");
-      sheet.getRangeByName("E22").setValue("CONVEYANCE & CONTIGENCY EXEMPTED");
+      sheet.getRangeByName("E22").setValue("UNIFORM");
       sheet.getRangeByName("E23").setValue("U/S 80 CCD (2)");
       sheet.getRangeByName("E24").setValue("U/S 80U (Physically Handicapped)");
 

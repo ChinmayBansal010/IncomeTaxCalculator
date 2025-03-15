@@ -455,7 +455,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
 
               SizedBox(height: 10),
 
-              _buildTextBox(label: "INCOME FROM OTHER SOURCES", controller: snext2Controller),
+              // _buildTextBox(label: "INCOME FROM OTHER SOURCES", controller: snext2Controller),
             ],
           ),
 

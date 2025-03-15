@@ -420,7 +420,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                     _buildTextBox(label: "SUKANYA SAMRIDHI YOJNA", controller: ssyController),
                     _buildTextBox(label: "TUTION FEES RECIEPT", controller: tutionController),
                     _buildTextBox(label: "OTHER", controller: ext3Controller),
-                    _buildTextBox(label: "MAX SSAVINGS", controller: maxsavController),
+                    _buildTextBox(label: "MAX SAVINGS", controller: maxsavController),
                     _buildTextBox(label: "TOTAL SAVINGS", controller: totalsavController),
 
                   ],
