@@ -1,7 +1,3 @@
-// ignore_for_file: unnecessary_cast
-
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -395,7 +391,6 @@ class _MainAddPageState extends State<MainAddPage> {
     if (esiNoController.text.trim() != '0'){
       esichk = '1';
     }
-    print('$gpfchk, $npschk, $empTypeController');
   }
 
   @override

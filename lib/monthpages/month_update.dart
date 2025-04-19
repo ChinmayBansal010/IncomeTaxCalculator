@@ -731,16 +731,16 @@ class _MonthDataPageState extends State<MonthDataPage> {
                     setState(() {
                       if (key == 'gpfchk') {
                         isGpfChecked = value;
-                        gpfController.text = value ? monthData['gpf'] : '0';
+                        gpfController.text = value ? monthData['gpf'] ?? '0' : '0';
                       } else if (key == 'npschk') {
                         isNpsChecked = value;
-                        npsController.text = value ? monthData['nps'] : '0';
+                        npsController.text = value ? monthData['nps'] ?? '0' : '0';
                       } else if (key == 'epfchk') {
                         isEpfChecked = value;
-                        epfController.text = value ? monthData['epf'] : '0';
+                        epfController.text = value ? monthData['epf'] ?? '0' : '0';
                       } else if (key == 'esichk') {
                         isEsiChecked = value;
-                        esiController.text = value ? monthData['esi'] : '0';
+                        esiController.text = value ? monthData['esi'] ?? '0' : '0';
                       }
                     });
                   }
@@ -971,7 +971,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
           ((int.tryParse(grossController.text))! -
                   (int.tryParse(totaldedController.text))!)
               .toString();
-      print(monthData);
     } catch (error) {
       final String message = "Error: $error";
       if (mounted){
