@@ -173,24 +173,26 @@ class _MainDataPageState extends State<MainDataPage> {
                                         category: details['category'] ?? '',
                                         sex: details['sex'] ?? '',
                                         address: details['address'] ?? '',
-                                        aadhaar: details['aadhaarno'] ?? '0',  // Default value '0' for aadhaar if null
-                                        mobile: details['mobileno'] ?? '0',    // Default value '0' for mobile if null
-                                        account: details['accountno'] ?? '0',  // Default value '0' for account if null
+                                        aadhaar: details['aadhaarno'] ?? '0',
+                                        mobile: details['mobileno'] ?? '0',
+                                        account: details['accountno'] ?? '0',
                                         branch: details['branch'] ?? '',
-                                        micr: details['micrno'] ?? '0',       // Default value '0' for micr if null
+                                        micr: details['micrno'] ?? '0',
                                         ifsc: details['ifsc'] ?? '',
                                         pan: details['panno'] ?? '',
                                         payScale: details['payscale'] ?? '',
                                         level: details['level'] ?? '',
-                                        gpfNo: details['gpfno'] ?? '0',     // Default value '0' for gpfNo if null
-                                        npsNo: details['npsno'] ?? '0',     // Default value '0' for npsNo if null
+                                        gpfNo: details['gpfno'] ?? '0',
+                                        npsNo: details['npsno'] ?? '0',
+                                        epfNo: details['epfno'] ?? '0',
+                                        esiNo: details['esino'] ?? '0',
                                         email: details['emailid'] ?? '',
                                         cycleNo: details['cycleno'] ?? '',
                                         voterId: details['voterid'] ?? '',
                                         dojo: details['dojo'] ?? '',
                                         place: details['place'] ?? '',
                                         bloodGroup: details['bloodgrp'] ?? '',
-                                        emergencyNo: details['emergencyno'] ?? '0', // Default value '0' for emergencyNo if null
+                                        emergencyNo: details['emergencyno'] ?? '0',
                                         nicEmail: details['nicemailid'] ?? '',
                                         dorn: details['dorn'] ?? '',
                                         education: details['education'] ?? '',

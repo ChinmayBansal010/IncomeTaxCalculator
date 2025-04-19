@@ -219,7 +219,7 @@ class DeductionAllPage {
 
         // Update fields conditionally
         if (nps > 0) {
-          atccd22 += bp + da + npa;
+          atccd22 += ((bp + da + npa)*0.14).round();
         }
 
         gis2 += gisValue;
@@ -257,7 +257,7 @@ class DeductionAllPage {
   Future<void> saveData() async {
     await _validateValue();
     await _calculateData();
-  
+
     try {
       await bioRef.child('deddata').child(biometricIdController.text).update({
         'biometricid': biometricIdController.text,

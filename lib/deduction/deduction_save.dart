@@ -291,7 +291,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
 
         // Update fields conditionally
         if (nps > 0) {
-          atccd2 += bp + da + npa;
+          atccd2 += ((bp + da + npa)*0.14).round();
         }
 
         gis += gisValue;

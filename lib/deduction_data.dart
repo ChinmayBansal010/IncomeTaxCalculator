@@ -87,7 +87,6 @@ class _DeductionPageState extends State<DeductionPage> {
     for (int index = 0; index < sortedBiometricIds.length; index++){
       String biometricId = sortedBiometricIds[index];
       Map<String, dynamic> details = biometricData[biometricId]!;
-      shouldRefetch = true;
 
       WidgetsFlutterBinding.ensureInitialized();
 
@@ -303,22 +302,25 @@ class _DeductionPageState extends State<DeductionPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // Navigate back before starting the async task
+           // Safe to navigate here before async task
+
+          // Now perform the async task
           setState(() {
             isLoading = true;
           });
-          try{
-            await _dedall();
+
+          try {
+            await _dedall(); // Perform your async task
           } catch (error) {
-            _showDialog("ERROR",error.toString());
-          } finally{
+            _showDialog("ERROR", error.toString());
+          } finally {
             setState(() {
-              isLoading = true;
+              isLoading = false;
               shouldRefetch = true;
             });
-            bioRef = _dbRef.child(sharedData.userPlace).child('maindata');
-            fetchData();
-            searchController.addListener(_filterData);
           }
+          Navigator.pop(context, true);
         },
         child: Icon(Icons.add),
       ),

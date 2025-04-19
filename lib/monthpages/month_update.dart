@@ -47,6 +47,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
   final TextEditingController gisController = TextEditingController();
   final TextEditingController gpfController = TextEditingController();
   final TextEditingController npsController = TextEditingController();
+  final TextEditingController epfController = TextEditingController();
+  final TextEditingController esiController = TextEditingController();
   final TextEditingController slfController = TextEditingController();
   final TextEditingController societyController = TextEditingController();
   final TextEditingController recoveryController = TextEditingController();
@@ -65,6 +67,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
   bool npachk = false;
   bool gpfchk = false;
   bool npschk = false;
+  bool epfchk = false;
+  bool esichk = false;
 
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
   Map<String, dynamic> monthData = {};
@@ -74,6 +78,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
   bool isGpfChecked = false;
   bool isNpsChecked = false;
+  bool isEpfChecked = false;
+  bool isEsiChecked = false;
 
 
 
@@ -116,6 +122,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
     gisController.text = monthData['gis'] ?? '';
     gpfController.text = monthData['gpf'] ?? '';
     npsController.text = monthData['nps'] ?? '';
+    epfController.text = monthData['epf'] ?? '';
+    esiController.text = monthData['esi'] ?? '';
     slfController.text = monthData['slf'] ?? '';
     societyController.text = monthData['society'] ?? '';
     recoveryController.text = monthData['recovery'] ?? '';
@@ -134,9 +142,13 @@ class _MonthDataPageState extends State<MonthDataPage> {
     npachk = monthData['npap'] == '1'? true: false;
     gpfchk = monthData['gpfchk'] == '1'? true: false;
     npschk = monthData['npschk'] == '1'? true: false;
+    epfchk = monthData['epfchk'] == '1'? true: false;
+    esichk = monthData['esichk'] == '1'? true: false;
 
     isGpfChecked = monthData['gpfchk'] == '1'? true: false;
     isNpsChecked = monthData['npschk'] == '1'? true: false;
+    isEpfChecked = monthData['epfchk'] == '1'? true: false;
+    isEsiChecked = monthData['esichk'] == '1'? true: false;
 
 
   }
@@ -176,6 +188,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
     gisController.dispose();
     gpfController.dispose();
     npsController.dispose();
+    epfController.dispose();
+    esiController.dispose();
     slfController.dispose();
     societyController.dispose();
     recoveryController.dispose();
@@ -470,6 +484,56 @@ class _MonthDataPageState extends State<MonthDataPage> {
                           ),
                         ],
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Small Checkbox for GPF
+                          SizedBox(
+                            width: 70, // Ensure the width is equal to the textfield's width
+                            child: _buildCheckbox(
+                              '',
+                              'epfchk',
+                              epfchk,
+                                  (bool newValue) {
+                                setState(() {
+                                  epfchk = newValue;
+                                });
+                              },
+                            ),
+                          ),
+
+                          // Text Field for GPF, width set equal to checkbox width
+                          SizedBox(
+                            width: 200, // Set width equal to textfields, same as the checkbox container
+                            child: _buildTextField('EPF', 'epf', epfController),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Small Checkbox for GPF
+                          SizedBox(
+                            width: 70, // Ensure the width is equal to the textfield's width
+                            child: _buildCheckbox(
+                              '',
+                              'esichk',
+                              esichk,
+                                  (bool newValue) {
+                                setState(() {
+                                  esichk = newValue;
+                                });
+                              },
+                            ),
+                          ),
+
+                          // Text Field for GPF, width set equal to checkbox width
+                          SizedBox(
+                            width: 200, // Set width equal to textfields, same as the checkbox container
+                            child: _buildTextField('ESI', 'esi', esiController),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -539,13 +603,20 @@ class _MonthDataPageState extends State<MonthDataPage> {
     double contentPaddingHorizontal = 25.0; // Constant horizontal padding
     double fieldWidth = isWideScreen ? 500.0 : screenWidth - 32.0; // Set a fixed width for text field
 
+    final Map<String, bool> enabledStatus = {
+      'gpf': isGpfChecked,
+      'nps': isNpsChecked,
+      'epf': isEpfChecked,
+      'esi': isEsiChecked,
+    };
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: horizontalPadding),
       child: SizedBox(
         width: fieldWidth, // Set a controlled width for the text field
         child: TextField(
           controller: controller,
-          enabled: key == 'gpf' ? isGpfChecked : key == 'nps' ? isNpsChecked : true,
+          enabled: !enabledStatus.containsKey(key) || enabledStatus[key] == true,
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyle(
@@ -626,7 +697,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
     double fontSize = isWideScreen ? 16.0 : 16.0; // Adjust font size
     double containerWidth = isWideScreen ? 200.0 : screenWidth / 2 - 24.0; // Dynamic container width
 
-    bool isSmallCheckbox = key == 'gpfchk' || key == 'npschk';
+    final smallCheckboxKeys = {'gpfchk', 'npschk', 'epfchk', 'esichk'};
+    bool isSmallCheckbox = smallCheckboxKeys.contains(key);
 
     return Padding(
       padding: EdgeInsets.all(4), // Reduced padding
@@ -663,6 +735,12 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       } else if (key == 'npschk') {
                         isNpsChecked = value;
                         npsController.text = value ? monthData['nps'] : '0';
+                      } else if (key == 'epfchk') {
+                        isEpfChecked = value;
+                        epfController.text = value ? monthData['epf'] : '0';
+                      } else if (key == 'esichk') {
+                        isEsiChecked = value;
+                        esiController.text = value ? monthData['esi'] : '0';
                       }
                     });
                   }
@@ -851,6 +929,21 @@ class _MonthDataPageState extends State<MonthDataPage> {
         monthData['nps'] =
             npsController.text = (npsTotal * 0.10).round().toString();
       }
+      monthData['epf'] = monthData['esi'] = '0';
+
+      if (esichk){
+        if ((int.tryParse(monthData['gross']) ?? 0) <= 21000){
+          monthData['esi'] = esiController.text = ((int.tryParse(monthData['gross']) ?? 0) *0.0075).ceil().toString();
+        }
+      }
+
+      if(epfchk){
+        if ((int.tryParse(monthData['gross']) ?? 0) >= 15000){
+          monthData['epf'] = epfController.text = '1800'; // 15000*0.12
+        } else {
+          monthData['epf'] = epfController.text = ((int.tryParse(monthData['gross']) ?? 0) *0.12).round().toString();
+        }
+      }
       if (month == 'feb') incometaxController.text = '0';
       var dedControllers = [
         incometaxController,
@@ -878,6 +971,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
           ((int.tryParse(grossController.text))! -
                   (int.tryParse(totaldedController.text))!)
               .toString();
+      print(monthData);
     } catch (error) {
       final String message = "Error: $error";
       if (mounted){
@@ -947,12 +1041,12 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if (targetIndex != -1) {
         for (int i = targetIndex; i < months.length; i++) {
-          if (months[i] == 'feb'){
-            monthData['incometax'] = '0';
-          }
           final String currentMonth = months[i];
           updatedmonths.add(currentMonth);
           await _calculateData(currentMonth);
+          if (months[i] == 'feb'){
+            monthData['incometax'] = '0';
+          }
           await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
         }
       } else{

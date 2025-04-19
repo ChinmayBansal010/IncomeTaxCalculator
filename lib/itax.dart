@@ -4375,7 +4375,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varAtu  = int.tryParse(dedData['80u']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("F24").setValue(varAtu);
 
-      int varTr = varAtd + varAtdp + varAtdps + varAccd1b + varAte + varAtg + varCea + varAtccd2 + varAtu;
+      int varTr = varAtd + varAtdp + varAtdps + varAccd1b + varAte + varAtg + varCea + varConvDrive + varUniform + varAtccd2 + varAtu;
       sheet.getRangeByName("G25").setValue(varTr);
 
       int varTd = varArp + varHli + varAtee + varSd + varAgg + varTr;
@@ -4552,7 +4552,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B51:G51").merge();
       sheet.getRangeByName("B51:G51").cellStyle = commontextStyle;
       sheet.getRangeByName("B51").setFormula(
-          r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$41, " is to be recovered as Income Tax for the total income of ₹ ",$G$3," from Sh./Smt./Ms ",' "\"${mainpgData['name']}\"" r'," working as ",'"\"${mainpgData['designation']}\"" r'," in ",$B$2, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
+          r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$43, " is to be recovered as Income Tax for the total income of ₹ ",$G$3," from Sh./Smt./Ms ",' "\"${mainpgData['name']}\"" r'," working as ",'"\"${mainpgData['designation']}\"" r'," in ",$B$2, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
       );
       sheet.getRangeByName("B51:G51").rowHeight = 54.60;
 

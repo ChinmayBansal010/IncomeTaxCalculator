@@ -27,6 +27,8 @@ class MainUpdatePage extends StatefulWidget {
   final String level;
   final String gpfNo;
   final String npsNo;
+  final String epfNo;
+  final String esiNo;
   final String email;
   final String cycleNo;
   final String voterId;
@@ -64,6 +66,8 @@ class MainUpdatePage extends StatefulWidget {
     required this.level,
     required this.gpfNo,
     required this.npsNo,
+    required this.epfNo,
+    required this.esiNo,
     required this.email,
     required this.cycleNo,
     required this.voterId,
@@ -105,6 +109,8 @@ class MainUpdatePageState extends State<MainUpdatePage> {
   final levelController = TextEditingController();
   final gpfNoController = TextEditingController(text: '0');
   final npsNoController = TextEditingController(text: '0');
+  final epfNoController = TextEditingController(text: '0');
+  final esiNoController = TextEditingController(text: '0');
   final emailController = TextEditingController();
   final cycleNoController = TextEditingController();
   final voterIdController = TextEditingController();
@@ -143,6 +149,8 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     levelController.text = widget.level;
     gpfNoController.text = widget.gpfNo;
     npsNoController.text = widget.npsNo;
+    epfNoController.text = widget.epfNo;
+    esiNoController.text = widget.esiNo;
     emailController.text = widget.email;
     cycleNoController.text = widget.cycleNo;
     voterIdController.text = widget.voterId;
@@ -189,6 +197,8 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     levelController.dispose();
     gpfNoController.dispose();
     npsNoController.dispose();
+    epfNoController.dispose();
+    esiNoController.dispose();
     emailController.dispose();
     cycleNoController.dispose();
     voterIdController.dispose();
@@ -279,6 +289,8 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         'level': levelController.text,
         'gpfno': gpfNoController.text,
         'npsno': npsNoController.text,
+        'epfno': epfNoController.text,
+        'esino': esiNoController.text,
         'emailid': emailController.text,
         'cycleno': cycleNoController.text,
         'voterid': voterIdController.text,
@@ -292,9 +304,11 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         'emptype': empTypeController,
         'bname': bankNameController.text,
       });
-      for (String months in month){
-        _getGpfNps(months);
-      }
+      await Future.wait([
+        for (String m in month) _getGpfNps(m),
+      ]);
+
+
       await bioRef.child('arrdata').child(biometricIdController.text.trim()).update({
         'biometricid': biometricIdController.text,
         'name': nameController.text,
@@ -424,36 +438,55 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     }
   }
 
-  void _getGpfNps(months) async{
+  Future<void> _getGpfNps(months) async{
     try{
-      if (empTypeController == 'REGULAR'){
-        if (npsNoController.text.trim() == '0' && gpfNoController.text.trim() != '0'){
-          await bioRef.child('monthdata').child(months).update({
-            'npschk' : '0',
-            'nps' : '0',
-            'gpfchk' : '1',
+      Map<String, String> updates = {};
+
+      String gpf = gpfNoController.text.trim();
+      String nps = npsNoController.text.trim();
+      String epf = epfNoController.text.trim();
+      String esi = esiNoController.text.trim();
+
+      if (empTypeController == 'REGULAR') {
+        if (nps == '0' && gpf != '0') {
+          updates.addAll({
+            'npschk': '0',
+            'nps': '0',
+            'gpfchk': '1',
           });
-        } else if(gpfNoController.text.trim() == '0' && npsNoController.text.trim() != '0'){
-          await bioRef.child('monthdata').child(months).update({
-            'npschk' : '1',
-            'gpfchk' : '1',
-            'gpf' : '0',
+        } else if (gpf == '0' && nps != '0') {
+          updates.addAll({
+            'npschk': '1',
+            'gpfchk': '0',
+            'gpf': '0',
           });
-        } else{
-          await bioRef.child('monthdata').child(months).update({
-            'npschk' : '0',
-            'nps' : '0',
-            'gpfchk' : '0',
-            'gpf' : '0',
+        } else {
+          updates.addAll({
+            'npschk': '0',
+            'nps': '0',
+            'gpfchk': '0',
+            'gpf': '0',
           });
         }
-      } else if(['CONTRACTUAL','DAILY WAGER'].contains(empTypeController)){
-        await bioRef.child('monthdata').child(months).update({
-          'npschk' : '0',
-          'nps' : '0',
-          'gpfchk' : '0',
-          'gpf' : '0',
+      } else if (['CONTRACTUAL', 'DAILY WAGER'].contains(empTypeController)) {
+        updates.addAll({
+          'npschk': '0',
+          'nps': '0',
+          'gpfchk': '0',
+          'gpf': '0',
         });
+      }
+      if (epf != '0') {
+        updates['epfchk'] = '1';
+      }
+
+      if (esi != '0') {
+        updates['esichk'] = '1';
+      }
+
+      print(updates);
+      if (updates.isNotEmpty) {
+        await bioRef.child('monthdata').child(months).child(biometricIdController.text).update(updates);
       }
     } catch (error) {
       if (mounted) {
@@ -505,13 +538,37 @@ class MainUpdatePageState extends State<MainUpdatePage> {
                         _buildTextField("NAME", nameController),
                         _buildTextField("FATHER/HUSBAND NAME", fhNameController),
                         _buildTextField("DESIGNATION", designationController),
-                        _buildDropdown("EMPLOYEE TYPE", empTypeController, ['','REGULAR', 'CONTRACTUAL', 'DAILY WAGER']),
+                        _buildDropdown("EMPLOYEE TYPE", empTypeController, ['','REGULAR', 'CONTRACTUAL', 'DAILY WAGER'],
+                              (newValue) {
+                            setState(() {
+                              empTypeController = newValue;
+                            });
+                          },
+                        ),
                         _buildTextField("DATE OF BIRTH", dobController, keyboardType: TextInputType.number,inputFormatters: [DateInputFormatter()]),
                         _buildTextField("DATE OF APPOINTMENT", doaController, keyboardType: TextInputType.number,inputFormatters: [DateInputFormatter()]),
-                        _buildTextField("DATE OF RETIREMENT", dornController, keyboardType: TextInputType.number,inputFormatters: [DateInputFormatter()]),
-                        _buildDropdown("GROUP", groupController, ['','A', 'B', 'C', 'D']),
-                        _buildDropdown("CATEGORY", categoryController, ['','GENERAL', 'SC', 'ST', 'OBC']),
-                        _buildDropdown("SEX", sexController, ['','MALE', 'FEMALE', 'OTHER']),
+                        _buildTextField("DATE OF RETIREMENT", dortController, keyboardType: TextInputType.number,inputFormatters: [DateInputFormatter()]),
+                        _buildDropdown("GROUP", groupController, ['','A', 'B', 'C', 'D'],
+                              (newValue) {
+                            setState(() {
+                              groupController = newValue;
+                            });
+                          },
+                        ),
+                        _buildDropdown("CATEGORY", categoryController, ['','GENERAL', 'SC', 'ST', 'OBC'],
+                              (newValue) {
+                            setState(() {
+                              categoryController = newValue;
+                            });
+                          },
+                        ),
+                        _buildDropdown("SEX", sexController, ['','MALE', 'FEMALE', 'OTHER'],
+                              (newValue) {
+                            setState(() {
+                              sexController = newValue;
+                            });
+                          },
+                        ),
                         _buildTextField("ADDRESS", addressController),
                         _buildTextField("AADHAAR NUMBER", aadhaarController),
                         _buildTextField("MOBILE NUMBER", mobileController, keyboardType: TextInputType.phone, inputFormatters: [MobileNumberFormatter()]),
@@ -525,12 +582,19 @@ class MainUpdatePageState extends State<MainUpdatePage> {
                         _buildTextField("LEVEL", levelController),
                         _buildTextField("GPF NUMBER", gpfNoController),
                         _buildTextField("NPS NUMBER", npsNoController),
+                        _buildTextField("EPF NUMBER", epfNoController),
+                        _buildTextField("ESI NUMBER", esiNoController),
                         _buildTextField("EMAIL ID", emailController),
                         _buildTextField("CYCLE NUMBER", cycleNoController),
                         _buildTextField("VOTER ID", voterIdController),
                         _buildTextField("DATE OF JOINING OFFICE", dojoController, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                         _buildTextField("PLACE OF DUTY", placeController),
-                        _buildDropdown("BLOOD GROUP", bloodGroupController, ['','A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+                        _buildDropdown("BLOOD GROUP", bloodGroupController, ['','A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                              (newValue) {
+                            setState(() {
+                              bloodGroupController = newValue;
+                            });
+                          },),
                         _buildTextField("EMERGENCY NUMBER", emergencyNoController, keyboardType: TextInputType.phone, inputFormatters: [MobileNumberFormatter()]),
                         _buildTextField("NIC EMAIL ID", nicEmailController),
                         _buildTextField("DATE OF RESIGNATION", dornController, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
@@ -666,19 +730,14 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     );
   }
 
-  Widget _buildDropdown(String label, String? value, List<String> items) {
+  Widget _buildDropdown(String label, String? currentValue, List<String> items, void Function(String?) onChangedCallback) {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isWideScreen = screenWidth > 600;
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: isWideScreen ? 32.0 : 16.0),
       child: DropdownButtonFormField<String?>(
-        value: value,
-        onChanged: (String? newValue) {
-          setState(() {
-            value = newValue;
-          });
-        },
+        value: currentValue,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(fontSize: isWideScreen ? 22.0 : 18.0, fontWeight: FontWeight.bold, color: Colors.black87),
@@ -704,6 +763,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
             child: Text(value),
           );
         }).toList(),
+        onChanged: onChangedCallback,
       ),
     );
   }
