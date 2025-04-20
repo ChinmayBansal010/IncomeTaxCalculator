@@ -98,10 +98,6 @@ Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, Stri
     final mainEntry = Map<String, dynamic>.from(dataMain[keys[i]]);
     final monthEntry = Map<String, dynamic>.from(monthData[keys[i]]);
 
-    int grossValue = parseValue(monthEntry['gross']);
-    int convValue = parseValue(monthEntry['conv']);
-    int driveValue = parseValue(monthEntry['drive']);
-
 
     List<dynamic> row = [
       0, // Placeholder for Sl. No.
