@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:incometax/tds.dart';
 import 'main.dart';
 import 'main_data.dart';
 import 'da.dart';
@@ -90,6 +91,7 @@ class _HomePageState extends State<HomePage> {
       "TAX EXPORT",
       "CALC",
       "EXPORT ALL",
+      "TDS",
       "LOGOUT"
     ];
 
@@ -158,6 +160,18 @@ class _HomePageState extends State<HomePage> {
           }
         }
         break;
+      case "TDS":
+        setState(() => _isLoading = true);
+        try {
+          await exportExcel();
+        } catch (e) {
+          if (!mounted) return;
+          _showErrorSnackbar(e.toString());
+        } finally {
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
+        }
       case "LOGOUT":
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
         break;
