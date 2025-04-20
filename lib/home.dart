@@ -132,9 +132,9 @@ class _HomePageState extends State<HomePage> {
       case "TAX EXPORT":
         setState(() => _isLoading = true);
         try {
-          await createExcel(); // Call the async Excel export function
+          await createExcel();
         } catch (e) {
-          if (!mounted) return; // Check if widget is still in the tree
+          if (!mounted) return;
           _showErrorSnackbar(e.toString());
         } finally {
           if (mounted) {
@@ -146,7 +146,17 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(context, MaterialPageRoute(builder: (context) => const CalcArrearPage()));
         break;
       case "EXPORT ALL":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ExportAll()));
+        setState(() => _isLoading = true);
+        try {
+          await exportAll();
+        } catch (e) {
+          if (!mounted) return;
+          _showErrorSnackbar(e.toString());
+        } finally {
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
+        }
         break;
       case "LOGOUT":
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));

@@ -403,6 +403,8 @@ class _ItaxPageState extends State<ItaxPage> {
         int varSocietygross,
         int varRecoverygross,
         int varWfgross,
+        int varEpfgross,
+        int varEsigross,
         int varOther2gross,
         int varDdext1gross,
         int varDdext2gross,
@@ -463,6 +465,8 @@ class _ItaxPageState extends State<ItaxPage> {
         'tsociety': varSocietygross,
         'trecovery': varRecoverygross,
         'twf': varWfgross,
+        'tepf': varEpfgross,
+        'tesi': varEsigross,
         'tother2': varOther2gross,
 
       });
@@ -487,6 +491,31 @@ class _ItaxPageState extends State<ItaxPage> {
 
   Future<void> updateItaxnew(
       String? biometricId,
+      int varTg,
+      int varConvDrive,
+      int varUniform,
+      int varGti,
+      int varAtccd2,
+      int varTi,
+      int varSd,
+      int varOther,
+      int varTti,
+      int varT1,
+      int varT2,
+      int varT3,
+      int varT4,
+      int varT5,
+      int varT6,
+      int varT7,
+      int varT8,
+      int varTl,
+      int varTre,
+      int varTtl,
+      int varEc,
+      int varTtp,
+      int varDeduct,
+      int varNitp,
+      int varRelief,
       int varNitpi,
       int varEp
       ) async{
@@ -511,9 +540,35 @@ class _ItaxPageState extends State<ItaxPage> {
     try {
       await bioRef.child('itaxnew').child(biometricId).set({
         'biometricid': biometricId,
+        'tg': varTg,
+        'convdrive': varConvDrive,
+        'uniform': varUniform,
+        'gti': varGti,
+        'atccd2': varAtccd2,
+        'ti': varTi,
+        'sd': varSd,
+        'other': varOther,
+        'tti': varTti,
+        't1': varT1,
+        't2': varT2,
+        't3': varT3,
+        't4': varT4,
+        't5': varT5,
+        't6': varT6,
+        't7': varT7,
+        't8': varT8,
+        'tl': varTl,
+        'tre': varTre,
+        'ttl': varTtl,
+        'ec': varEc,
+        'ttp': varTtp,
+        'deduct': varDeduct,
+        'nitp': varNitp,
+        'relief': varRelief,
         'nitpi': varNitpi,
         'ep': varEp
       });
+
     } catch (error) {
       if (mounted) {
         showDialog(
@@ -878,15 +933,17 @@ class _ItaxPageState extends State<ItaxPage> {
 
 
     final xls.Workbook workbook = xls.Workbook();
-    final xls.Worksheet itaxformSheet = workbook.worksheets[0];
+    final xls.Worksheet ecrSheet = workbook.worksheets[0];
+    final xls.Worksheet itaxformSheet = workbook.worksheets.add();
+    final xls.Worksheet itaxnewSheet = workbook.worksheets.add();
     final xls.Worksheet computationSheet = workbook.worksheets.add();
     final xls.Worksheet itaxoldSheet = workbook.worksheets.add();
-    final xls.Worksheet itaxnewSheet = workbook.worksheets.add();
 
+    ecrSheet.name = "ECR";
     itaxformSheet.name = "ITAX FORM";
+    itaxnewSheet.name = "ITAX CALC-NEW";
     computationSheet.name = "COMPUTATION";
     itaxoldSheet.name =  "ITAX CAL-OLD";
-    itaxnewSheet.name = "ITAX CALC-NEW";
 
 
     //-------------styles-------------------
@@ -1024,7 +1081,8 @@ class _ItaxPageState extends State<ItaxPage> {
     janData = monthdata['jan']!;
     febData = monthdata['feb']!;
 
-    await _itaxformPage(biometricId, itaxformSheet, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
+    await _itaxformPage(biometricId, ecrSheet, true, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
+    await _itaxformPage(biometricId, itaxformSheet, false, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
     await fetchitaxData(biometricId);
     await _computationPage(biometricId, computationSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
     await _itaxOldPage(biometricId, itaxoldSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
@@ -1055,6 +1113,7 @@ class _ItaxPageState extends State<ItaxPage> {
   Future<void> _itaxformPage(
       String? biometricId,
       xls.Worksheet sheet,
+      bool isECR,
       [
         xls.Style? formheaderStyle,
         xls.Style? commontextStyle,
@@ -1076,7 +1135,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName('A1').columnWidth = 13.33;
       sheet.getRangeByName('A1:K1').cellStyle = formheaderStyle!;
 
-      sheet.getRangeByName('B1:K1').columnWidth = 8.89;
+      sheet.getRangeByName('B1:K1').columnWidth = 11;
 
       sheet.getRangeByName('A2').setValue("BIOMETRIC ID");
       sheet.getRangeByName('B2').setValue(biometricId);
@@ -1173,6 +1232,15 @@ class _ItaxPageState extends State<ItaxPage> {
 
       sheet.getRangeByName('A10').rowHeight = 30.60;
 
+      // name, bioid
+      sheet.getRangeByName('A2').rowHeight = 40;
+
+      sheet.getRangeByName('B2:C2').cellStyle = commontextStyleBold;
+      sheet.getRangeByName('B2:C2').cellStyle.fontSize = 20;
+
+      sheet.getRangeByName('E2:G2').cellStyle = commontextStyleBold;
+      sheet.getRangeByName('E2:G2').cellStyle.fontSize = 16;
+
       List<String> values = [
         "MAR - 24", "APR - 24", "MAY - 24", "ARREAR", "QTR - 1 TOTAL",
         "JUN - 24", "JUL - 24", "AUG - 24", "ARREAR", "QTR - 2 TOTAL",
@@ -1244,6 +1312,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietymar = int.tryParse(marData['society']?.toString() ?? '0') ?? 0;
       int varRecoverymar = int.tryParse(marData['recovery']?.toString() ?? '0') ?? 0;
       int varWfmar = int.tryParse(marData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfmar = int.tryParse(marData['epf']?.toString() ?? '0') ?? 0;
+      int varEsimar = int.tryParse(marData['esi']?.toString() ?? '0') ?? 0;
       int varOther2mar = int.tryParse(marData['other']?.toString() ?? '0') ?? 0;
       int varDdext1mar = int.tryParse(marData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2mar = int.tryParse(marData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1301,6 +1371,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyapr = int.tryParse(aprData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryapr = int.tryParse(aprData['recovery']?.toString() ?? '0') ?? 0;
       int varWfapr = int.tryParse(aprData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfapr = int.tryParse(aprData['epf']?.toString() ?? '0') ?? 0;
+      int varEsiapr = int.tryParse(aprData['esi']?.toString() ?? '0') ?? 0;
       int varOther2apr = int.tryParse(aprData['other']?.toString() ?? '0') ?? 0;
       int varDdext1apr = int.tryParse(aprData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2apr = int.tryParse(aprData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1358,6 +1430,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietymay = int.tryParse(mayData['society']?.toString() ?? '0') ?? 0;
       int varRecoverymay = int.tryParse(mayData['recovery']?.toString() ?? '0') ?? 0;
       int varWfmay = int.tryParse(mayData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfmay = int.tryParse(mayData['epf']?.toString() ?? '0') ?? 0;
+      int varEsimay = int.tryParse(mayData['esi']?.toString() ?? '0') ?? 0;
       int varOther2may = int.tryParse(mayData['other']?.toString() ?? '0') ?? 0;
       int varDdext1may = int.tryParse(mayData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2may = int.tryParse(mayData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1409,6 +1483,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyarrearqtr1 = int.tryParse('0') ?? 0;
       int varRecoveryarrearqtr1 = int.tryParse('0') ?? 0;
       int varWfarrearqtr1 = int.tryParse('0') ?? 0;
+      int varEpfarrearqtr1 = int.tryParse('0') ?? 0;
+      int varEsiarrearqtr1 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr1 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr1 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr1 = int.tryParse('0') ?? 0;
@@ -1457,6 +1533,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyqtr1 = [varSocietymar, varSocietyapr, varSocietymay, varSocietyarrearqtr1].fold(0, (sum, value) => sum + value);
       int varRecoveryqtr1 = [varRecoverymar, varRecoveryapr, varRecoverymay, varRecoveryarrearqtr1].fold(0, (sum, value) => sum + value);
       int varWfqtr1 = [varWfmar, varWfapr, varWfmay, varWfarrearqtr1].fold(0, (sum, value) => sum + value);
+      int varEpfqtr1 = [varEpfmar, varEpfapr, varEpfmay, varEpfarrearqtr1].fold(0, (sum, value) => sum + value);
+      int varEsiqtr1 = [varEsimar, varEsiapr, varEsimay, varEsiarrearqtr1].fold(0, (sum, value) => sum + value);
       int varOther2qtr1 = [varOther2mar, varOther2apr, varOther2may, varOther2arrearqtr1].fold(0, (sum, value) => sum + value);
       int varDdext1qtr1 = [varDdext1mar, varDdext1apr, varDdext1may, varDdext1arrearqtr1].fold(0, (sum, value) => sum + value);
       int varDdext2qtr1 = [varDdext2mar, varDdext2apr, varDdext2may, varDdext2arrearqtr1].fold(0, (sum, value) => sum + value);
@@ -1514,6 +1592,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyjun = int.tryParse(junData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryjun = int.tryParse(junData['recovery']?.toString() ?? '0') ?? 0;
       int varWfjun = int.tryParse(junData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfjun = int.tryParse(junData['epf']?.toString() ?? '0') ?? 0;
+      int varEsijun = int.tryParse(junData['esi']?.toString() ?? '0') ?? 0;
       int varOther2jun = int.tryParse(junData['other']?.toString() ?? '0') ?? 0;
       int varDdext1jun = int.tryParse(junData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2jun = int.tryParse(junData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1571,6 +1651,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyjul = int.tryParse(julData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryjul = int.tryParse(julData['recovery']?.toString() ?? '0') ?? 0;
       int varWfjul = int.tryParse(julData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfjul = int.tryParse(julData['epf']?.toString() ?? '0') ?? 0;
+      int varEsijul = int.tryParse(julData['esi']?.toString() ?? '0') ?? 0;
       int varOther2jul = int.tryParse(julData['other']?.toString() ?? '0') ?? 0;
       int varDdext1jul = int.tryParse(julData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2jul = int.tryParse(julData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1628,6 +1710,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyaug = int.tryParse(augData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryaug = int.tryParse(augData['recovery']?.toString() ?? '0') ?? 0;
       int varWfaug = int.tryParse(augData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfaug = int.tryParse(augData['epf']?.toString() ?? '0') ?? 0;
+      int varEsiaug = int.tryParse(augData['esi']?.toString() ?? '0') ?? 0;
       int varOther2aug = int.tryParse(augData['other']?.toString() ?? '0') ?? 0;
       int varDdext1aug = int.tryParse(augData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2aug = int.tryParse(augData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1679,6 +1763,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyarrearqtr2 = int.tryParse('0') ?? 0;
       int varRecoveryarrearqtr2 = int.tryParse('0') ?? 0;
       int varWfarrearqtr2 = int.tryParse('0') ?? 0;
+      int varEpfarrearqtr2 = int.tryParse('0') ?? 0;
+      int varEsiarrearqtr2 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr2 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr2 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr2 = int.tryParse('0') ?? 0;
@@ -1727,6 +1813,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyqtr2 = [varSocietyjun, varSocietyjul, varSocietyaug, varSocietyarrearqtr2].fold(0, (sum, value) => sum + value);
       int varRecoveryqtr2 = [varRecoveryjun, varRecoveryjul, varRecoveryaug, varRecoveryarrearqtr2].fold(0, (sum, value) => sum + value);
       int varWfqtr2 = [varWfjun, varWfjul, varWfaug, varWfarrearqtr2].fold(0, (sum, value) => sum + value);
+      int varEpfqtr2 = [varEpfjun, varEpfjul, varEpfaug, varEpfarrearqtr2].fold(0, (sum, value) => sum + value);
+      int varEsiqtr2 = [varEsijun, varEsijul, varEsiaug, varEsiarrearqtr2].fold(0, (sum, value) => sum + value);
       int varOther2qtr2 = [varOther2jun, varOther2jul, varOther2aug, varOther2arrearqtr2].fold(0, (sum, value) => sum + value);
       int varDdext1qtr2 = [varDdext1jun, varDdext1jul, varDdext1aug, varDdext1arrearqtr2].fold(0, (sum, value) => sum + value);
       int varDdext2qtr2 = [varDdext2jun, varDdext2jul, varDdext2aug, varDdext2arrearqtr2].fold(0, (sum, value) => sum + value);
@@ -1784,6 +1872,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietysept = int.tryParse(septData['society']?.toString() ?? '0') ?? 0;
       int varRecoverysept = int.tryParse(septData['recovery']?.toString() ?? '0') ?? 0;
       int varWfsept = int.tryParse(septData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfsept = int.tryParse(septData['epf']?.toString() ?? '0') ?? 0;
+      int varEsisept = int.tryParse(septData['esi']?.toString() ?? '0') ?? 0;
       int varOther2sept = int.tryParse(septData['other']?.toString() ?? '0') ?? 0;
       int varDdext1sept = int.tryParse(septData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2sept = int.tryParse(septData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1841,6 +1931,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyoct = int.tryParse(octData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryoct = int.tryParse(octData['recovery']?.toString() ?? '0') ?? 0;
       int varWfoct = int.tryParse(octData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfoct = int.tryParse(octData['epf']?.toString() ?? '0') ?? 0;
+      int varEsioct = int.tryParse(octData['esi']?.toString() ?? '0') ?? 0;
       int varOther2oct = int.tryParse(octData['other']?.toString() ?? '0') ?? 0;
       int varDdext1oct = int.tryParse(octData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2oct = int.tryParse(octData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1898,6 +1990,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietynov = int.tryParse(novData['society']?.toString() ?? '0') ?? 0;
       int varRecoverynov = int.tryParse(novData['recovery']?.toString() ?? '0') ?? 0;
       int varWfnov = int.tryParse(novData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfnov = int.tryParse(novData['epf']?.toString() ?? '0') ?? 0;
+      int varEsinov = int.tryParse(novData['esi']?.toString() ?? '0') ?? 0;
       int varOther2nov = int.tryParse(novData['other']?.toString() ?? '0') ?? 0;
       int varDdext1nov = int.tryParse(novData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2nov = int.tryParse(novData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1947,6 +2041,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyarrearqtr3 = int.tryParse('0') ?? 0;
       int varRecoveryarrearqtr3 = int.tryParse('0') ?? 0;
       int varWfarrearqtr3 = int.tryParse('0') ?? 0;
+      int varEpfarrearqtr3 = int.tryParse('0') ?? 0;
+      int varEsiarrearqtr3 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr3 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr3 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr3 = int.tryParse('0') ?? 0;
@@ -1995,6 +2091,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyqtr3 = [varSocietysept, varSocietyoct, varSocietynov, varSocietyarrearqtr3].fold(0, (sum, value) => sum + value);
       int varRecoveryqtr3 = [varRecoverysept, varRecoveryoct, varRecoverynov, varRecoveryarrearqtr3].fold(0, (sum, value) => sum + value);
       int varWfqtr3 = [varWfsept, varWfoct, varWfnov, varWfarrearqtr3].fold(0, (sum, value) => sum + value);
+      int varEpfqtr3 = [varEpfsept, varEpfoct, varEpfnov, varEpfarrearqtr3].fold(0, (sum, value) => sum + value);
+      int varEsiqtr3 = [varEsisept, varEsioct, varEsinov, varEsiarrearqtr3].fold(0, (sum, value) => sum + value);
       int varOther2qtr3 = [varOther2sept, varOther2oct, varOther2nov, varOther2arrearqtr3].fold(0, (sum, value) => sum + value);
       int varDdext1qtr3 = [varDdext1sept, varDdext1oct, varDdext1nov, varDdext1arrearqtr3].fold(0, (sum, value) => sum + value);
       int varDdext2qtr3 = [varDdext2sept, varDdext2oct, varDdext2nov, varDdext2arrearqtr3].fold(0, (sum, value) => sum + value);
@@ -2051,6 +2149,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietydec = int.tryParse(decData['society']?.toString() ?? '0') ?? 0;
       int varRecoverydec = int.tryParse(decData['recovery']?.toString() ?? '0') ?? 0;
       int varWfdec = int.tryParse(decData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfdec = int.tryParse(decData['epf']?.toString() ?? '0') ?? 0;
+      int varEsidec = int.tryParse(decData['esi']?.toString() ?? '0') ?? 0;
       int varOther2dec = int.tryParse(decData['other']?.toString() ?? '0') ?? 0;
       int varDdext1dec = int.tryParse(decData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2dec = int.tryParse(decData['ddext2']?.toString() ?? '0') ?? 0;
@@ -2108,6 +2208,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyjan = int.tryParse(janData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryjan = int.tryParse(janData['recovery']?.toString() ?? '0') ?? 0;
       int varWfjan = int.tryParse(janData['wf']?.toString() ?? '0') ?? 0;
+      int varEpfjan = int.tryParse(janData['epf']?.toString() ?? '0') ?? 0;
+      int varEsijan = int.tryParse(janData['esi']?.toString() ?? '0') ?? 0;
       int varOther2jan = int.tryParse(janData['other']?.toString() ?? '0') ?? 0;
       int varDdext1jan = int.tryParse(janData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2jan = int.tryParse(janData['ddext2']?.toString() ?? '0') ?? 0;
@@ -2164,6 +2266,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyfeb = int.tryParse(febData['society']?.toString() ?? '0') ?? 0;
       int varRecoveryfeb = int.tryParse(febData['recovery']?.toString() ?? '0') ?? 0;
       int varWffeb = int.tryParse(febData['wf']?.toString() ?? '0') ?? 0;
+      int varEpffeb = int.tryParse(febData['epf']?.toString() ?? '0') ?? 0;
+      int varEsifeb = int.tryParse(febData['esi']?.toString() ?? '0') ?? 0;
       int varOther2feb = int.tryParse(febData['other']?.toString() ?? '0') ?? 0;
       int varDdext1feb = int.tryParse(febData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2feb = int.tryParse(febData['ddext2']?.toString() ?? '0') ?? 0;
@@ -2171,8 +2275,6 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDdext4feb = int.tryParse(febData['ddext4']?.toString() ?? '0') ?? 0;
       int varTotaldedfeb = int.tryParse(febData['totalded']?.toString() ?? '0') ?? 0;
       int varNetsalaryfeb = int.tryParse(febData['netsalary']?.toString() ?? '0') ?? 0;
-
-
 
       // ============================= arrearqtr4 ==============================
       int varBparrearqtr4 = int.tryParse('0') ?? 0;
@@ -2215,6 +2317,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyarrearqtr4 = int.tryParse('0') ?? 0;
       int varRecoveryarrearqtr4 = int.tryParse('0') ?? 0;
       int varWfarrearqtr4 = int.tryParse('0') ?? 0;
+      int varEpfarrearqtr4 = int.tryParse('0') ?? 0;
+      int varEsiarrearqtr4 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr4 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr4 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr4 = int.tryParse('0') ?? 0;
@@ -2269,6 +2373,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietyqtr4 = [varSocietydec, varSocietyjan, varSocietyfeb, varSocietyarrearqtr4].fold(0, (sum, value) => sum + value);
       int varRecoveryqtr4 = [varRecoverydec, varRecoveryjan, varRecoveryfeb, varRecoveryarrearqtr4].fold(0, (sum, value) => sum + value);
       int varWfqtr4 = [varWfdec, varWfjan, varWffeb, varWfarrearqtr4].fold(0, (sum, value) => sum + value);
+      int varEpfqtr4 = [varEpfdec, varEpfjan, varEpffeb, varEpfarrearqtr4].fold(0, (sum, value) => sum + value);
+      int varEsiqtr4 = [varEsidec, varEsijan, varEsifeb, varEsiarrearqtr4].fold(0, (sum, value) => sum + value);
       int varOther2qtr4 = [varOther2dec, varOther2jan, varOther2feb, varOther2arrearqtr4].fold(0, (sum, value) => sum + value);
       int varDdext1qtr4 = [varDdext1dec, varDdext1jan, varDdext1feb, varDdext1arrearqtr4].fold(0, (sum, value) => sum + value);
       int varDdext2qtr4 = [varDdext2dec, varDdext2jan, varDdext2feb, varDdext2arrearqtr4].fold(0, (sum, value) => sum + value);
@@ -2317,6 +2423,8 @@ class _ItaxPageState extends State<ItaxPage> {
       int varSocietygross = [varSocietyqtr1, varSocietyqtr2, varSocietyqtr3, varSocietyqtr4].fold(0, (sum, value) => sum + value);
       int varRecoverygross = [varRecoveryqtr1, varRecoveryqtr2, varRecoveryqtr3, varRecoveryqtr4].fold(0, (sum, value) => sum + value);
       int varWfgross = [varWfqtr1, varWfqtr2, varWfqtr3, varWfqtr4].fold(0, (sum, value) => sum + value);
+      int varEpfgross = [varEpfqtr1, varEpfqtr2, varEpfqtr3, varEpfqtr4].fold(0, (sum, value) => sum + value);
+      int varEsigross = [varEsiqtr1, varEsiqtr2, varEsiqtr3, varEsiqtr4].fold(0, (sum, value) => sum + value);
       int varOther2gross = [varOther2qtr1, varOther2qtr2, varOther2qtr3, varOther2qtr4].fold(0, (sum, value) => sum + value);
       int varDdext1gross = [varDdext1qtr1, varDdext1qtr2, varDdext1qtr3, varDdext1qtr4].fold(0, (sum, value) => sum + value);
       int varDdext2gross = [varDdext2qtr1, varDdext2qtr2, varDdext2qtr3, varDdext2qtr4].fold(0, (sum, value) => sum + value);
@@ -2326,51 +2434,55 @@ class _ItaxPageState extends State<ItaxPage> {
       int varNetsalarygross = [varNetsalaryqtr1, varNetsalaryqtr2, varNetsalaryqtr3, varNetsalaryqtr4].fold(0, (sum, value) => sum + value);
 
       // ================================= Update Itax Form total value ==================================
-      await updateitax(
-        biometricId,
-        varBpgross,
-        varDagross,
-        varHragross,
-        varNpagross,
-        varSplpaygross,
-        varConvgross,
-        varPggross,
-        varAnnualgross,
-        varUniformgross,
-        varNursinggross,
-        varTagross,
-        varDaontagross,
-        varMedicalgross,
-        varDirtgross,
-        varWashinggross,
-        varTbgross,
-        varNightgross,
-        varDrivegross,
-        varCyclegross,
-        varPcagross,
-        varNpsempgross,
-        varOthergross,
-        varDaext1gross,
-        varDaext2gross,
-        varDaext3gross,
-        varDaext4gross,
-        varSalarygross,
-        varIncometaxgross,
-        varGisgross,
-        varGpfgross,
-        varNpsgross,
-        varSlfgross,
-        varSocietygross,
-        varRecoverygross,
-        varWfgross,
-        varOther2gross,
-        varDdext1gross,
-        varDdext2gross,
-        varDdext3gross,
-        varDdext4gross,
-        varTotaldedgross,
-        varNetsalarygross
-      );
+      if (!isECR){
+        await updateitax(
+          biometricId,
+          varBpgross,
+          varDagross,
+          varHragross,
+          varNpagross,
+          varSplpaygross,
+          varConvgross,
+          varPggross,
+          varAnnualgross,
+          varUniformgross,
+          varNursinggross,
+          varTagross,
+          varDaontagross,
+          varMedicalgross,
+          varDirtgross,
+          varWashinggross,
+          varTbgross,
+          varNightgross,
+          varDrivegross,
+          varCyclegross,
+          varPcagross,
+          varNpsempgross,
+          varOthergross,
+          varDaext1gross,
+          varDaext2gross,
+          varDaext3gross,
+          varDaext4gross,
+          varSalarygross,
+          varIncometaxgross,
+          varGisgross,
+          varGpfgross,
+          varNpsgross,
+          varSlfgross,
+          varSocietygross,
+          varRecoverygross,
+          varWfgross,
+          varEpfgross,
+          varEsigross,
+          varOther2gross,
+          varDdext1gross,
+          varDdext2gross,
+          varDdext3gross,
+          varDdext4gross,
+          varTotaldedgross,
+          varNetsalarygross
+        );
+      }
 
       //================================== excel formation =================================================
       List<String> columns = ['B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
@@ -3257,48 +3369,50 @@ class _ItaxPageState extends State<ItaxPage> {
 
       }
 
-      if (varNpsempgross > 0){
+      if (!isECR){
+        if (varNpsempgross > 0){
 
-        sheet.getRangeByName("${columns[end]}10").setValue("NPS 14%");
-        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+          sheet.getRangeByName("${columns[end]}10").setValue("NPS 14%");
+          sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
 
-        sheet.getRangeByName("${columns[end]}11").setValue(varNpsempmar);
-        sheet.getRangeByName("${columns[end]}12").setValue(varNpsempapr);
-        sheet.getRangeByName("${columns[end]}13").setValue(varNpsempmay);
-        sheet.getRangeByName("${columns[end]}14").setValue(varNpsemparrearqtr1);
-        sheet.getRangeByName("${columns[end]}15").setValue(varNpsempqtr1);
-        sheet.getRangeByName("${columns[end]}16").setValue(varNpsempjun);
-        sheet.getRangeByName("${columns[end]}17").setValue(varNpsempjul);
-        sheet.getRangeByName("${columns[end]}18").setValue(varNpsempaug);
-        sheet.getRangeByName("${columns[end]}19").setValue(varNpsemparrearqtr2);
-        sheet.getRangeByName("${columns[end]}20").setValue(varNpsempqtr2);
-        sheet.getRangeByName("${columns[end]}21").setValue(varNpsempsept);
-        sheet.getRangeByName("${columns[end]}22").setValue(varNpsempoct);
-        sheet.getRangeByName("${columns[end]}23").setValue(varNpsempnov);
-        sheet.getRangeByName("${columns[end]}24").setValue(varNpsemparrearqtr3);
-        sheet.getRangeByName("${columns[end]}25").setValue(varNpsempqtr3);
-        sheet.getRangeByName("${columns[end]}26").setValue(varNpsempdec);
-        sheet.getRangeByName("${columns[end]}27").setValue(varNpsempjan);
-        sheet.getRangeByName("${columns[end]}28").setValue(varNpsempfeb);
-        sheet.getRangeByName("${columns[end]}29").setValue(varNpsemparrearqtr4);
-        sheet.getRangeByName("${columns[end]}30").setValue('0');
-        sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varNpsempqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varNpsempgross);
+          sheet.getRangeByName("${columns[end]}11").setValue(varNpsempmar);
+          sheet.getRangeByName("${columns[end]}12").setValue(varNpsempapr);
+          sheet.getRangeByName("${columns[end]}13").setValue(varNpsempmay);
+          sheet.getRangeByName("${columns[end]}14").setValue(varNpsemparrearqtr1);
+          sheet.getRangeByName("${columns[end]}15").setValue(varNpsempqtr1);
+          sheet.getRangeByName("${columns[end]}16").setValue(varNpsempjun);
+          sheet.getRangeByName("${columns[end]}17").setValue(varNpsempjul);
+          sheet.getRangeByName("${columns[end]}18").setValue(varNpsempaug);
+          sheet.getRangeByName("${columns[end]}19").setValue(varNpsemparrearqtr2);
+          sheet.getRangeByName("${columns[end]}20").setValue(varNpsempqtr2);
+          sheet.getRangeByName("${columns[end]}21").setValue(varNpsempsept);
+          sheet.getRangeByName("${columns[end]}22").setValue(varNpsempoct);
+          sheet.getRangeByName("${columns[end]}23").setValue(varNpsempnov);
+          sheet.getRangeByName("${columns[end]}24").setValue(varNpsemparrearqtr3);
+          sheet.getRangeByName("${columns[end]}25").setValue(varNpsempqtr3);
+          sheet.getRangeByName("${columns[end]}26").setValue(varNpsempdec);
+          sheet.getRangeByName("${columns[end]}27").setValue(varNpsempjan);
+          sheet.getRangeByName("${columns[end]}28").setValue(varNpsempfeb);
+          sheet.getRangeByName("${columns[end]}29").setValue(varNpsemparrearqtr4);
+          sheet.getRangeByName("${columns[end]}30").setValue('0');
+          sheet.getRangeByName("${columns[end]}31").setValue('0');
+          sheet.getRangeByName("${columns[end]}32").setValue(varNpsempqtr4);
+          sheet.getRangeByName("${columns[end]}33").setValue(varNpsempgross);
 
-        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
-        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
-        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
 
-        List<String> qtrcolumns = ['15','20','25','32'];
-        for (String cols in qtrcolumns){
-          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+          List<String> qtrcolumns = ['15','20','25','32'];
+          for (String cols in qtrcolumns){
+            sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+          }
+          sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+          end+=1;
+
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
-
-        end+=1;
-
       }
 
       if ((varOthergross + varTution + varBonus) > 0){
@@ -3669,7 +3783,6 @@ class _ItaxPageState extends State<ItaxPage> {
 
       }
 
-
       if (varRecoverygross > 0){
 
         sheet.getRangeByName("${columns[end]}10").setValue("RECOVERY");
@@ -3758,6 +3871,94 @@ class _ItaxPageState extends State<ItaxPage> {
 
       }
 
+      if (varEpfgross > 0){
+
+        sheet.getRangeByName("${columns[end]}10").setValue("EPF");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varEpfmar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varEpfapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varEpfmay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varEpfarrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varEpfqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varEpfjun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varEpfjul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varEpfaug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varEpfarrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varEpfqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varEpfsept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varEpfoct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varEpfnov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varEpfarrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varEpfqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varEpfdec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varEpfjan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varEpffeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varEpfarrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varEpfqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varEpfgross);
+
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15','20','25','32'];
+        for (String cols in qtrcolumns){
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end+=1;
+
+      }
+
+      if (varEsigross > 0){
+
+        sheet.getRangeByName("${columns[end]}10").setValue("ESI");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varEsimar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varEsiapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varEsimay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varEsiarrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varEsiqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varEsijun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varEsijul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varEsiaug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varEsiarrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varEsiqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varEsisept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varEsioct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varEsinov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varEsiarrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varEsiqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varEsidec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varEsijan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varEsifeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varEsiarrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varEsiqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varEsigross);
+
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15','20','25','32'];
+        for (String cols in qtrcolumns){
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end+=1;
+
+      }
+
       if (varOther2gross > 0){
 
         sheet.getRangeByName("${columns[end]}10").setValue("OTHER");
@@ -3801,6 +4002,99 @@ class _ItaxPageState extends State<ItaxPage> {
         end+=1;
 
       }
+
+      if (isECR){
+        if (varTotaldedgross > 0){
+
+          sheet.getRangeByName("${columns[end]}10").setValue("TOTAL DEDUCTION");
+          sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+          sheet.getRangeByName("${columns[end]}11").setValue(varTotaldedmar);
+          sheet.getRangeByName("${columns[end]}12").setValue(varTotaldedapr);
+          sheet.getRangeByName("${columns[end]}13").setValue(varTotaldedmay);
+          sheet.getRangeByName("${columns[end]}14").setValue(varTotaldedarrearqtr1);
+          sheet.getRangeByName("${columns[end]}15").setValue(varTotaldedqtr1);
+          sheet.getRangeByName("${columns[end]}16").setValue(varTotaldedjun);
+          sheet.getRangeByName("${columns[end]}17").setValue(varTotaldedjul);
+          sheet.getRangeByName("${columns[end]}18").setValue(varTotaldedaug);
+          sheet.getRangeByName("${columns[end]}19").setValue(varTotaldedarrearqtr2);
+          sheet.getRangeByName("${columns[end]}20").setValue(varTotaldedqtr2);
+          sheet.getRangeByName("${columns[end]}21").setValue(varTotaldedsept);
+          sheet.getRangeByName("${columns[end]}22").setValue(varTotaldedoct);
+          sheet.getRangeByName("${columns[end]}23").setValue(varTotaldednov);
+          sheet.getRangeByName("${columns[end]}24").setValue(varTotaldedarrearqtr3);
+          sheet.getRangeByName("${columns[end]}25").setValue(varTotaldedqtr3);
+          sheet.getRangeByName("${columns[end]}26").setValue(varTotaldeddec);
+          sheet.getRangeByName("${columns[end]}27").setValue(varTotaldedjan);
+          sheet.getRangeByName("${columns[end]}28").setValue(varTotaldedfeb);
+          sheet.getRangeByName("${columns[end]}29").setValue(varTotaldedarrearqtr4);
+          sheet.getRangeByName("${columns[end]}30").setValue('0');
+          sheet.getRangeByName("${columns[end]}31").setValue('0');
+          sheet.getRangeByName("${columns[end]}32").setValue(varTotaldedqtr4);
+          sheet.getRangeByName("${columns[end]}33").setValue(varTotaldedgross);
+
+          sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+          List<String> qtrcolumns = ['15','20','25','32'];
+          for (String cols in qtrcolumns){
+            sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+          }
+          sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+          sheet.getRangeByName("${columns[end]}33").columnWidth = 11;
+
+          end+=1;
+
+        }
+
+        if (varNetsalarygross > 0){
+
+          sheet.getRangeByName("${columns[end]}10").setValue("NET SALARY");
+          sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+          sheet.getRangeByName("${columns[end]}11").setValue(varNetsalarymar);
+          sheet.getRangeByName("${columns[end]}12").setValue(varNetsalaryapr);
+          sheet.getRangeByName("${columns[end]}13").setValue(varNetsalarymay);
+          sheet.getRangeByName("${columns[end]}14").setValue(varNetsalaryarrearqtr1);
+          sheet.getRangeByName("${columns[end]}15").setValue(varNetsalaryqtr1);
+          sheet.getRangeByName("${columns[end]}16").setValue(varNetsalaryjun);
+          sheet.getRangeByName("${columns[end]}17").setValue(varNetsalaryjul);
+          sheet.getRangeByName("${columns[end]}18").setValue(varNetsalaryaug);
+          sheet.getRangeByName("${columns[end]}19").setValue(varNetsalaryarrearqtr2);
+          sheet.getRangeByName("${columns[end]}20").setValue(varNetsalaryqtr2);
+          sheet.getRangeByName("${columns[end]}21").setValue(varNetsalarysept);
+          sheet.getRangeByName("${columns[end]}22").setValue(varNetsalaryoct);
+          sheet.getRangeByName("${columns[end]}23").setValue(varNetsalarynov);
+          sheet.getRangeByName("${columns[end]}24").setValue(varNetsalaryarrearqtr3);
+          sheet.getRangeByName("${columns[end]}25").setValue(varNetsalaryqtr3);
+          sheet.getRangeByName("${columns[end]}26").setValue(varNetsalarydec);
+          sheet.getRangeByName("${columns[end]}27").setValue(varNetsalaryjan);
+          sheet.getRangeByName("${columns[end]}28").setValue(varNetsalaryfeb);
+          sheet.getRangeByName("${columns[end]}29").setValue(varNetsalaryarrearqtr4);
+          sheet.getRangeByName("${columns[end]}30").setValue('0');
+          sheet.getRangeByName("${columns[end]}31").setValue('0');
+          sheet.getRangeByName("${columns[end]}32").setValue(varNetsalaryqtr4);
+          sheet.getRangeByName("${columns[end]}33").setValue(varNetsalarygross);
+
+          sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+          sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+          List<String> qtrcolumns = ['15','20','25','32'];
+          for (String cols in qtrcolumns){
+            sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+          }
+          sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+          sheet.getRangeByName("${columns[end]}33").columnWidth = 11;
+
+          end+=1;
+
+        }
+      }
+
       if (dstart != end ){
         if((dstart - end) > 2) {
           sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").merge();
@@ -3814,6 +4108,14 @@ class _ItaxPageState extends State<ItaxPage> {
           sheet.getRangeByName("${columns[dstart]}9:${columns[end - 1]}9").cellStyle.hAlign = xls.HAlignType.center;
         }
       }
+
+      if(!isECR){
+        sheet.getRangeByName('A38:B38').merge();
+        sheet.getRangeByName('A38:B38').cellStyle = commontextStyleBold;
+        sheet.getRangeByName('A38:B38').cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+        sheet.getRangeByName('A38').setValue('Signature of Employee');
+      }
+
 
     } catch (error) {
       if (mounted) {
@@ -4634,12 +4936,12 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B12:B19").cellStyle = commontextStyle!;
       sheet.getRangeByName("B12:B19").cellStyle.hAlign = xls.HAlignType.center;
 
-      for (int i = 11; i<=21; i++){
-        sheet.getRangeByName("B${i+9}").setValue(i);
-        sheet.getRangeByName("B${i+9}").cellStyle = commontextStyle;
-        sheet.getRangeByName("B${i+9}").cellStyle.hAlign = xls.HAlignType.center;
-        sheet.getRangeByName("C${i+9}:F${i+9}").merge();
-        sheet.getRangeByName("C${i+9}:F${i+9}").cellStyle = commontextStyle;
+      for (int i = 11; i<=20; i++){
+        sheet.getRangeByName("B${i+10}").setValue(i);
+        sheet.getRangeByName("B${i+10}").cellStyle = commontextStyle;
+        sheet.getRangeByName("B${i+10}").cellStyle.hAlign = xls.HAlignType.center;
+        sheet.getRangeByName("C${i+10}:F${i+10}").merge();
+        sheet.getRangeByName("C${i+10}:F${i+10}").cellStyle = commontextStyle;
 
       }
 
@@ -4649,9 +4951,9 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("C4").setValue("Conveyance & Contigency Exempted");
       sheet.getRangeByName("C5").setValue("Uniform Exempted");
       sheet.getRangeByName("C6").setValue("Gross Total Income");
-      sheet.getRangeByName("C7").setValue("Housing Loan Interest");
-      sheet.getRangeByName("C8").setValue("Standard deducion");
-      sheet.getRangeByName("C9").setValue("U/S 80CCD (2)");
+      sheet.getRangeByName("C7").setValue("U/S 80CCD (2)");
+      sheet.getRangeByName("C8").setValue("Taxable Income");
+      sheet.getRangeByName("C9").setValue("Standard deducion");
       sheet.getRangeByName("C10").setValue("Other");
       sheet.getRangeByName("C11").setValue("Total Taxable Income (Round off)");
       sheet.getRangeByName("C11").cellStyle = commontextStyleBold;
@@ -4662,7 +4964,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("C12:F12").cellStyle.hAlign = xls.HAlignType.center;
       sheet.getRangeByName("C12").setValue("Rate of Income Table Leviable");
 
-      List<String> romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii"];
+      List<String> romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", 'viii'];
 
       for (int i = 0; i < romanNumerals.length; i++) {
         sheet.getRangeByName("C${i+13}").setValue(romanNumerals[i]);
@@ -4675,28 +4977,28 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("D16").setValue("Rs. 10,00,001/- To Rs. 12,00,000          15%");
       sheet.getRangeByName("D17").setValue("Rs. 12,00,001/- To Rs. 15,00,000          20%");
       sheet.getRangeByName("D18").setValue("ABOVE Rs. 15,00,001                               30%");
-      sheet.getRangeByName("D19").setValue("SURCHARGE");
+      sheet.getRangeByName("D19").setValue("TOTAL TAX");
+      sheet.getRangeByName("D19").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("D20").setValue("SURCHARGE");
 
-      sheet.getRangeByName("C20").setValue("Tax rebate (Sec.87A):if applicable");
-      sheet.getRangeByName("C21").setValue("Total Tax Liability");
+      sheet.getRangeByName("C21").setValue("Tax Liability");
       sheet.getRangeByName("C21").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C21").rowHeight = 17.40;
-      sheet.getRangeByName("C22").setValue("Education Cess  4%");
-      sheet.getRangeByName("C22").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C22").rowHeight = 17.40;
-      sheet.getRangeByName("C23").setValue("Total Tax Payble Rs.");
+      sheet.getRangeByName("C22").setValue("Tax rebate (Sec.87A):if applicable");
+      sheet.getRangeByName("C23").setValue("Total Tax Liability");
       sheet.getRangeByName("C23").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C23").rowHeight = 17.40;
-      sheet.getRangeByName("C24").setValue("Total Tax Payble round off to the nearest Rs.");
+      sheet.getRangeByName("C24").setValue("Education Cess  4%");
       sheet.getRangeByName("C24").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C24").rowHeight = 17.40;
-      sheet.getRangeByName("C25").setValue("Deduct :-Income Tax already Paid");
-      sheet.getRangeByName("C26").setValue("Net Income Tax Payble");
-      sheet.getRangeByName("C26").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C27").setValue("Interest, If Any");
+      sheet.getRangeByName("C25").setValue("Total Tax Payble Rs.");
+      sheet.getRangeByName("C25").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C25").rowHeight = 17.40;
+      sheet.getRangeByName("C26").setValue("Deduct :-Income Tax already Paid");
+      sheet.getRangeByName("C27").setValue("Income Tax Payble");
+      sheet.getRangeByName("C27").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C28").setValue("Relief u/s 89(i)");
       sheet.getRangeByName("C29").rowHeight = 19.80;
-      sheet.getRangeByName("C29").setValue("Net Income Tax Payble with Interest");
+      sheet.getRangeByName("C29").setValue("Net Income Tax Payble");
       sheet.getRangeByName("C29").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C29").cellStyle.fontSize = 14;
       sheet.getRangeByName("C29").cellStyle.backColor = "#FBD4B4";
@@ -4722,19 +5024,19 @@ class _ItaxPageState extends State<ItaxPage> {
       int varGti = varTg - varConvDrive - varUniform;
       sheet.getRangeByName("G6").setValue(varGti);
 
-      int varHli = 0;
-      sheet.getRangeByName("G7").setValue(varHli);
+      int varAtccd2 = int.tryParse(itfData['tnpsemp']?.toString() ?? '0') ?? 0;
+      sheet.getRangeByName("G7").setValue(varAtccd2);
+
+      int varTi = varGti - varAtccd2;
+      sheet.getRangeByName("G8").setValue(varTi);
 
       int varSd = 75000;
-      sheet.getRangeByName("G8").setValue(varSd);
-
-      int varAtccd2 = int.tryParse(dedData['80ccd2']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G9").setValue(varAtccd2);
+      sheet.getRangeByName("G9").setValue(varSd);
 
       int varOther = int.tryParse(dedData['other']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("G10").setValue(varOther);
 
-      int varTti = varGti - varHli - varSd - varAtccd2 - varOther;
+      int varTti = varTi - varSd;
       if (varTti < 0){
         varTti = 0;
       }
@@ -4747,6 +5049,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varT5 = 0;
       int varT6 = 0;
       int varT7 = 0;
+      int varT8 = 0;
 
       if (varTti > 700000){
         varT2 = 20000;
@@ -4770,29 +5073,33 @@ class _ItaxPageState extends State<ItaxPage> {
         varT5 = ((varTti - 1200000)*0.2).round();
       }
 
+      varT7 = varT1+varT2+varT3+varT4+varT5+varT6;
+
       int varTre = 0;
       if (varTti<=700000){
         varTre = min(25000,(varT2+varT3));
       }
 
+      int varTl = varT7+varT8;
+
       int varTtl = 0;
       if((varT2+varT3+varT4+varT5+varT6-varTre)>=0){
-        varTtl = varT2+varT3+varT4+varT5+varT6-varTre;
+        varTtl = varTl - varTre;
       }
 
       int varEc = 0;
       int varTtp = 0;
       if(varTti> 5000000){
-        varT7 = (varTtl * 0.1).round();
-        varEc = ((varTtl + varT7)*0.04).round();
+        varT8 = (varTtl * 0.1).round();
+        varEc = ((varTtl + varT8)*0.04).round();
 
-        varTtp = varTtl + varEc + varT7;
+        varTtp = varTtl + varEc + varT8;
         int excess = varTtp - 1190000;
 
         if ((varTti - 5000000) < excess){
-          varT7 = (varTti - 5000000 - (varTtl - 1190000));
-          if (varT7 > (varTtl * 0.1)){
-            varT7 = (varTtl * 0.1).round();
+          varT8 = (varTti - 5000000 - (varTtl - 1190000));
+          if (varT8 > (varTtl * 0.1)){
+            varT8 = (varTtl * 0.1).round();
           }
         }
       }
@@ -4804,35 +5111,29 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("G17").setValue(varT5);
       sheet.getRangeByName("G18").setValue(varT6);
       sheet.getRangeByName("G19").setValue(varT7);
-      sheet.getRangeByName("G20").setValue(varTre);
-      sheet.getRangeByName("G21").setValue(varTtl);
-      varEc = ((varTtl + varT7) * 0.04).round();
-      sheet.getRangeByName("G22").setValue(varEc);
-      varTtp = varTtl + varEc + varT7;
-      sheet.getRangeByName("G23").setValue(varTtp);
-      int lastDigit = varTtp % 10;
-      int varTtpi = varTtp;
-      if (lastDigit > 0){
-        varTtpi = varTtp + (10- lastDigit);
-      }
-      sheet.getRangeByName("G24").setValue(varTtpi);
+      sheet.getRangeByName("G20").setValue(varT8);
+      sheet.getRangeByName("G21").setValue(varTl);
+      sheet.getRangeByName("G22").setValue(varTre);
+      sheet.getRangeByName("G23").setValue(varTtl);
+      varEc = ((varTtl + varT8) * 0.04).round();
+      sheet.getRangeByName("G24").setValue(varEc);
+      varTtp = varTtl + varEc + varT8;
+      sheet.getRangeByName("G25").setValue(varTtp);
 
       int varDeduct = int.tryParse(itfData['tincometax']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G25").setValue(varDeduct);
+      sheet.getRangeByName("G26").setValue(varDeduct);
 
-      int varNitp = varTtpi - varDeduct;
+      int varNitp = varTtp - varDeduct;
       if (varNitp < 0){
         varNitp = 0;
       }
-      sheet.getRangeByName("G26").setValue(varNitp);
+      sheet.getRangeByName("G27").setValue(varNitp);
 
-      int varInterest = 0;
-      sheet.getRangeByName("G27").setValue(varInterest);
 
       int varRelief = int.tryParse(dedData['relief']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("G28").setValue(varRelief);
 
-      int varNitpi = varTtpi - varDeduct - varRelief + varInterest;
+      int varNitpi = varTtp - varDeduct - varRelief;
       int varEp = 0;
       if (varNitpi < 0){
         varEp = varNitpi.abs();
@@ -4846,10 +5147,35 @@ class _ItaxPageState extends State<ItaxPage> {
 
       await updateItaxnew(
         biometricId,
+        varTg,
+        varConvDrive,
+        varUniform,
+        varGti,
+        varAtccd2,
+        varTi,
+        varSd,
+        varOther,
+        varTti,
+        varT1,
+        varT2,
+        varT3,
+        varT4,
+        varT5,
+        varT6,
+        varT7,
+        varT8,
+        varTl,
+        varTre,
+        varTtl,
+        varEc,
+        varTtp,
+        varDeduct,
+        varNitp,
+        varRelief,
         varNitpi,
         varEp
       );
-      List<int> excludedNumbers = [3,11,21,22,23,24,26,29,30];
+      List<int> excludedNumbers = [3,11,19,21,23,24,25,27,29,30];
       for (int i = 3; i<=30; i++){
         xls.Range rangeValue = sheet.getRangeByName("G$i");
         xls.Range rangeNum = sheet.getRangeByName("B$i");
@@ -4900,7 +5226,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B36:G36").merge();
       sheet.getRangeByName("B36:G36").cellStyle = commontextStyle;
       sheet.getRangeByName("B36").setFormula(
-          r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$29, " is to be recovered as Income Tax for the total income of ₹ ",$G$3," from Sh./Smt./Ms ",' "\"${mainpgData['name']}\"" r'," working as ",'"\"${mainpgData['designation']}\"" r'," in ",$B$2, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
+          r'=CONCATENATE("This is to certify that a sum of ₹ ",$G$29, " is to be recovered as Income Tax for the total income of ₹ ",$G$6," from Sh./Smt./Ms ",' "\"${mainpgData['name']}\"" r'," working as ",'"\"${mainpgData['designation']}\"" r'," in ",$B$2, " on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. 2025 " )'
       );
       sheet.getRangeByName("B36:G36").rowHeight = 54.60;
 
@@ -4908,12 +5234,12 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B38:D38").merge();
       sheet.getRangeByName("B38:E38").cellStyle = commontextStyle;
       sheet.getRangeByName("B38").setValue("Tax Due: ");
-      sheet.getRangeByName("E38").setFormula('=G21');
+      sheet.getRangeByName("E38").setFormula('=G23');
 
       sheet.getRangeByName("B39:D39").merge();
       sheet.getRangeByName("B39:E39").cellStyle = commontextStyle;
       sheet.getRangeByName("B39").setValue("Surcharge:");
-      sheet.getRangeByName("E39").setFormula('=G19');
+      sheet.getRangeByName("E39").setFormula('=G20');
 
       sheet.getRangeByName("B40:D40").merge();
       sheet.getRangeByName("B40:E40").cellStyle = commontextStyle;
@@ -4923,7 +5249,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B41:D41").merge();
       sheet.getRangeByName("B41:E41").cellStyle = commontextStyle;
       sheet.getRangeByName("B41").setValue("Total Tax Due:");
-      sheet.getRangeByName("E41").setFormula('=G24');
+      sheet.getRangeByName("E41").setFormula('=G25');
 
       sheet.getRangeByName("B42:D42").merge();
       sheet.getRangeByName("B42:E42").cellStyle = commontextStyle;
@@ -4933,7 +5259,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B43:D43").merge();
       sheet.getRangeByName("B43:E43").cellStyle = commontextStyle;
       sheet.getRangeByName("B43").setValue("Already Paid:");
-      sheet.getRangeByName("E43").setFormula('=G25');
+      sheet.getRangeByName("E43").setFormula('=G26');
 
       sheet.getRangeByName("B44:D44").merge();
       sheet.getRangeByName("B44:E44").cellStyle = commontextStyle;
