@@ -52,8 +52,6 @@ Future<void> exportExcel() async {
         totalTds += parseValue(row[3]);
         totalGross += parseValue(row[4]);
         rowIndex++;
-      } else {
-        print("Invalid row: $row");
       }
     }
 
@@ -106,7 +104,8 @@ Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, Stri
       parseValue(monthEntry["incometax"]),
       parseValue(monthEntry["gross"]) -
           parseValue(monthEntry["conv"]) -
-          parseValue(monthEntry["drive"]),
+          parseValue(monthEntry["drive"]) -
+          parseValue(monthEntry["uniform"]),
       "", "", "", month.toUpperCase()
     ];
 
@@ -147,7 +146,6 @@ Future<int> fetchDataFromFirebase(String bio) async {
 
   int oldVal = parseValue(oldData['nitpi']) + parseValue(oldData['ec']);
   int newVal = parseValue(newData['nitpi']) + parseValue(newData['ec']);
-
 
   return oldVal < newVal ? oldVal : newVal;
 }

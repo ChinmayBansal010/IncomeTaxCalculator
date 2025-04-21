@@ -48,6 +48,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   bool _isHovered = false;
 
+  late String selectedYear;
+  final List<String> yearOptions = [
+    '2024-25',
+    '2025-26',
+    '2026-27',
+    '2027-28',
+  ];
+
+
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -69,7 +78,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
     try {
       final databaseRef = FirebaseDatabase.instance.ref();
-      final userRef = databaseRef.child(username).child(username); // Correct child path
+      final userRef = databaseRef.child('$selectedYear/$username').child(username); // Correct child path
       final dataSnapshot = await userRef.get();
 
       if (dataSnapshot.exists) {
@@ -77,9 +86,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         String? storedPassword = userMap['password'];
         String storedZone = userMap['zone'];
         if (storedPassword == password) {
-          sharedData.userPlace = username;
+          sharedData.userPlace = '$selectedYear/$username';
           sharedData.zone = storedZone;
-          // If login is successful, navigate to the HomePage
           if(mounted){
             Navigator.pushReplacement(
               context,
@@ -137,6 +145,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
+
+    DateTime now = DateTime.now();
+    int currentYear = now.year;
+    int startYear = now.month >= 3 ? currentYear : currentYear - 1;
+    selectedYear = '$startYear-${(startYear + 1).toString().substring(2)}';
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -212,6 +226,34 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   ),
                   const SizedBox(height: 20),
                   // Username TextField with scale and slide animation
+                  SlideTransition(
+                    position: _fieldSlideAnimation,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: DropdownButton<String>(
+                        value: selectedYear,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedYear = newValue!;
+                          });
+                        },
+                        items: yearOptions.map<DropdownMenuItem<String>>((String year) {
+                          return DropdownMenuItem<String>(
+                            value: year,
+                            child: Text(
+                              year,
+                              style: TextStyle(
+                                fontSize: fontSize - 5,
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   SlideTransition(
                     position: _fieldSlideAnimation,
                     child: ScaleTransition(
