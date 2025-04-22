@@ -296,7 +296,7 @@ Future<Map<String, dynamic>> fetchitaxNewData() async {
       final orderedKeys = [
         'biometricid', 'tg', 'Convdrive', 'uniform', 'gti', 'atccd2',
         'ti', 'sd', 'other', 'tti', 't1', 't2', 't3', 't4',
-        't5', 't6', 't7', 't8', 'tl', 'tre', 'ttl', 'ec',
+        't5', 't6', 't7', 'tt', 'sur', 'tl', 'tre', 'ttl', 'ec',
         'ttp', 'deduct', 'nitp', 'relief', 'nitpi', 'ep'
       ];
 
@@ -305,8 +305,8 @@ Future<Map<String, dynamic>> fetchitaxNewData() async {
         'uniform': 'Uniform', 'gti': 'Gross Taxable Income', 'atccd2': '80CCD(2)',
         'ti': 'Taxable Income', 'sd': 'Standard Deduction', 'other': 'Other',
         'tti': 'Total Taxable Income', 't1': 'Tax Slab 1', 't2': 'Tax Slab 2', 't3': 'Tax Slab 3',
-        't4': 'Tax Slab 4', 't5': 'Tax Slab 5', 't6': 'Tax Slab 6', 't7': 'Tax',
-        't8': 'Standard Deduction', 'tl': 'Tax Liability', 'tre': 'Tax Rebate', 'ttl': 'Total Tax Liability',
+        't4': 'Tax Slab 4', 't5': 'Tax Slab 5', 't6': 'Tax Slab 6', 't7': 'Tax Slab 7', 'tt': 'Total Tax',
+        'sur': 'Standard Deduction', 'tl': 'Tax Liability', 'tre': 'Tax Rebate', 'ttl': 'Total Tax Liability',
         'ec': 'Cess', 'ttp': 'Total Tax Payble', 'deduct': 'Deductions', 'nitp': 'Net Taxable Income',
         'relief': 'tax Relief', 'nitpi': 'Net Taxable Income', 'ep': 'Excess'
       };

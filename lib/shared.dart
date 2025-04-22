@@ -4,6 +4,7 @@ class SharedData {
   factory SharedData() => _instance;
 
   String userPlace = '';
+  String ccurrentYear = '';
   String zone = '';
 }
 

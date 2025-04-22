@@ -56,10 +56,12 @@ class _ArrearPageState extends State<ArrearPage> {
         });
       }
     } catch (e) {
-      setState(() {
-        errorMessage = 'Error fetching data: $e';
-        isLoading = false;
-      });
+      if(mounted){
+        setState(() {
+          errorMessage = 'Error fetching data: $e';
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -169,7 +171,7 @@ class _ArrearPageState extends State<ArrearPage> {
                                         mmdaonta: details['mmdaonta'] ?? '0',
                                         mmpca: details['mmpca'] ?? '0',
                                         mmnpa: details['mmnpa'] ?? '0',
-                                        mmtutuion: details['mmtutuion'] ?? '0',
+                                        mmtution: details['mmtution'] ?? '0',
                                         mmother: details['mmother'] ?? '0',
                                         mmext1: details['mmext1'] ?? '0',
                                         mmext2: details['mmext2'] ?? '0',
@@ -179,7 +181,7 @@ class _ArrearPageState extends State<ArrearPage> {
                                         jadaonta: details['jadaonta'] ?? '0',
                                         japca: details['japca'] ?? '0',
                                         janpa: details['janpa'] ?? '0',
-                                        jatutuion: details['jatutuion'] ?? '0',
+                                        jatution: details['jatution'] ?? '0',
                                         jaother: details['jaother'] ?? '0',
                                         jaext1: details['jaext1'] ?? '0',
                                         jaext2: details['jaext2'] ?? '0',
@@ -189,7 +191,7 @@ class _ArrearPageState extends State<ArrearPage> {
                                         sndaonta: details['sndaonta'] ?? '0',
                                         snpca: details['snpca'] ?? '0',
                                         snnpa: details['snnpa'] ?? '0',
-                                        sntutuion: details['sntutuion'] ?? '0',
+                                        sntution: details['sntution'] ?? '0',
                                         snother: details['snother'] ?? '0',
                                         snext1: details['snext1'] ?? '0',
                                         snext2: details['snext2'] ?? '0',
@@ -199,7 +201,7 @@ class _ArrearPageState extends State<ArrearPage> {
                                         dfdaonta: details['dfdaonta'] ?? '0',
                                         dfpca: details['dfpca'] ?? '0',
                                         dfnpa: details['dfnpa'] ?? '0',
-                                        dftutuion: details['dftutuion'] ?? '0',
+                                        dftution: details['dftution'] ?? '0',
                                         dfother: details['dfother'] ?? '0',
                                         dfext1: details['dfext1'] ?? '0',
                                         dfext2: details['dfext2'] ?? '0',
@@ -209,13 +211,15 @@ class _ArrearPageState extends State<ArrearPage> {
                                     ),
                                   );
                                   if (result == true) {
-                                    setState(() {
-                                      isLoading = true;
-                                      shouldRefetch = true;
-                                    });
-                                    bioRef = _dbRef.child(sharedData.userPlace).child('arrdata');
-                                    fetchData();
-                                    searchController.addListener(_filterData);
+                                    if (mounted){
+                                      setState(() {
+                                        isLoading = true;
+                                        shouldRefetch = true;
+                                      });
+                                      bioRef = _dbRef.child(sharedData.userPlace).child('arrdata');
+                                      fetchData();
+                                      searchController.addListener(_filterData);
+                                    }
                                   }
                                 },
                                 child: Container(

@@ -11,7 +11,7 @@ class ArrearUpdatePage extends StatefulWidget {
   final String mmdaonta;
   final String mmpca;
   final String mmnpa;
-  final String mmtutuion;
+  final String mmtution;
   final String mmother;
   final String mmext1;
   final String mmext2;
@@ -21,7 +21,7 @@ class ArrearUpdatePage extends StatefulWidget {
   final String jadaonta;
   final String japca;
   final String janpa;
-  final String jatutuion;
+  final String jatution;
   final String jaother;
   final String jaext1;
   final String jaext2;
@@ -31,7 +31,7 @@ class ArrearUpdatePage extends StatefulWidget {
   final String sndaonta;
   final String snpca;
   final String snnpa;
-  final String sntutuion;
+  final String sntution;
   final String snother;
   final String snext1;
   final String snext2;
@@ -41,7 +41,7 @@ class ArrearUpdatePage extends StatefulWidget {
   final String dfdaonta;
   final String dfpca;
   final String dfnpa;
-  final String dftutuion;
+  final String dftution;
   final String dfother;
   final String dfext1;
   final String dfext2;
@@ -57,7 +57,7 @@ class ArrearUpdatePage extends StatefulWidget {
     required this.mmdaonta,
     required this.mmpca,
     required this.mmnpa,
-    required this.mmtutuion,
+    required this.mmtution,
     required this.mmother,
     required this.mmext1,
     required this.mmext2,
@@ -67,7 +67,7 @@ class ArrearUpdatePage extends StatefulWidget {
     required this.jadaonta,
     required this.japca,
     required this.janpa,
-    required this.jatutuion,
+    required this.jatution,
     required this.jaother,
     required this.jaext1,
     required this.jaext2,
@@ -77,7 +77,7 @@ class ArrearUpdatePage extends StatefulWidget {
     required this.sndaonta,
     required this.snpca,
     required this.snnpa,
-    required this.sntutuion,
+    required this.sntution,
     required this.snother,
     required this.snext1,
     required this.snext2,
@@ -87,7 +87,7 @@ class ArrearUpdatePage extends StatefulWidget {
     required this.dfdaonta,
     required this.dfpca,
     required this.dfnpa,
-    required this.dftutuion,
+    required this.dftution,
     required this.dfother,
     required this.dfext1,
     required this.dfext2,
@@ -108,7 +108,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
   final mmdaontaController = TextEditingController();
   final mmpcaController = TextEditingController();
   final mmnpaController = TextEditingController();
-  final mmtutuionController = TextEditingController();
+  final mmtutionController = TextEditingController();
   final mmotherController = TextEditingController();
   final mmext1Controller = TextEditingController();
   final mmext2Controller = TextEditingController();
@@ -118,7 +118,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
   final jadaontaController = TextEditingController();
   final japcaController = TextEditingController();
   final janpaController = TextEditingController();
-  final jatutuionController = TextEditingController();
+  final jatutionController = TextEditingController();
   final jaotherController = TextEditingController();
   final jaext1Controller = TextEditingController();
   final jaext2Controller = TextEditingController();
@@ -128,7 +128,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
   final sndaontaController = TextEditingController();
   final snpcaController = TextEditingController();
   final snnpaController = TextEditingController();
-  final sntutuionController = TextEditingController();
+  final sntutionController = TextEditingController();
   final snotherController = TextEditingController();
   final snext1Controller = TextEditingController();
   final snext2Controller = TextEditingController();
@@ -138,7 +138,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
   final dfdaontaController = TextEditingController();
   final dfpcaController = TextEditingController();
   final dfnpaController = TextEditingController();
-  final dftutuionController = TextEditingController();
+  final dftutionController = TextEditingController();
   final dfotherController = TextEditingController();
   final dfext1Controller = TextEditingController();
   final dfext2Controller = TextEditingController();
@@ -155,7 +155,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     mmdaontaController.text = widget.mmdaonta;
     mmpcaController.text = widget.mmpca;
     mmnpaController.text = widget.mmnpa;
-    mmtutuionController.text = widget.mmtutuion;
+    mmtutionController.text = widget.mmtution;
     mmotherController.text = widget.mmother;
     mmext1Controller.text = widget.mmext1;
     mmext2Controller.text = widget.mmext2;
@@ -165,7 +165,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     jadaontaController.text = widget.jadaonta;
     japcaController.text = widget.japca;
     janpaController.text = widget.janpa;
-    jatutuionController.text = widget.jatutuion;
+    jatutionController.text = widget.jatution;
     jaotherController.text = widget.jaother;
     jaext1Controller.text = widget.jaext1;
     jaext2Controller.text = widget.jaext2;
@@ -175,7 +175,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     sndaontaController.text = widget.sndaonta;
     snpcaController.text = widget.snpca;
     snnpaController.text = widget.snnpa;
-    sntutuionController.text = widget.sntutuion;
+    sntutionController.text = widget.sntution;
     snotherController.text = widget.snother;
     snext1Controller.text = widget.snext1;
     snext2Controller.text = widget.snext2;
@@ -185,7 +185,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     dfdaontaController.text = widget.dfdaonta;
     dfpcaController.text = widget.dfpca;
     dfnpaController.text = widget.dfnpa;
-    dftutuionController.text = widget.dftutuion;
+    dftutionController.text = widget.dftution;
     dfotherController.text = widget.dfother;
     dfext1Controller.text = widget.dfext1;
     dfext2Controller.text = widget.dfext2;
@@ -211,7 +211,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     mmdaontaController.dispose();
     mmpcaController.dispose();
     mmnpaController.dispose();
-    mmtutuionController.dispose();
+    mmtutionController.dispose();
     mmotherController.dispose();
     mmext1Controller.dispose();
     mmext2Controller.dispose();
@@ -221,7 +221,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     jadaontaController.dispose();
     japcaController.dispose();
     janpaController.dispose();
-    jatutuionController.dispose();
+    jatutionController.dispose();
     jaotherController.dispose();
     jaext1Controller.dispose();
     jaext2Controller.dispose();
@@ -231,7 +231,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     sndaontaController.dispose();
     snpcaController.dispose();
     snnpaController.dispose();
-    sntutuionController.dispose();
+    sntutionController.dispose();
     snotherController.dispose();
     snext1Controller.dispose();
     snext2Controller.dispose();
@@ -241,7 +241,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     dfdaontaController.dispose();
     dfpcaController.dispose();
     dfnpaController.dispose();
-    dftutuionController.dispose();
+    dftutionController.dispose();
     dfotherController.dispose();
     dfext1Controller.dispose();
     dfext2Controller.dispose();
@@ -316,7 +316,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
                     _buildTextBox(label: "DA ON TA", controller: mmdaontaController),
                     _buildTextBox(label: "PCA", controller: mmpcaController),
                     _buildTextBox(label: "NPA", controller: mmnpaController),
-                    _buildTextBox(label: "TUTION", controller: mmtutuionController),
+                    _buildTextBox(label: "TUTION", controller: mmtutionController),
                     _buildTextBox(label: "OTHER", controller: mmotherController),
                     _buildTextBox(label: "TAX", controller: mmext1Controller),
                     Visibility(visible: false,
@@ -356,7 +356,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
                     _buildTextBox(label: "DA ON TA", controller: jadaontaController),
                     _buildTextBox(label: "PCA", controller: japcaController),
                     _buildTextBox(label: "NPA", controller: janpaController),
-                    _buildTextBox(label: "TUTION", controller: jatutuionController),
+                    _buildTextBox(label: "TUTION", controller: jatutionController),
                     _buildTextBox(label: "OTHER", controller: jaotherController),
                     _buildTextBox(label: "TAX", controller: jaext1Controller),
 
@@ -396,7 +396,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
                     _buildTextBox(label: "DA ON TA", controller: sndaontaController),
                     _buildTextBox(label: "PCA", controller: snpcaController),
                     _buildTextBox(label: "NPA", controller: snnpaController),
-                    _buildTextBox(label: "TUTION", controller: sntutuionController),
+                    _buildTextBox(label: "TUTION", controller: sntutionController),
                     _buildTextBox(label: "OTHER", controller: snotherController),
                     _buildTextBox(label: "TAX", controller: snext1Controller),
                     Visibility(visible: false,
@@ -434,7 +434,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
                     _buildTextBox(label: "DA ON TA", controller: dfdaontaController),
                     _buildTextBox(label: "PCA", controller: dfpcaController),
                     _buildTextBox(label: "NPA", controller: dfnpaController),
-                    _buildTextBox(label: "TUTION", controller: dftutuionController),
+                    _buildTextBox(label: "TUTION", controller: dftutionController),
                     _buildTextBox(label: "OTHER", controller: dfotherController),
                     _buildTextBox(label: "TAX", controller: dfext1Controller),
                     Visibility(visible: false,
@@ -633,7 +633,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
         'mmdaonta': mmdaontaController.text,
         'mmpca': mmpcaController.text,
         'mmnpa': mmnpaController.text,
-        'mmtutuion': mmtutuionController.text,
+        'mmtution': mmtutionController.text,
         'mmother': mmotherController.text,
         'mmext1': mmext1Controller.text,
         'mmext2': mmext2Controller.text,
@@ -643,7 +643,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
         'jadaonta': jadaontaController.text,
         'japca': japcaController.text,
         'janpa': janpaController.text,
-        'jatutuion': jatutuionController.text,
+        'jatution': jatutionController.text,
         'jaother': jaotherController.text,
         'jaext1': jaext1Controller.text,
         'jaext2': jaext2Controller.text,
@@ -653,7 +653,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
         'sndaonta': sndaontaController.text,
         'snpca': snpcaController.text,
         'snnpa': snnpaController.text,
-        'sntutuion': sntutuionController.text,
+        'sntution': sntutionController.text,
         'snother': snotherController.text,
         'snext1': snext1Controller.text,
         'snext2': snext2Controller.text,
@@ -663,7 +663,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
         'dfdaonta': dfdaontaController.text,
         'dfpca': dfpcaController.text,
         'dfnpa': dfnpaController.text,
-        'dftutuion': dftutuionController.text,
+        'dftution': dftutionController.text,
         'dfother': dfotherController.text,
         'dfext1': dfext1Controller.text,
         'dfext2': dfext2Controller.text,

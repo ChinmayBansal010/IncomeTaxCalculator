@@ -87,6 +87,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         String storedZone = userMap['zone'];
         if (storedPassword == password) {
           sharedData.userPlace = '$selectedYear/$username';
+          sharedData.ccurrentYear = selectedYear;
           sharedData.zone = storedZone;
           if(mounted){
             Navigator.pushReplacement(
