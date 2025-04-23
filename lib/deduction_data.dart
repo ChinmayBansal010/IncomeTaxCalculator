@@ -44,23 +44,29 @@ class _DeductionPageState extends State<DeductionPage> {
           }
         });
 
-        setState(() {
-          biometricData = data;
-          filteredData = data;
-          isLoading = false;
-          shouldRefetch = false;
-        });
+        if(mounted){
+          setState(() {
+            biometricData = data;
+            filteredData = data;
+            isLoading = false;
+            shouldRefetch = false;
+          });
+        }
       } else {
+        if(mounted){
+          setState(() {
+            errorMessage = 'No data available';
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if(mounted){
         setState(() {
-          errorMessage = 'No data available';
+          errorMessage = 'Error fetching data: $e';
           isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Error fetching data: $e';
-        isLoading = false;
-      });
     }
   }
 
@@ -268,10 +274,10 @@ class _DeductionPageState extends State<DeductionPage> {
                                         isLoading = true;
                                         shouldRefetch = true;
                                       });
+                                      bioRef = _dbRef.child(sharedData.userPlace).child('deddata');
+                                      fetchData();
+                                      searchController.addListener(_filterData);
                                     }
-                                    bioRef = _dbRef.child(sharedData.userPlace).child('deddata');
-                                    fetchData();
-                                    searchController.addListener(_filterData);
                                   }
                                 },
                                 child: Container(

@@ -610,19 +610,23 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text("Saving...", style: TextStyle(fontSize: 16)),
-            ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300), // limit width for web
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Saving...", style: TextStyle(fontSize: 16)),
+              ],
+            ),
           ),
         ),
       ),
     );
+
 
     try {
       await bioRef.child('arrdata').child(biometricIdController.text).update({

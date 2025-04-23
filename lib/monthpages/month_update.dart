@@ -1030,6 +1030,26 @@ class _MonthDataPageState extends State<MonthDataPage> {
   }
 
   Future<void> _saveAll() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Saving...", style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
     final List<String> months = ['mar','apr','may','jun','jul','aug','sept','oct','nov','dec','jan','feb'];
     List<String> updatedmonths = [];
     try {
@@ -1054,22 +1074,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
           SnackBar(content: Text(message)),
         );
       }
-      if (mounted){
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text("Success"),
-            content: Text("Data Saved Successfully for months: \n$updatedmonths"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
+
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
@@ -1084,6 +1089,25 @@ class _MonthDataPageState extends State<MonthDataPage> {
                   Navigator.pop(ctx),
                   Navigator.pop(context),
                 },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally{
+      if (mounted){
+        Navigator.of(context).pop();
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Success"),
+            content: Text(
+              "Data Saved Successfully for months:\n${updatedmonths.map((m) => m.toUpperCase()).join(', ')}",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
                 child: const Text("OK"),
               ),
             ],

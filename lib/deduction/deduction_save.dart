@@ -492,9 +492,23 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                     _buildTextBox(label: "HOUSE RENT RECIEPT", controller: hrrController),
                     _buildTextBox(label: "OWNER NAME", controller: onameController),
                     _buildTextBox(label: "OWNER PAN NUMBER", controller: opanController),
-                    _buildTextBox(label: "RELIEF U/S 90", controller: reliefController),
-                    _buildTextBox(label: "RENT PAID 80GG", controller: rpaidController),
+                  ],
+                ),
+              ),
 
+              SizedBox(height: 10),
+
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue, width: 2), // Box border
+                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
+                ),
+                child: Column(
+                  children: [
+
+                    _buildTextBox(label: "RELIEF U/S 89", controller: reliefController),
+                    // _buildTextBox(label: "RENT PAID 80GG", controller: rpaidController),
 
                     Visibility(visible: false,
                       child: Column(
@@ -507,8 +521,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                   ],
                 ),
               ),
-
-              SizedBox(height: 10),
 
             ],
           ),
@@ -524,7 +536,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                   mainAxisAlignment: MainAxisAlignment.center, // Center buttons horizontally
                   children: [
                     // First button
-                    Expanded(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: _saveData,
                         style: ElevatedButton.styleFrom(
@@ -539,7 +552,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                         child: const Text(
                           "SAVE",
                           style: TextStyle(
-                            fontSize: 18.0,
+                            fontSize: 30.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -734,7 +747,27 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       return;
     }
 
-    _showLoadingDialog();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300), // limit width for web
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Saving...", style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
 
     _calculateData();
 
@@ -839,29 +872,4 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       });
     }
   }
-
-  void _showLoadingDialog() {
-    // Ensure this dialog is shown only after the build phase
-    if (mounted) { // Make sure the widget is still in the widget tree
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => Dialog(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 20),
-                Text("Saving..."),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-
 }

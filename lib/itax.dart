@@ -654,7 +654,7 @@ class _ItaxPageState extends State<ItaxPage> {
           children: [
             const Icon(Icons.home, size: 24, color: Colors.black),
             const SizedBox(width: 8),
-            const Text('INOCME TAX', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
+            const Text('INCOME TAX', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
           ],
         ),
         backgroundColor: Colors.blue,
@@ -4851,7 +4851,7 @@ class _ItaxPageState extends State<ItaxPage> {
 
       sheet.getRangeByName("E49:G49").merge();
       sheet.getRangeByName("E49:G49").cellStyle = commontextStyle;
-      sheet.getRangeByName("E49").setValue("Sub: INCOME TAX FOR THE FINANCIAL YEAR 2024-25");
+      sheet.getRangeByName("E49").setValue("Sub: INCOME TAX FOR THE FINANCIAL YEAR ${sharedData.ccurrentYear}");
 
       sheet.getRangeByName("B51:G51").merge();
       sheet.getRangeByName("B51:G51").cellStyle = commontextStyle;
@@ -5094,35 +5094,34 @@ class _ItaxPageState extends State<ItaxPage> {
         } else if (varTti > 1200000 && varTti <= 1500000) {
           varT5 = ((varTti - 1200000) * 0.2).round();
         }
+
         varTt = varT1+varT2+varT3+varT4+varT5+varT6;
+
+        if(varTti> 5000000){
+          varSur = (varTt * 0.1).round();
+          varEc = ((varTt + varSur)*0.04).round();
+
+          varTtp = varTt + varEc + varSur;
+          int excess = varTtp - 1190000;
+
+          if ((varTti - 5000000) < excess){
+            varSur = (varTti - 5000000 - (varTt - 1190000));
+            if (varSur > (varTt * 0.1)){
+              varSur = (varTt * 0.1).round();
+            }
+          }
+        }
+
+        varTl = varTt+varSur;
 
         if (varTti<=700000){
           varTre = min(25000,(varT2+varT3));
         }
 
-        varTl = varTt+varSur;
-
-        varTtl = 0;
         if((varT2+varT3+varT4+varT5+varT6-varTre)>=0){
           varTtl = varTl - varTre;
         }
 
-        varEc = 0;
-        varTtp = 0;
-        if(varTti> 5000000){
-          varSur = (varTtl * 0.1).round();
-          varEc = ((varTtl + varSur)*0.04).round();
-
-          varTtp = varTtl + varEc + varSur;
-          int excess = varTtp - 1190000;
-
-          if ((varTti - 5000000) < excess){
-            varSur = (varTti - 5000000 - (varTtl - 1190000));
-            if (varSur > (varTtl * 0.1)){
-              varSur = (varTtl * 0.1).round();
-            }
-          }
-        }
       } else if(sharedData.ccurrentYear == '2025-26'){
         if (varTti > 800000){
           varT2 = 20000;
@@ -5162,36 +5161,32 @@ class _ItaxPageState extends State<ItaxPage> {
 
         varTt = varT1+varT2+varT3+varT4+varT5+varT6+varT7;
 
+        if(varTti> 5000000){
+          varSur = (varTt * 0.1).round();
+          varEc = ((varTt + varSur)*0.04).round();
+
+          varTtp = varTt + varEc + varSur;
+          int excess = varTtp - 1190000;
+
+          if ((varTti - 5000000) < excess){
+            varSur = (varTti - 5000000 - (varTt - 1190000));
+            if (varSur > (varTt * 0.1)){
+              varSur = (varTt * 0.1).round();
+            }
+          }
+        }
+
+        varTl = varTt+varSur;
 
         if (varTti<=1200000){
           varTre = min(60000,(varT2+varT3));
         }
 
-
-        varTl = varTt+varSur;
-
-        varTtl = 0;
         if((varT2+varT3+varT4+varT5+varT6+varT7-varTre)>=0){
           varTtl = varTl - varTre;
         }
 
-        varEc = 0;
-        varTtp = 0;
-
-        if(varTti> 5000000){
-          varSur = (varTtl * 0.1).round();
-          varEc = ((varTtl + varSur)*0.04).round();
-
-          varTtp = varTtl + varEc + varSur;
-          int excess = varTtp - 1190000;
-
-          if ((varTti - 5000000) < excess){
-            varSur = (varTti - 5000000 - (varTtl - 1190000));
-            if (varSur > (varTtl * 0.1)){
-              varSur = (varTtl * 0.1).round();
-            }
-          }
-        }
+        sheet.getRangeByName("G19").setValue(varT7);
       }
 
       sheet.getRangeByName("G13").setValue(varT1);
@@ -5267,7 +5262,7 @@ class _ItaxPageState extends State<ItaxPage> {
         varNitpi,
         varEp
       );
-      List<int> excludedNumbers = [3,11,19,22,24,25,26,28,30,31];
+      List<int> excludedNumbers = [3,11,20,22,24,25,26,28,30,31];
       for (int i = 3; i<=31; i++){
         xls.Range rangeValue = sheet.getRangeByName("G$i");
         xls.Range rangeNum = sheet.getRangeByName("B$i");
@@ -5313,7 +5308,7 @@ class _ItaxPageState extends State<ItaxPage> {
 
       sheet.getRangeByName("E36:G36").merge();
       sheet.getRangeByName("E36:G36").cellStyle = commontextStyle;
-      sheet.getRangeByName("E36").setValue("Sub: INCOME TAX FOR THE FINANCIAL YEAR 2024-25");
+      sheet.getRangeByName("E36").setValue("Sub: INCOME TAX FOR THE FINANCIAL YEAR ${sharedData.ccurrentYear}");
 
       sheet.getRangeByName("B37:G37").merge();
       sheet.getRangeByName("B37:G37").cellStyle = commontextStyle;
@@ -5326,7 +5321,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B39:D39").merge();
       sheet.getRangeByName("B39:E39").cellStyle = commontextStyle;
       sheet.getRangeByName("B39").setValue("Tax Due: ");
-      sheet.getRangeByName("E39").setFormula('=G26');
+      sheet.getRangeByName("E39").setFormula('=G20');
 
       sheet.getRangeByName("B40:D40").merge();
       sheet.getRangeByName("B40:E40").cellStyle = commontextStyle;
@@ -5335,32 +5330,37 @@ class _ItaxPageState extends State<ItaxPage> {
 
       sheet.getRangeByName("B41:D41").merge();
       sheet.getRangeByName("B41:E41").cellStyle = commontextStyle;
-      sheet.getRangeByName("B41").setValue("Education Cess:");
-      sheet.getRangeByName("E41").setFormula('=G25');
+      sheet.getRangeByName("B41").setValue("Sec. 87A ");
+      sheet.getRangeByName("E41").setFormula('=G23');
 
       sheet.getRangeByName("B42:D42").merge();
       sheet.getRangeByName("B42:E42").cellStyle = commontextStyle;
-      sheet.getRangeByName("B42").setValue("Total Tax Due:");
-      sheet.getRangeByName("E42").setFormula('=G26');
+      sheet.getRangeByName("B42").setValue("Education Cess:");
+      sheet.getRangeByName("E42").setFormula('=G25');
 
       sheet.getRangeByName("B43:D43").merge();
       sheet.getRangeByName("B43:E43").cellStyle = commontextStyle;
-      sheet.getRangeByName("B43").setValue("Relief U/S 89(i):");
-      sheet.getRangeByName("E43").setFormula('=G29');
+      sheet.getRangeByName("B43").setValue("Total Tax Due:");
+      sheet.getRangeByName("E43").setFormula('=G26');
 
       sheet.getRangeByName("B44:D44").merge();
       sheet.getRangeByName("B44:E44").cellStyle = commontextStyle;
-      sheet.getRangeByName("B44").setValue("Already Paid:");
-      sheet.getRangeByName("E44").setFormula('=G27');
+      sheet.getRangeByName("B44").setValue("Relief U/S 89(i):");
+      sheet.getRangeByName("E44").setFormula('=G29');
 
       sheet.getRangeByName("B45:D45").merge();
       sheet.getRangeByName("B45:E45").cellStyle = commontextStyle;
-      sheet.getRangeByName("B45").setValue("Balance:");
-      sheet.getRangeByName("E45").setFormula('=G30');
+      sheet.getRangeByName("B45").setValue("Already Paid:");
+      sheet.getRangeByName("E45").setFormula('=G27');
 
-      sheet.getRangeByName("B46:G46").merge();
-      sheet.getRangeByName("B46:G46").cellStyle = commontextStyle;
-      sheet.getRangeByName("B46").setFormula(
+      sheet.getRangeByName("B46:D46").merge();
+      sheet.getRangeByName("B46:E46").cellStyle = commontextStyle;
+      sheet.getRangeByName("B46").setValue("Balance:");
+      sheet.getRangeByName("E46").setFormula('=G30');
+
+      sheet.getRangeByName("B47:G47").merge();
+      sheet.getRangeByName("B47:G47").cellStyle = commontextStyle;
+      sheet.getRangeByName("B47").setFormula(
         r'=CONCATENATE("Income Tax",IF($G$31<>0,(" EXCESS PAID ₹ "&$G$31),(" TAX DUE ₹ "&$G$30)))'
       );
 
@@ -5370,10 +5370,10 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("G44").cellStyle.hAlign = xls.HAlignType.right;
       sheet.getRangeByName("G44").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
 
-      sheet.getRangeByName("B36:G46").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
-      sheet.getRangeByName("B36:B46").cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("B46:G46").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
-      sheet.getRangeByName("G36:G46").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("B36:G47").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("B36:B47").cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("B47:G47").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("G36:G47").cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
 
     }catch (error) {
       if (mounted) {
