@@ -93,7 +93,7 @@ class _MainDataPageState extends State<MainDataPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("MAIN", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text("MAIN || EMPLOYEE - ${biometricData.keys.length}", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blue,
         leading: BackButton(onPressed: () {
           Navigator.pop(context, true);
