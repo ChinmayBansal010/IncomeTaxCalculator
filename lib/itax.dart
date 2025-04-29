@@ -5163,7 +5163,7 @@ class _ItaxPageState extends State<ItaxPage> {
 
         if(varTti> 5000000){
           varSur = (varTt * 0.1).round();
-          varEc = ((varTt + varSur)*0.04).round();
+          varEc = ((varTt+varSur)*0.04).round();
 
           varTtp = varTt + varEc + varSur;
           int excess = varTtp - 1190000;
@@ -5201,9 +5201,9 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("G22").setValue(varTl);
       sheet.getRangeByName("G23").setValue(varTre);
       sheet.getRangeByName("G24").setValue(varTtl);
-      varEc = ((varTtl + varSur) * 0.04).round();
+      varEc = ((varTtl) * 0.04).round();
       sheet.getRangeByName("G25").setValue(varEc);
-      varTtp = varTtl + varEc + varSur;
+      varTtp = varTtl + varEc;
       sheet.getRangeByName("G26").setValue(varTtp);
 
       int varDeduct = int.tryParse(itfData['tincometax']?.toString() ?? '0') ?? 0;

@@ -139,9 +139,7 @@ class _HomePageState extends State<HomePage> {
           if (!mounted) return;
           _showErrorSnackbar(e.toString());
         } finally {
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
+          setState(() => _isLoading = false);
         }
         break;
       case "CALC":

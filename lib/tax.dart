@@ -18,8 +18,6 @@ bool shouldRefetch = true;
 String errorMessage = '';
 TextEditingController searchController = TextEditingController();
 
-bool toLoad = false;
-
 Map<String?, dynamic> itaxnewData = {};
 Map<String?, dynamic> itaxoldData = {};
 
