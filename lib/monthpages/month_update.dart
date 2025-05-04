@@ -950,6 +950,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
         gisController,
         gpfController,
         npsController,
+        epfController,
+        esiController,
         slfController,
         societyController,
         recoveryController,

@@ -5204,6 +5204,9 @@ class _ItaxPageState extends State<ItaxPage> {
       varEc = ((varTtl) * 0.04).round();
       sheet.getRangeByName("G25").setValue(varEc);
       varTtp = varTtl + varEc;
+      if(sharedData.userPlace.split(r'/')[1] == 'mcd-camo' && sharedData.ccurrentYear == '2024-25'){
+        varTtp = ((varTtp + 9) ~/ 10) * 10;
+      }
       sheet.getRangeByName("G26").setValue(varTtp);
 
       int varDeduct = int.tryParse(itfData['tincometax']?.toString() ?? '0') ?? 0;
@@ -5220,6 +5223,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("G29").setValue(varRelief);
 
       int varNitpi = varTtp - varDeduct - varRelief;
+
       int varEp = 0;
       if (varNitpi < 0){
         varEp = varNitpi.abs();

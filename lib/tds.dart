@@ -61,7 +61,6 @@ Future<void> exportExcel() async {
       sheet.importList(totalRow, rowIndex, 1, false);
     }
 
-
     sheet.getRangeByIndex(1, 1, rowIndex, 9).autoFit();
   }
 
@@ -113,7 +112,7 @@ Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, Stri
       row[3] = await fetchDataFromFirebase(mainEntry["biometricid"]);
     }
 
-    if (row[3] != 0) dataList.add(row);
+    if (row[3] != 0 && row[4] != 0) dataList.add(row);
   }
 
   for (int i = 0; i < dataList.length; i++) {
@@ -144,8 +143,8 @@ Future<int> fetchDataFromFirebase(String bio) async {
   final oldData = Map<String, dynamic>.from(oldRaw);
   final newData = Map<String, dynamic>.from(newRaw);
 
-  int oldVal = parseValue(oldData['nitpi']) + parseValue(oldData['ec']);
-  int newVal = parseValue(newData['nitpi']) + parseValue(newData['ec']);
+  int oldVal = parseValue(oldData['nitpi']);
+  int newVal = parseValue(newData['nitpi']);
 
   return oldVal < newVal ? oldVal : newVal;
 }
