@@ -92,6 +92,7 @@ class _HomePageState extends State<HomePage> {
       "CALC",
       "EXPORT ALL",
       "TDS",
+      "TDS-0",
       "LOGOUT"
     ];
 
@@ -161,7 +162,19 @@ class _HomePageState extends State<HomePage> {
       case "TDS":
         setState(() => _isLoading = true);
         try {
-          await exportExcel();
+          await exportExcel(false);
+        } catch (e) {
+          if (!mounted) return;
+          _showErrorSnackbar(e.toString());
+        } finally {
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
+        }
+      case "TDS-0":
+        setState(() => _isLoading = true);
+        try {
+          await exportExcel(true);
         } catch (e) {
           if (!mounted) return;
           _showErrorSnackbar(e.toString());

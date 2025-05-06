@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio;
 import 'package:universal_html/html.dart' as html;
 
-Future<void> exportExcel() async {
+Future<void> exportExcel(bool isZero) async {
   final db = FirebaseDatabase.instance.ref();
   final dataMainSnapshot = await db.child(sharedData.userPlace).child("maindata").once();
   final rawMain = dataMainSnapshot.snapshot.value;
@@ -28,7 +29,7 @@ Future<void> exportExcel() async {
 
   for (int i = 0; i < dataMonths.length; i++) {
     final sheet = workbook.worksheets.addWithName(sheetMonths[i]);
-    final data = await getData(db, sharedData.userPlace, dataMonths[i], dataMain);
+    final data = await getData(db, sharedData.userPlace, dataMonths[i], dataMain, isZero);
 
     sheet.getRangeByIndex(1, 1, 1, 9).merge();
     sheet.getRangeByIndex(1, 1).setText(sharedData.zone.toUpperCase());
@@ -82,7 +83,7 @@ Future<void> exportExcel() async {
   }
 }
 
-Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, String month, Map<String, dynamic> dataMain) async {
+Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, String month, Map<String, dynamic> dataMain, bool isZero) async {
   final monthSnapshot = await db.child(userPlace).child("monthdata").child(month).once();
   final rawMonth = monthSnapshot.snapshot.value;
   if (rawMonth is! Map) return [];
@@ -112,7 +113,9 @@ Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, Stri
       row[3] = await fetchDataFromFirebase(mainEntry["biometricid"]);
     }
 
-    if (row[3] != 0 && row[4] != 0) dataList.add(row);
+    if ((isZero && row[4] != 0) || (!isZero && row[3] != 0 && row[4] != 0)) {
+      dataList.add(row);
+    }
   }
 
   for (int i = 0; i < dataList.length; i++) {
@@ -146,7 +149,7 @@ Future<int> fetchDataFromFirebase(String bio) async {
   int oldVal = parseValue(oldData['nitpi']);
   int newVal = parseValue(newData['nitpi']);
 
-  return oldVal < newVal ? oldVal : newVal;
+  return min(oldVal, newVal);
 }
 
 

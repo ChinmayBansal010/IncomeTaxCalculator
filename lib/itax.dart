@@ -32,7 +32,7 @@ class _ItaxPageState extends State<ItaxPage> {
   TextEditingController searchController = TextEditingController();
 
   bool toLoad = false;
-
+  int globalNitpi = 0;
   Map<String?, dynamic> mainpgData = {};
 
   Map<String?, dynamic> marData = {};
@@ -1083,12 +1083,12 @@ class _ItaxPageState extends State<ItaxPage> {
     janData = monthdata['jan']!;
     febData = monthdata['feb']!;
 
-    await _itaxformPage(biometricId, ecrSheet, true, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
     await _itaxformPage(biometricId, itaxformSheet, false, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
     await fetchitaxData(biometricId);
     await _computationPage(biometricId, computationSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
     await _itaxOldPage(biometricId, itaxoldSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
     await _itaxNewPage(biometricId, itaxnewSheet, otherheaderStyle, commontextStyle, commontextStyleBold);
+    await _itaxformPage(biometricId, ecrSheet, true, formheaderStyle,commontextStyle, commontextStyleBold, tableheadingStyle, totalrowStyle, formlastrowStyle, specialcolStyle, specialtotalrowStyle, speciallastrowStyle);
 
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
@@ -2260,7 +2260,7 @@ class _ItaxPageState extends State<ItaxPage> {
         varDirtfeb, varWashingfeb, varTbfeb, varNightfeb, varDrivefeb, varCyclefeb,
         varPcafeb, varNpsempfeb, varOtherfeb, varDaext1feb, varDaext2feb, varDaext3feb, varDaext4feb,
       ].fold(0, (sum, value) => sum + value);
-      int varIncometaxfeb = int.tryParse(febData['incometax']?.toString() ?? '0') ?? 0;
+      int varIncometaxfeb = !isECR ? int.tryParse(febData['incometax']?.toString() ?? '0') ?? 0 : globalNitpi;
       int varGisfeb = int.tryParse(febData['gis']?.toString() ?? '0') ?? 0;
       int varGpffeb = int.tryParse(febData['gpf']?.toString() ?? '0') ?? 0;
       int varNpsfeb = int.tryParse(febData['nps']?.toString() ?? '0') ?? 0;
@@ -5229,6 +5229,7 @@ class _ItaxPageState extends State<ItaxPage> {
         varEp = varNitpi.abs();
         varNitpi = 0;
       }
+      globalNitpi = varNitpi;
       sheet.getRangeByName("G30").rowHeight = 19.80;
       sheet.getRangeByName("G30").setValue(varNitpi);
       sheet.getRangeByName("G30").cellStyle.fontSize = 14;
