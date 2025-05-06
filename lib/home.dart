@@ -90,10 +90,10 @@ class _HomePageState extends State<HomePage> {
       "DEDUCTION",
       "ITAX FORM",
       "TAX EXPORT",
-      "CALC",
+      "ARREAR - CALC",
       "EXPORT ALL",
       "TDS",
-      "TDS-0",
+      "TDS - 0",
       "LOGOUT"
     ];
 
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
           setState(() => _isLoading = false);
         }
         break;
-      case "CALC":
+      case "ARREAR - CALC":
         Navigator.push(context, MaterialPageRoute(builder: (context) => const CalcArrearPage()));
         break;
       case "EXPORT ALL":
@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
             setState(() => _isLoading = false);
           }
         }
-      case "TDS-0":
+      case "TDS - 0":
         setState(() => _isLoading = true);
         try {
           await exportExcel(true);
