@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:incometax/shared.dart';
 import 'package:incometax/tds.dart';
 import 'main.dart';
 import 'main_data.dart';
@@ -26,10 +27,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: const [
+          children: [
             Icon(Icons.home, size: 24, color: Colors.black),
             SizedBox(width: 8),
-            Text('HOME', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            Text('HOME - ${sharedData.ccurrentYear}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ],
         ),
         backgroundColor: Colors.blue,
