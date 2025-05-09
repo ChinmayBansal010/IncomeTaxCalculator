@@ -8,7 +8,7 @@
     "test": "test"
   },
   "devDependencies": {
-    "webpack": "^5.97.1",
+    "webpack": "^5.99.8",
     "webpack-cli": "^6.0.1"
   },
   "scripts": {
@@ -28,24 +28,24 @@
   },
   "homepage": "https://github.com/ChinmayBansal010/Flutter-app-itax#readme",
   "dependencies": {
-    "@firebase/database": "^1.0.11",
-    "@firebase/firestore": "^4.7.6",
-    "@firebase/storage": "^0.13.5",
-    "axios": "^1.7.9",
+    "@firebase/database": "^1.0.14",
+    "@firebase/firestore": "^4.7.11",
+    "@firebase/storage": "^0.13.7",
+    "axios": "^1.9.0",
     "cloud-firestore": "^0.0.60",
     "darty": "^0.55.0",
-    "firebase": "^11.2.0",
-    "firebase-admin": "^13.0.2",
-    "firebase-tools": "^13.29.2",
+    "firebase": "^11.6.1",
+    "firebase-admin": "^13.3.0",
+    "firebase-tools": "^14.2.2",
     "flutter": "^0.0.5",
-    "glob": "^11.0.1",
+    "glob": "^11.0.2",
     "google-fonts": "^1.0.0",
     "intl": "^1.2.5",
-    "lru-cache": "^11.0.2",
+    "lru-cache": "^11.1.0",
     "path": "^0.12.7",
     "path-browserify": "^1.0.1",
     "quiver": "^1.3.1",
     "rimraf": "^6.0.1",
-    "sass": "^1.83.4"
+    "sass": "^1.87.0"
   }
 }
