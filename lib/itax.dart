@@ -4806,7 +4806,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varRelief = int.tryParse(dedData['relief']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("G44").setValue(varRelief);
 
-      int varNitpi = varNitp - varRelief;
+      int varNitpi = varTtp - varDeduct - varRelief;
       int varEp = 0;
       if (varNitpi < 0){
         varEp = varNitpi.abs();
