@@ -244,7 +244,7 @@ Future<Map<String, dynamic>> fetchdedData() async {
 
       final orderedKeys = [
         "biometricid", "name", "oname", "opan", "po", "ppf", "lic", "hlp",
-        "hli", "tution", "cea", "fd", "nsc", "80c", "ulip", "80ccd1", "gpf",
+        "hli", "80g", "tution", "cea", "fd", "nsc", "80c", "ulip", "80ccd1", "gpf",
         "gis", "elss", "ssy", "80ccdnps", "80d", "80dp", "80dps", "80u", "80e",
         "relief", "80ee", "rpaid", "taexem", "other", "totalsav",
         "maxsav", "htype", "ext3", "ext4", "ext5"
@@ -253,7 +253,7 @@ Future<Map<String, dynamic>> fetchdedData() async {
       final labelMap = {
         "biometricid": "Biometric ID", "name": "Name", "oname": "O Name", "opan": "O PAN",
         "po": "Post Office", "ppf": "PPF", "lic": "LIC", "hlp": "Home Loan Principal",
-        "hli": "Home Loan Interest", "tution": "Tuition", "cea": "CEA", "fd": "FD",
+        "hli": "Home Loan Interest", "80g":"80G", "tution": "Tuition", "cea": "CEA", "fd": "FD",
         "nsc": "NSC", "80c": "80C", "ulip": "ULIP", "80ccd1": "80CCD(1)", "gpf": "GPF",
         "gis": "GIS", "elss": "ELSS", "ssy": "SSY", "80ccdnps": "80CCD(NPS)",
         "80d": "80D", "80dp": "80D Parents", "80dps": "80D Parents Senior",
