@@ -783,7 +783,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         'lic': licController.text,
         'hlp': hlpController.text,
         'hli': hliController.text,
-        'atg': atgController.text,
+        '80g': atgController.text,
         'tution': tutionController.text,
         'cea': ceaController.text,
         'fd': fdController.text,

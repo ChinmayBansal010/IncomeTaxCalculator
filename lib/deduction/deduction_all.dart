@@ -3,47 +3,47 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/shared.dart';
 
 class DeductionAllPage {
-  final String biometricId;
-  final String name;
-  final String hrr;
-  final String oname;
-  final String opan;
-  final String po;
-  final String ppf;
-  final String lic;
-  final String hlp;
-  final String hli;
-  final String atg;
-  final String tution;
-  final String cea;
-  final String fd;
-  final String nsc;
-  final String atc;
-  final String ulip;
-  final String atccd1;
-  final String gpf;
-  final String gis;
-  final String elss;
-  final String ssy;
-  final String atccdnps;
-  final String atd;
-  final String atdp;
-  final String atdps;
-  final String atu;
-  final String ate;
-  final String relief;
-  final String atee;
-  final String rpaid;
-  final String convcontuniform;
-  final String other;
-  final String atccd2;
-  final String totalsav;
-  final String maxsav;
-  final String htype;
-  final String rent;
-  final String ext3;
-  final String ext4;
-  final String ext5;
+  String biometricId;
+  String name;
+  String hrr;
+  String oname;
+  String opan;
+  String po;
+  String ppf;
+  String lic;
+  String hlp;
+  String hli;
+  String atg;
+  String tution;
+  String cea;
+  String fd;
+  String nsc;
+  String atc;
+  String ulip;
+  String atccd1;
+  String gpf;
+  String gis;
+  String elss;
+  String ssy;
+  String atccdnps;
+  String atd;
+  String atdp;
+  String atdps;
+  String atu;
+  String ate;
+  String relief;
+  String atee;
+  String rpaid;
+  String convcontuniform;
+  String other;
+  String atccd2;
+  String totalsav;
+  String maxsav;
+  String htype;
+  String rent;
+  String ext3;
+  String ext4;
+  String ext5;
 
    DeductionAllPage({
     required this.biometricId,
@@ -89,48 +89,6 @@ class DeductionAllPage {
     required this.ext5,
 
   });
-  // Text controllers for form inputs
-  final biometricIdController = TextEditingController();
-  final nameController = TextEditingController();
-  final hrrController = TextEditingController();
-  final onameController = TextEditingController();
-  final opanController = TextEditingController();
-  final poController = TextEditingController();
-  final ppfController = TextEditingController();
-  final licController = TextEditingController();
-  final hlpController = TextEditingController();
-  final hliController = TextEditingController();
-  final atgController = TextEditingController();
-  final tutionController = TextEditingController();
-  final ceaController = TextEditingController();
-  final fdController = TextEditingController();
-  final nscController = TextEditingController();
-  final atcController = TextEditingController();
-  final ulipController = TextEditingController();
-  final atccd1Controller = TextEditingController();
-  final gpfController = TextEditingController();
-  final gisController = TextEditingController();
-  final elssController = TextEditingController();
-  final ssyController = TextEditingController();
-  final atccdnpsController = TextEditingController();
-  final atdController = TextEditingController();
-  final atdpController = TextEditingController();
-  final atdpsController = TextEditingController();
-  final atuController = TextEditingController();
-  final ateController = TextEditingController();
-  final reliefController = TextEditingController();
-  final ateeController = TextEditingController();
-  final rpaidController = TextEditingController();
-  final convcontuniformController = TextEditingController();
-  final otherController = TextEditingController();
-  final atccd2Controller = TextEditingController();
-  final totalsavController = TextEditingController();
-  final maxsavController = TextEditingController();
-  late String htypeController = 'SELF';
-  final rentController = TextEditingController();
-  final ext3Controller = TextEditingController();
-  final ext4Controller = TextEditingController();
-  final ext5Controller = TextEditingController();
 
   int gis2 = 0, gpf2 = 0, atccd12 = 0, atccd22 = 0, taexem2 = 0;
   bool isCea = false;
@@ -144,57 +102,12 @@ class DeductionAllPage {
 
 
   Future<void> initializeData() async {
-
     await Future.wait(months.map((month) => fetchMonthData(month)));
-
+    gis = gis2.toString();
+    gpf = gpf2.toString();
+    atccd1 = atccd12.toString();
+    convcontuniform = taexem2.toString();
     await fetchArrData();
-    debugPrint("initialization called");
-
-    convcontuniformController.text = taexem2.toString();
-    atccd1Controller.text = atccd12.toString();
-    gpfController.text = gpf2.toString();
-    gisController.text = gis2.toString();
-    atccd2Controller.text = atccd22.toString();
-
-
-    biometricIdController.text = biometricId;
-    nameController.text = name;
-    hrrController.text = hrr;
-    onameController.text = oname;
-    opanController.text = opan;
-    poController.text = po;
-    ppfController.text = ppf;
-    licController.text = lic;
-    hlpController.text = hlp;
-    hliController.text = hli;
-    atgController.text = atg;
-    tutionController.text = tution;
-    ceaController.text = cea;
-    fdController.text = fd;
-    nscController.text = nsc;
-    atcController.text = atc;
-    ulipController.text = ulip;
-    elssController.text = elss;
-    ssyController.text = ssy;
-    atccdnpsController.text = atccdnps;
-    atdController.text = atd;
-    atdpController.text = atdp;
-    atdpsController.text = atdps;
-    atuController.text = atu;
-    ateController.text = ate;
-    reliefController.text = relief;
-    ateeController.text = atee;
-    rpaidController.text = rpaid;
-    // convcontuniformController.text = taexem2;
-    otherController.text = other;
-    totalsavController.text = totalsav;
-    maxsavController.text = maxsav;
-    htypeController = htype;
-    rentController.text = rent;
-    ext3Controller.text = ext3;
-    ext4Controller.text = ext4;
-    ext5Controller.text = ext5;
-
     await saveData();
   }
 
@@ -259,48 +172,48 @@ class DeductionAllPage {
     await _calculateData();
 
     try {
-      await bioRef.child('deddata').child(biometricIdController.text).update({
-        'biometricid': biometricIdController.text,
-        'name': nameController.text,
-        'hrr': hrrController.text,
-        'oname': onameController.text,
-        'opan': opanController.text,
-        'po': poController.text,
-        'ppf': ppfController.text,
-        'lic': licController.text,
-        'hlp': hlpController.text,
-        'hli': hliController.text,
-        'atg': atgController.text,
-        'tution': tutionController.text,
-        'cea': ceaController.text,
-        'fd': fdController.text,
-        'nsc': nscController.text,
-        '80c': atcController.text,
-        'ulip': ulipController.text,
-        '80ccd1': atccd1Controller.text,
-        'gpf': gpfController.text,
-        'gis': gisController.text,
-        'elss': elssController.text,
-        'ssy': ssyController.text,
-        '80ccdnps': atccdnpsController.text,
-        '80d': atdController.text,
-        '80dp': atdpController.text,
-        '80dps': atdpsController.text,
-        '80u': atuController.text,
-        '80e': ateController.text,
-        'relief': reliefController.text,
-        '80ee': ateeController.text,
-        'rpaid': rpaidController.text,
-        'taexem': convcontuniformController.text,
-        'other': otherController.text,
-        '80ccd2': atccd2Controller.text,
-        'totalsav': totalsavController.text,
-        'maxsav': maxsavController.text,
-        'htype': htypeController,
-        'rent': rentController.text,
-        'ext3': ext3Controller.text,
-        'ext4': ext4Controller.text,
-        'ext5': ext5Controller.text,
+      await bioRef.child('deddata').child(biometricId).update({
+        'biometricid': biometricId,
+        'name': name,
+        'hrr': hrr,
+        'oname': oname,
+        'opan': opan,
+        'po': po,
+        'ppf': ppf,
+        'lic': lic,
+        'hlp': hlp,
+        'hli': hli,
+        '80g': atg,
+        'tution': tution,
+        'cea': cea,
+        'fd': fd,
+        'nsc': nsc,
+        '80c': atc,
+        'ulip': ulip,
+        '80ccd1': atccd1,
+        'gpf': gpf,
+        'gis': gis,
+        'elss': elss,
+        'ssy': ssy,
+        '80ccdnps': atccdnps,
+        '80d': atd,
+        '80dp': atdp,
+        '80dps': atdps,
+        '80u': atu,
+        '80e': ate,
+        'relief': relief,
+        '80ee': atee,
+        'rpaid': rpaid,
+        'taexem': convcontuniform,
+        'other': other,
+        '80ccd2': atccd2,
+        'totalsav': totalsav,
+        'maxsav': maxsav,
+        'htype': htype,
+        'rent': rent,
+        'ext3': ext3,
+        'ext4': ext4,
+        'ext5': ext5,
       });
     } catch (error) {
       return;
@@ -309,42 +222,42 @@ class DeductionAllPage {
   }
 
   Future<void> _validateValue() async{
-    if ((int.tryParse(hliController.text) ?? 0)> 200000) {
-      hliController.text = '200000';
-    } else if ((int.tryParse(atccdnpsController.text) ?? 0) > 50000) {
-      atccdnpsController.text = '50000';
-    } else if ((int.tryParse(atdpController.text)?? 0) > 50000) {
-      atdpController.text = '50000';
-    }else if ((int.tryParse(atdpsController.text) ?? 0) > 50000) {
-      atdpsController.text = '50000';
-    }else if ((int.tryParse(atdController.text) ?? 0)> 25000) {
-      atdController.text = '25000';
+    if ((int.tryParse(hli) ?? 0)> 200000) {
+      hli = '200000';
+    } else if ((int.tryParse(atccdnps) ?? 0) > 50000) {
+      atccdnps = '50000';
+    } else if ((int.tryParse(atdp)?? 0) > 50000) {
+      atdp = '50000';
+    }else if ((int.tryParse(atdps) ?? 0) > 50000) {
+      atdps = '50000';
+    }else if ((int.tryParse(atd) ?? 0)> 25000) {
+      atd = '25000';
     }
   }
-  
+
   Future<void> _calculateData() async{
-    final po = int.tryParse(poController.text) ?? 0;
-    final ppf = int.tryParse(ppfController.text) ?? 0;
-    final lic = int.tryParse(licController.text) ?? 0;
-    final hlp = int.tryParse(hlpController.text) ?? 0;
-    final tution = int.tryParse(tutionController.text) ?? 0;
-    final fd = int.tryParse(fdController.text) ?? 0;
-    final nsc = int.tryParse(nscController.text) ?? 0;
-    final atc = int.tryParse(atcController.text) ?? 0;
-    final ulip = int.tryParse(ulipController.text) ?? 0;
-    final atccd1 = int.tryParse(atccd1Controller.text) ?? 0;
-    final gpf = int.tryParse(gpfController.text) ?? 0;
-    final gis = int.tryParse(gisController.text) ?? 0;
-    final elss = int.tryParse(elssController.text) ?? 0;
-    final ssy = int.tryParse(ssyController.text) ?? 0;
-    final ext3 = int.tryParse(ext3Controller.text) ?? 0;
-    final totalsav = po + ppf + lic + hlp + tution + fd + nsc + atc + ulip + atccd1 + gpf + gis + elss + ssy + ext3;
-    totalsavController.text = totalsav.toString();
-    if (totalsav > 150000){
-      maxsavController.text = '150000';
+     int po2 = int.tryParse(po) ?? 0;
+     int ppf2 = int.tryParse(ppf) ?? 0;
+     int lic2 = int.tryParse(lic) ?? 0;
+     int hlp2 = int.tryParse(hlp) ?? 0;
+     int tution2 = int.tryParse(tution) ?? 0;
+     int fd2 = int.tryParse(fd) ?? 0;
+     int nsc2 = int.tryParse(nsc) ?? 0;
+     int atc2 = int.tryParse(atc) ?? 0;
+     int ulip2 = int.tryParse(ulip) ?? 0;
+     int atccd12 = int.tryParse(atccd1) ?? 0;
+     int gpf2 = int.tryParse(gpf) ?? 0;
+     int gis2 = int.tryParse(gis) ?? 0;
+     int elss2 = int.tryParse(elss) ?? 0;
+     int ssy2 = int.tryParse(ssy) ?? 0;
+     int ext32 = int.tryParse(ext3) ?? 0;
+     int totalsav2 = po2 + ppf2 + lic2 + hlp2 + tution2 + fd2 + nsc2 + atc2 + ulip2 + atccd12 + gpf2 + gis2 + elss2 + ssy2 + ext32;
+     totalsav = totalsav2.toString();
+    if (totalsav2 > 150000){
+      maxsav = '150000';
     } else {
-      maxsavController.text = totalsavController.text;
+      maxsav = totalsav;
     }
-    debugPrint(totalsavController.text);
+    debugPrint(totalsav);
   }
 }
