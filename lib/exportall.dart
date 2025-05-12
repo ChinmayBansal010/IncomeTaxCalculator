@@ -243,24 +243,23 @@ Future<Map<String, dynamic>> fetchdedData() async {
       final dedData = Map<String, dynamic>.from(event.snapshot.value as Map);
 
       final orderedKeys = [
-        "biometricid", "name", "oname", "opan", "po", "ppf", "lic", "hlp",
+        "biometricid", "name", "oname", "opan", "po", "hrr", "ppf", "lic", "hlp",
         "hli", "80g", "tution", "cea", "fd", "nsc", "80c", "ulip", "80ccd1", "gpf",
         "gis", "elss", "ssy", "80ccdnps", "80d", "80dp", "80dps", "80u", "80e",
-        "relief", "80ee", "rpaid", "taexem", "other", "totalsav",
-        "maxsav", "htype", "ext3", "ext4", "ext5"
+        "relief", "80ee", "taexem", "other", "totalsav",
+        "maxsav"
       ];
 
       final labelMap = {
-        "biometricid": "Biometric ID", "name": "Name", "oname": "O Name", "opan": "O PAN",
+        "biometricid": "Biometric ID", "name": "Name", "oname": "O Name", "opan": "O PAN", "hrr": "Rent",
         "po": "Post Office", "ppf": "PPF", "lic": "LIC", "hlp": "Home Loan Principal",
         "hli": "Home Loan Interest", "80g":"80G", "tution": "Tuition", "cea": "CEA", "fd": "FD",
         "nsc": "NSC", "80c": "80C", "ulip": "ULIP", "80ccd1": "80CCD(1)", "gpf": "GPF",
-        "gis": "GIS", "elss": "ELSS", "ssy": "SSY", "80ccdnps": "80CCD(NPS)",
-        "80d": "80D", "80dp": "80D Parents", "80dps": "80D Parents Senior",
+        "gis": "GIS", "elss": "ELSS", "ssy": "SSY", "80ccdnps": "80CCD(1B)",
+        "80d": "80D", "80dp": "80DP", "80dps": "80DPS",
         "80u": "80U", "80e": "80E", "relief": "Relief",
-        "80ee": "80EE", "rpaid": "Rent Paid", "taexem": "CONV+CONT+UNIFORM",
-        "other": "Other", "totalsav": "Total Savings", "maxsav": "Max Saving",
-        "htype": "H Type", "ext3": "Extra 3", "ext4": "Extra 4", "ext5": "Extra 5"
+        "80ee": "80EE", "taexem": "CONV+CONT+UNIFORM",
+        "other": "Other", "totalsav": "Total Savings", "maxsav": "Max Saving"
       };
 
       final mappedData = <String, Map<String, dynamic>>{};
