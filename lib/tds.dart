@@ -30,40 +30,48 @@ Future<void> exportExcel(bool isZero) async {
   for (int i = 0; i < dataMonths.length; i++) {
     final sheet = workbook.worksheets.addWithName(sheetMonths[i]);
     final data = await getData(db, sharedData.userPlace, dataMonths[i], dataMain, isZero);
-
     sheet.getRangeByIndex(1, 1, 1, 9).merge();
     sheet.getRangeByIndex(1, 1).setText(sharedData.zone.toUpperCase());
+    sheet.getRangeByIndex(1, 1, 1, 9).cellStyle.hAlign = xlsio.HAlignType.center;
+    sheet.getRangeByIndex(1, 1, 1, 9).cellStyle.vAlign = xlsio.VAlignType.center;
+    sheet.getRangeByIndex(1, 1, 1, 9).cellStyle.bold = true;
 
     sheet.getRangeByIndex(2, 1, 2, 9).merge();
     sheet.getRangeByIndex(2, 1).setText(
         "Details of Salary Payments made and TDS Deduction for financial Year");
+    sheet.getRangeByIndex(2, 1, 2, 9).cellStyle.hAlign = xlsio.HAlignType.center;
+    sheet.getRangeByIndex(2, 1, 2, 9).cellStyle.vAlign = xlsio.VAlignType.center;
+    sheet.getRangeByIndex(2, 1, 2, 9).cellStyle.bold = true;
 
     final header = [
-      "Sl. No.", "Name of Employee", "PAN NO.", "TDS (Total Tax Deducted)",
-      "Gross Salary", "Cheque No. & Date", "CRN No dated", "Amount in Rs/-", "MONTH"
+      "Sl. No.", "NAME AS PAN CARD (IT IS USED FOR IDENTIFICATION OF CORRECT NAME) IN CAPITAL LETTERS", "PAN NO AS PRINTED ON PAN CARD", "BMID NO", "DESIGNATION", "SALARY MONTH",
+      "GROSS SALARY EXCLUDING NON TAXABLE", "TAX", "CHALLAN DATE (DD/MM/YYYY)", "SRN", "CHALLAN AMOUNT", "BSR CODE"
     ];
     sheet.importList(header, 3, 1, false);
+    sheet.getRangeByIndex(3,1,3,12).cellStyle.wrapText = true;
+    sheet.getRangeByIndex(3,1,3,12).autoFit();
 
     int rowIndex = 4;
     int totalTds = 0, totalGross = 0;
 
     for (var row in data) {
-      if (row.length >= 5) { // Ensure row has at least 5 columns
-        sheet.importList(row, rowIndex, 1, false);
-        totalTds += parseValue(row[3]);
-        totalGross += parseValue(row[4]);
-        rowIndex++;
-      }
+      sheet.importList(row, rowIndex, 1, false);
+      totalGross += parseValue(row[6]);
+      totalTds += parseValue(row[7]);
+      rowIndex++;
     }
 
 
-    List<dynamic> totalRow = ["", "", "Total", totalTds, totalGross, "", "", "", ""];
+    List<dynamic> totalRow = ["", "", "", "", "", "Total", totalGross, totalTds, "", "", "", ""];
     if (totalRow.length >= 5) {
       sheet.importList(totalRow, rowIndex, 1, false);
     }
 
-    sheet.getRangeByIndex(1, 1, rowIndex, 9).autoFit();
+    sheet.getRangeByIndex(1, 1, rowIndex, 12).autoFit();
   }
+
+  final xlsio.Worksheet firstSheet = workbook.worksheets[0];
+  firstSheet.visibility = xlsio.WorksheetVisibility.hidden;
 
   final List<int> bytes = workbook.saveAsStream();
   workbook.dispose();
@@ -101,19 +109,22 @@ Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, Stri
       0, // Placeholder for Sl. No.
       mainEntry["name"] ?? "",
       mainEntry["panno"] ?? "",
-      parseValue(monthEntry["incometax"]),
+      mainEntry["biometricid"] ?? "",
+      mainEntry["designation"] ?? "",
+      month.toUpperCase(),
       parseValue(monthEntry["gross"]) -
           parseValue(monthEntry["conv"]) -
           parseValue(monthEntry["drive"]) -
           parseValue(monthEntry["uniform"]),
-      "", "", "", month.toUpperCase()
+      parseValue(monthEntry["incometax"]),
+      "", "", "", ""
     ];
 
     if (month == 'feb') {
-      row[3] = await fetchDataFromFirebase(mainEntry["biometricid"]);
+      row[7] = await fetchDataFromFirebase(mainEntry["biometricid"]);
     }
 
-    if ((isZero && row[4] != 0) || (!isZero && row[3] != 0 && row[4] != 0)) {
+    if ((isZero && row[6] != 0) || (!isZero && row[7] != 0 && row[6] != 0)) {
       dataList.add(row);
     }
   }
@@ -121,7 +132,6 @@ Future<List<List<dynamic>>> getData(DatabaseReference db, String userPlace, Stri
   for (int i = 0; i < dataList.length; i++) {
     dataList[i][0] = i + 1;
   }
-
   return dataList;
 }
 

@@ -134,7 +134,27 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(context, MaterialPageRoute(builder: (context) => const ItaxPage()));
         break;
       case "TAX EXPORT":
-        setState(() => _isLoading = true);
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Confirm Export"),
+            content: Text("Are you sure you want to export the tax data?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("Yes, Export"),
+              ),
+            ],
+          ),
+        );
+
+        if (confirm != true) break; // User cancelled
+
+        if (!mounted) return; setState(() => _isLoading = true);
         try {
           await createExcel();
         } catch (e) {
@@ -148,6 +168,25 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(context, MaterialPageRoute(builder: (context) => const CalcArrearPage()));
         break;
       case "EXPORT ALL":
+        final confirmExportAll = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Confirm Export"),
+            content: Text("Are you sure you want to export all data?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("Yes, Export"),
+              ),
+            ],
+          ),
+        );
+        if (confirmExportAll != true) break;
+
         setState(() => _isLoading = true);
         try {
           await exportAll();
@@ -155,12 +194,30 @@ class _HomePageState extends State<HomePage> {
           if (!mounted) return;
           _showErrorSnackbar(e.toString());
         } finally {
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
+          if (mounted) setState(() => _isLoading = false);
         }
         break;
+
       case "TDS":
+        final confirmTDS = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Confirm TDS Export"),
+            content: Text("Are you sure you want to export TDS data?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("Yes, Export"),
+              ),
+            ],
+          ),
+        );
+        if (confirmTDS != true) break;
+
         setState(() => _isLoading = true);
         try {
           await exportExcel(false);
@@ -168,11 +225,30 @@ class _HomePageState extends State<HomePage> {
           if (!mounted) return;
           _showErrorSnackbar(e.toString());
         } finally {
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
+          if (mounted) setState(() => _isLoading = false);
         }
+        break;
+
       case "TDS - 0":
+        final confirmTDSZero = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Confirm TDS Export"),
+            content: Text("Are you sure you want to export TDS data with 0%?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("Yes, Export"),
+              ),
+            ],
+          ),
+        );
+        if (confirmTDSZero != true) break;
+
         setState(() => _isLoading = true);
         try {
           await exportExcel(true);
@@ -180,10 +256,9 @@ class _HomePageState extends State<HomePage> {
           if (!mounted) return;
           _showErrorSnackbar(e.toString());
         } finally {
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
+          if (mounted) setState(() => _isLoading = false);
         }
+        break;
       case "LOGOUT":
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
         break;

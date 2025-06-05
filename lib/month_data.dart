@@ -206,24 +206,24 @@ class _MonthDataPageState extends State<MonthDataPage> {
           ),
         ],
       ),
-      floatingActionButton: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: CustomFloatingButton(
-              label: 'COPY',
-              icon: Icons.copy,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Copy functionality executed!')),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+      // floatingActionButton: Stack(
+      //   fit: StackFit.expand,
+      //   children: [
+      //     Positioned(
+      //       bottom: 16,
+      //       right: 16,
+      //       child: CustomFloatingButton(
+      //         label: 'COPY',
+      //         icon: Icons.copy,
+      //         onPressed: () {
+      //           ScaffoldMessenger.of(context).showSnackBar(
+      //             const SnackBar(content: Text('Copy functionality executed!')),
+      //           );
+      //         },
+      //       ),
+      //     ),
+      //   ],
+      // ),
     );
   }
 }
