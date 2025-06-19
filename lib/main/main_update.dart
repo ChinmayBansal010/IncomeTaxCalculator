@@ -218,9 +218,25 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     if (biometricIdController.text.isEmpty) {
       showDialog(
         context: context,
+        builder: (ctx) =>
+            AlertDialog(
+              title: const Text("Error"),
+              content: const Text("Biometric ID cannot be blank."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+      );
+      return;
+    } if (dobController.text.isEmpty) {
+      showDialog(
+        context: context,
         builder: (ctx) => AlertDialog(
           title: const Text("Error"),
-          content: const Text("Biometric ID cannot be blank."),
+          content: const Text("Date of Birth cannot be blank."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -230,7 +246,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         ),
       );
       return;
-    } else if(gpfNoController.text != '0' && npsNoController.text != '0'){
+    } if(gpfNoController.text != '0' && npsNoController.text != '0'){
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -372,23 +388,44 @@ class MainUpdatePageState extends State<MainUpdatePage> {
       return;
     }
 
-    showDialog(
+    final confirm = await showDialog<bool>(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
-      builder: (ctx) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(), // Loading spinner
-              SizedBox(width: 20),
-              Text("Deleting...", style: TextStyle(fontSize: 16)),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text("Confirm Export"),
+        content: Text("Are you sure you want to delete data?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text("Cancel"),
           ),
-        ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text("Yes, Delete"),
+          ),
+        ],
       ),
     );
+    if (confirm != true) return;
+
+    if(mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Prevent dismissing by tapping outside
+        builder: (ctx) => Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(), // Loading spinner
+                SizedBox(width: 20),
+                Text("Deleting...", style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     try {
       await bioRef.child('maindata').child(biometricIdController.text).remove();

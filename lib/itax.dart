@@ -786,7 +786,7 @@ class _ItaxPageState extends State<ItaxPage> {
                               dataRowColor: WidgetStateProperty.resolveWith(
                                     (Set<WidgetState> states) {
                                   if (states.contains(WidgetState.hovered)) {
-                                    return Colors.blue.shade50; // Hover effect
+                                    return Colors.blue.shade50;
                                   }
                                   return Colors.white;
                                 },
@@ -802,7 +802,7 @@ class _ItaxPageState extends State<ItaxPage> {
                               ),
                               border: TableBorder.all(
                                 color: Colors.blue.shade300,
-                                width: 2, // Bold borders
+                                width: 2,
                               ),
                               columns: const [
                                 DataColumn(
@@ -818,21 +818,19 @@ class _ItaxPageState extends State<ItaxPage> {
                                   ),
                                 ),
                               ],
-                              rows: filteredData.keys
-                                  .toList()
-                                  .asMap()
-                                  .entries
-                                  .map(
-                                    (entry) {
+                              rows: (() {
+                                final sortedEntries = filteredData.entries.toList()
+                                  ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key)));
+
+                                return sortedEntries.asMap().entries.map((entry) {
                                   int index = entry.key;
-                                  String biometricId = entry.value;
+                                  String biometricId = entry.value.key;
+                                  String name = entry.value.value['name'] ?? 'N/A';
+
                                   return DataRow(
                                     color: WidgetStateProperty.resolveWith(
                                           (Set<WidgetState> states) {
-                                        if (index % 2 == 0) {
-                                          return Colors.blue.shade50; // Alternate row color
-                                        }
-                                        return Colors.white;
+                                        return index % 2 == 0 ? Colors.blue.shade50 : Colors.white;
                                       },
                                     ),
                                     cells: [
@@ -842,28 +840,22 @@ class _ItaxPageState extends State<ItaxPage> {
                                           child: Text(biometricId),
                                         ),
                                         onTap: () {
-                                          biometricIdController.text =
-                                              biometricId; // Set value to controller
+                                          biometricIdController.text = biometricId;
                                         },
                                       ),
                                       DataCell(
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            filteredData[biometricId]
-                                            ?['name'] ??
-                                                'N/A',
-                                          ),
+                                          child: Text(name),
                                         ),
                                         onTap: () {
-                                          biometricIdController.text =
-                                              biometricId; // Set value to controller
+                                          biometricIdController.text = biometricId;
                                         },
                                       ),
                                     ],
                                   );
-                                },
-                              ).toList(),
+                                }).toList();
+                              })(),
                             ),
                           ),
                         ),

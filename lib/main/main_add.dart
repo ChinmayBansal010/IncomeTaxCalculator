@@ -102,9 +102,25 @@ class _MainAddPageState extends State<MainAddPage> {
     if (biometricIdController.text.isEmpty) {
       showDialog(
         context: context,
+        builder: (ctx) =>
+            AlertDialog(
+              title: const Text("Error"),
+              content: const Text("Biometric ID cannot be blank."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+      );
+      return;
+    } if (dobController.text.isEmpty) {
+      showDialog(
+        context: context,
         builder: (ctx) => AlertDialog(
           title: const Text("Error"),
-          content: const Text("Biometric ID cannot be blank."),
+          content: const Text("Date of Birth cannot be blank."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -114,7 +130,7 @@ class _MainAddPageState extends State<MainAddPage> {
         ),
       );
       return;
-    }else if(gpfNoController.text != '0' && npsNoController.text != '0'){
+    } if(gpfNoController.text != '0' && npsNoController.text != '0'){
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
