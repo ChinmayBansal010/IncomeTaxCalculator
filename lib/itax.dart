@@ -724,6 +724,23 @@ class _ItaxPageState extends State<ItaxPage> {
                                     ),
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  child: ElevatedButton(
+                                    onPressed: () => exportAll(true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blueAccent,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                      elevation: 8.0,
+                                    ),
+                                    child: const Text(
+                                      "EXPORT ALL - PAN",
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -927,7 +944,7 @@ class _ItaxPageState extends State<ItaxPage> {
   }
 
 
-  Future<void> createExcel({String? biometricId}) async {
+  Future<void> createExcel({String? biometricId , bool? isPan, bool? isExportAll = false}) async {
     setState(() {
       toLoad = true;
     });
@@ -1092,19 +1109,21 @@ class _ItaxPageState extends State<ItaxPage> {
 
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
-
+    String? name = isPan!
+        ? (mainpgData['panno'] ?? biometricId).toString()
+        : biometricId.toString();
     if (kIsWeb){
       AnchorElement(
           href: 'data:application/octet-stream;charset=utf-16le;base64,${base64.encode(bytes)}')
-        ..setAttribute('download','$biometricId.xlsx')
+        ..setAttribute('download','$name.xlsx')
         ..click();
 
     } else{
       final String path = (await getApplicationSupportDirectory()).path;
-      final String fileName = '$path/$biometricId.xlsx';
+      final String fileName = '$path/$name.xlsx';
       final File file = File(fileName);
       await file.writeAsBytes(bytes, flush: true);
-      OpenFile.open(fileName);
+      if (!isExportAll!) { OpenFile.open(fileName); }
     }
 
     setState(() {
@@ -5428,7 +5447,7 @@ class _ItaxPageState extends State<ItaxPage> {
     }
   }
 
-  Future<void> exportAll() async{
+  Future<void> exportAll([bool isPan = false]) async{
     try{
       var sortedEntries = biometricData.entries.toList()
         ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key)));
@@ -5442,7 +5461,7 @@ class _ItaxPageState extends State<ItaxPage> {
           : 0;
 
       for (int i = startIndex; i < biometricIds.length; i++) {
-        await createExcel(biometricId: biometricIds[i]);
+        await createExcel(biometricId: biometricIds[i], isPan: isPan, isExportAll: true);
       }
 
     } catch (error) {
