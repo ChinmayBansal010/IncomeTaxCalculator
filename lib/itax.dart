@@ -944,7 +944,7 @@ class _ItaxPageState extends State<ItaxPage> {
   }
 
 
-  Future<void> createExcel({String? biometricId , bool? isPan, bool? isExportAll = false}) async {
+  Future<void> createExcel({String? biometricId , bool? isPan = false, bool? isExportAll = false}) async {
     setState(() {
       toLoad = true;
     });
