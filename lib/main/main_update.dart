@@ -484,7 +484,6 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         updates['esichk'] = '1';
       }
 
-      print(updates);
       if (updates.isNotEmpty) {
         await bioRef.child('monthdata').child(months).child(biometricIdController.text).update(updates);
       }
