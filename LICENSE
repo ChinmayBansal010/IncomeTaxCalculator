@@ -4,34 +4,35 @@ Copyright © 2025 Chinmay Bansal
 
 This software, including all source code, files, and exported data formats, is protected and governed by the terms described herein.
 
-## 1. Use and Distribution
+1. Use and Distribution
 
-- The **complete software system** (including any deployed version or bundled package) is NOT permitted to be used, distributed, or deployed without **explicit permission** from the author.
-- You may **view, reference, or use specific portions of the codebase** for **educational or non-commercial purposes** after obtaining written consent from the author.
+- The complete software system (including any deployed version or bundled package) is NOT permitted to be used, distributed, or deployed without explicit permission from the author.
+- You may view, reference, or use specific portions of the codebase for educational or non-commercial purposes after obtaining written consent from the author.
 
-## 2. Derivative Works
+2. Derivative Works
 
-- Derivative works or adaptations based on the original source code may **not be publicly shared, published, or deployed** without permission.
+- Derivative works or adaptations based on the original source code may not be publicly shared, published, or deployed without permission.
 - Any approved modifications or forks must retain this license file and clearly mark changes.
 
-## 3. Commercial Use
+3. Commercial Use
 
-- Commercial use of any part of this software is **strictly prohibited** unless a separate commercial license or written approval is granted by the author.
+- Commercial use of any part of this software is strictly prohibited unless a separate commercial license or written approval is granted by the author.
 
-## 4. Attribution
+4. Attribution
 
 - If permission is granted, any usage must credit the original author:
-  > "Originally developed by Chinmay Bansal – 2025"
+  "Originally developed by Chinmay Bansal – 2025"
 
-## 5. Warranty Disclaimer
+5. Warranty Disclaimer
 
 This software is provided "AS IS", without warranty of any kind, express or implied. The author makes no guarantees regarding functionality, accuracy, or compatibility.
 
-## 6. Contact
+6. Contact
 
 For permissions, licensing inquiries, or collaboration requests, contact:
 
-📧 Email: chinmay8521@gmail.com  
+Email: chinmay8521@gmail.com
+
 ---
 
-This license is **not the official Apache 2.0 license** and is tailored specifically to restrict unauthorized distribution and use while allowing educational reference with permission.
+Note: This license is not the official Apache 2.0 license and is tailored specifically to restrict unauthorized distribution and use while allowing educational reference with permission.
