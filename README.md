@@ -82,6 +82,14 @@ lib/
 
 ---
 
+## 🏢 Real-World Usage
+
+✅ **Currently in Active Use:**  
+This application is deployed and being used to manage salary and tax data for **over 400 employees** at the **MCD Dispensary, Delhi**.  
+It streamlines the entire finance process and generates audit-ready reports in Excel format.
+
+---
+
 ## 📩 Contact
 
 **Developer**: Chinmay Bansal  
