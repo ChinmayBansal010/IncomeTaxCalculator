@@ -1,15 +1,37 @@
+Modified Software License – Based on Apache License Version 2.0
+
 Copyright © 2025 Chinmay Bansal
 
-This software — the Income Tax Calculator & Employee Management System — is **intended solely for authorized use** by the MCD Dispensary, Delhi, or individuals explicitly granted permission by the developer.
+This software, including all source code, files, and exported data formats, is protected and governed by the terms described herein.
 
-Unauthorized use, redistribution, or deployment of the software in whole or in part is strictly prohibited.
+## 1. Use and Distribution
 
-However, **re-use of parts of the source code for educational or reference purposes is allowed**, provided the following conditions are met:
+- The **complete software system** (including any deployed version or bundled package) is NOT permitted to be used, distributed, or deployed without **explicit permission** from the author.
+- You may **view, reference, or use specific portions of the codebase** for **educational or non-commercial purposes** after obtaining written consent from the author.
 
-1. **Permission must be obtained** from the developer (Chinmay Bansal) before re-using or adapting any part of the codebase.
-2. Proper **attribution** must be given in any derivative works, documentation, or presentations.
-3. Commercial use of this software or its components is **not permitted** without explicit written consent.
+## 2. Derivative Works
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. UNDER NO CIRCUMSTANCES SHALL THE AUTHOR BE HELD LIABLE FOR DAMAGES OR MISUSE.
+- Derivative works or adaptations based on the original source code may **not be publicly shared, published, or deployed** without permission.
+- Any approved modifications or forks must retain this license file and clearly mark changes.
 
-Contact for permissions: *chinmay8521@gmail.com*
+## 3. Commercial Use
+
+- Commercial use of any part of this software is **strictly prohibited** unless a separate commercial license or written approval is granted by the author.
+
+## 4. Attribution
+
+- If permission is granted, any usage must credit the original author:
+  > "Originally developed by Chinmay Bansal – 2025"
+
+## 5. Warranty Disclaimer
+
+This software is provided "AS IS", without warranty of any kind, express or implied. The author makes no guarantees regarding functionality, accuracy, or compatibility.
+
+## 6. Contact
+
+For permissions, licensing inquiries, or collaboration requests, contact:
+
+📧 Email: chinmay8521@gmail.com  
+---
+
+This license is **not the official Apache 2.0 license** and is tailored specifically to restrict unauthorized distribution and use while allowing educational reference with permission.
