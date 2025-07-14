@@ -171,6 +171,7 @@ class _MainDataPageState extends State<MainDataPage> {
                                         dort: details['dort'] ?? '',
                                         group: details['group'] ?? '',
                                         category: details['category'] ?? '',
+                                        mincrement: details['mincrement'] ?? '',
                                         sex: details['sex'] ?? '',
                                         address: details['address'] ?? '',
                                         aadhaar: details['aadhaarno'] ?? '0',

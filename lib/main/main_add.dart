@@ -21,6 +21,7 @@ class _MainAddPageState extends State<MainAddPage> {
   final dortController = TextEditingController();
   String? groupController;
   String? categoryController;
+  String? mincrementController;
   String? sexController;
   final addressController = TextEditingController();
   final aadhaarController = TextEditingController(text: '0');
@@ -68,6 +69,7 @@ class _MainAddPageState extends State<MainAddPage> {
     dortController.dispose();
     // groupController.dispose();
     // categoryController.dispose();
+    // mincrement.dispose();
     // sexController.dispose();
     addressController.dispose();
     aadhaarController.dispose();
@@ -175,6 +177,7 @@ class _MainAddPageState extends State<MainAddPage> {
         'dort': dortController.text,
         'group': groupController,
         'category': categoryController,
+        'mincrement': mincrementController,
         'sex': sexController,
         'address': addressController.text,
         'aadhaarno': aadhaarController.text,
@@ -461,6 +464,13 @@ class _MainAddPageState extends State<MainAddPage> {
                           (newValue) {
                             setState(() {
                               categoryController = newValue;
+                            });
+                          },
+                        ),
+                        _buildDropdown("INCREMENT MONTH", mincrementController, ['','JULY', 'JANUARY'],
+                              (newValue) {
+                            setState(() {
+                              mincrementController = newValue;
                             });
                           },
                         ),

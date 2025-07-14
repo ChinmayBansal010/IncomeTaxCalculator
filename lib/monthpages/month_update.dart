@@ -73,6 +73,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
   Map<String, dynamic> monthData = {};
   Map<dynamic, dynamic> percentageData = {};
+  String mIncrement = '';
   bool isLoading = true;
   String errorMessage = '';
 
@@ -201,7 +202,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
     ddext4Controller.dispose();
     totaldedController.dispose();
     netsalaryController.dispose();
-
     super.dispose();
   }
 
@@ -235,6 +235,29 @@ class _MonthDataPageState extends State<MonthDataPage> {
     }
   }
 
+  Future<void> fetchIncrement() async{
+    try{
+      DatabaseReference incrementRef = _dbRef
+          .child(sharedData.userPlace)
+          .child('maindata')
+          .child(widget.biometricId)
+          .child('mincrement');
+      DatabaseEvent event = await incrementRef.once();
+      DataSnapshot snapshot = event.snapshot;
+      if(snapshot.exists){
+        setState(() {
+          mIncrement = snapshot.value.toString();
+          isLoading = false;
+        });
+      }else{
+      }
+    }catch (e) {
+      setState(() {
+        errorMessage = 'Error fetching data: $e';
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -798,26 +821,21 @@ class _MonthDataPageState extends State<MonthDataPage> {
     );
   }
 
-  Future<void> _calculateData(var month) async {
+  Future<void> _calculateData(var month , {bool isIncrement = false}) async {
     try {
       DatabaseReference percentageRef = _dbRef.child(sharedData.userPlace).child('percentage');
       DatabaseEvent event = await percentageRef.once();
       DataSnapshot snapshot = event.snapshot;
       // await percentageRef.set(monthData);
       if (snapshot.exists) {
-        // Cast the snapshot value safely
         Map<Object?, Object?> rawData = snapshot.value as Map<Object?, Object?>;
-        // Initialize the data map
         Map<dynamic, dynamic> percentageData = {};
-        // Ensure data exists and process the fetched rawData
         rawData.forEach((key, value) {
-          // Ensure each value is a valid Map, and add to the percentageData
           percentageData[key] = value;
         });
 
         setState(() {
-          // Store the percentage data in the state
-          this.percentageData = percentageData; // Initially, no filter applied
+          this.percentageData = percentageData;
         });
       }
     } catch (e) {
@@ -830,8 +848,15 @@ class _MonthDataPageState extends State<MonthDataPage> {
     try {
       int dap = 0, hrap = 0, tap = 0, npap = 0;
       int? bp = int.tryParse(bpController.text);
+      int? tempBp = bp;
       int? npa = int.tryParse(npaController.text);
-
+      if (isIncrement) {
+        double incrementAmount = bp! * 0.03;
+        incrementAmount = (incrementAmount / 50).ceil() * 50;
+        bp = bp + incrementAmount.toInt();
+        bpController.text = bp.toString();
+      }
+      monthData['bp'] = bp.toString();
       if (npachk) {
         npap = int.tryParse(percentageData['${month}n'])!;
         npa = (bp! * (npap / 100)).round();
@@ -973,6 +998,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
           ((int.tryParse(grossController.text))! -
                   (int.tryParse(totaldedController.text))!)
               .toString();
+
+      bpController.text = tempBp.toString();
     } catch (error) {
       final String message = "Error: $error";
       if (mounted){
@@ -986,12 +1013,47 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
   Future<void> _saveData() async {
     try {
-      DatabaseReference monthRef = _dbRef
+      DatabaseReference userMonthDataRef = _dbRef
           .child(sharedData.userPlace)
-          .child('monthdata')
+          .child('monthdata');
+
+      DatabaseReference currentMonthNodeRef = userMonthDataRef
           .child(widget.shortMonth)
           .child(widget.biometricId);
-      await monthRef.set(monthData);
+      await currentMonthNodeRef.set(monthData);
+
+      await fetchIncrement();
+
+      bool needsJulyIncrement = widget.shortMonth == 'jun' && mIncrement == 'JULY';
+      bool needsJanuaryIncrement = widget.shortMonth == 'dec' && mIncrement == 'JANUARY';
+
+      if (needsJulyIncrement || needsJanuaryIncrement) {
+        String nextIncrementMonth = needsJulyIncrement ? 'jul' : 'jan';
+
+        await _calculateData(nextIncrementMonth, isIncrement: true);
+
+        DatabaseReference nextMonthNodeRef = userMonthDataRef
+            .child(nextIncrementMonth)
+            .child(widget.biometricId);
+        await nextMonthNodeRef.set(monthData);
+      }
+
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Success"),
+            content: const Text("Data Saved Successfully"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
       if (mounted){
         showDialog(
           context: context,
@@ -1061,14 +1123,26 @@ class _MonthDataPageState extends State<MonthDataPage> {
       final int targetIndex = months.indexOf(widget.shortMonth);
 
       if (targetIndex != -1) {
+        await fetchIncrement();
         for (int i = targetIndex; i < months.length; i++) {
           final String currentMonth = months[i];
           updatedmonths.add(currentMonth);
-          await _calculateData(currentMonth);
-          if (months[i] == 'feb'){
-            monthData['incometax'] = '0';
+          if (mIncrement == 'JULY' && currentMonth == 'jul') {
+          } else if (mIncrement == 'JANUARY' && currentMonth == 'jan') {
+          } else {
+            await _calculateData(currentMonth);
+            await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
+            if (currentMonth == 'feb'){
+              monthData['incometax'] = '0';
+            }
+            if ((currentMonth == 'jun' && mIncrement == 'JULY') || (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
+              if (mIncrement != '') {
+                String nextMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
+                await _calculateData(currentMonth, isIncrement: true);
+                await monthRef.child(nextMonth).child(widget.biometricId).set(monthData);
+              }
+            }
           }
-          await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
         }
       } else{
         final String message = "Invalid month : ${widget.shortMonth}";

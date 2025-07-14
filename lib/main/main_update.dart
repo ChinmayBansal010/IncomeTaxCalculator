@@ -14,6 +14,7 @@ class MainUpdatePage extends StatefulWidget {
   final String dort;
   final String group;
   final String category;
+  final String mincrement;
   final String sex;
   final String address;
   final String aadhaar;
@@ -53,6 +54,7 @@ class MainUpdatePage extends StatefulWidget {
     required this.dort,
     required this.group,
     required this.category,
+    required this. mincrement,
     required this.sex,
     required this.address,
     required this.aadhaar,
@@ -96,6 +98,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
   final dortController = TextEditingController();
   String? groupController;
   String? categoryController;
+  String? mincrementController;
   String? sexController;
   final addressController = TextEditingController();
   final aadhaarController = TextEditingController(text: '0');
@@ -136,6 +139,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     dortController.text = widget.dort;
     groupController = widget.group;
     categoryController = widget.category;
+    mincrementController = widget.mincrement;
     sexController = widget.sex;
     addressController.text = widget.address;
     aadhaarController.text = widget.aadhaar;
@@ -184,6 +188,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     dortController.dispose();
     // groupController.dispose();
     // categoryController.dispose();
+    // mincrementController.dispose();
     // sexController.dispose();
     addressController.dispose();
     aadhaarController.dispose();
@@ -292,6 +297,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         'dort': dortController.text,
         'group': groupController,
         'category': categoryController,
+        'mincrement': mincrementController,
         'sex': sexController,
         'address': addressController.text,
         'aadhaarno': aadhaarController.text,
@@ -595,6 +601,13 @@ class MainUpdatePageState extends State<MainUpdatePage> {
                               (newValue) {
                             setState(() {
                               categoryController = newValue;
+                            });
+                          },
+                        ),
+                        _buildDropdown("INCREMENT MONTH", mincrementController, ['','JULY', 'JANUARY',],
+                              (newValue) {
+                            setState(() {
+                              mincrementController = newValue;
                             });
                           },
                         ),

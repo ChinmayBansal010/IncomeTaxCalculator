@@ -8,8 +8,10 @@ import 'package:incometax/shared.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xls;
-import 'package:universal_html/html.dart' show AnchorElement;
+import 'package:universal_html/html.dart' as uh show AnchorElement ;
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 
 
@@ -1104,8 +1106,10 @@ class _ItaxPageState extends State<ItaxPage> {
     String? name = isPan!
         ? (mainpgData['panno'] ?? biometricId).toString()
         : biometricId.toString();
+
+    // await uploadExcelAndDownloadPDF(bytes, name, isExportAll!);
     if (kIsWeb){
-      AnchorElement(
+      uh.AnchorElement(
           href: 'data:application/octet-stream;charset=utf-16le;base64,${base64.encode(bytes)}')
         ..setAttribute('download','$name.xlsx')
         ..click();
@@ -1117,10 +1121,62 @@ class _ItaxPageState extends State<ItaxPage> {
       await file.writeAsBytes(bytes, flush: true);
       if (!isExportAll!) { OpenFile.open(fileName); }
     }
-
     setState(() {
       toLoad = false;
     });
+  }
+
+  Future<void> uploadExcelAndDownloadPDF(
+      List<int> bytes,
+      String name,
+      bool isExportAll,
+      ) async {
+    final uri = Uri.parse("http://192.168.1.36:5000/convert");
+
+    var request = http.MultipartRequest("POST", uri);
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: "$name.xlsx",
+      contentType: MediaType("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    ));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      final pdfBytes = await response.stream.toBytes();
+
+      if (kIsWeb) {
+        final base64Pdf = base64Encode(pdfBytes);
+        uh.AnchorElement(href: 'data:application/pdf;base64,$base64Pdf')
+          ..setAttribute('download', '$name.pdf')
+          ..click();
+      } else {
+        final path = (await getApplicationSupportDirectory()).path;
+        final filePath = '$path/$name.pdf';
+        final file = File(filePath);
+        await file.writeAsBytes(pdfBytes, flush: true);
+        if (!isExportAll) OpenFile.open(filePath);
+      }
+    } else {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(
+                title: Text("Error"),
+                content: Text('Failed to convert Excel to PDF. Code: ${response
+                    .statusCode}'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("OK"),
+                  ),
+                ],
+              ),
+        );
+      }
+    }
   }
 
   Future<void> _itaxformPage(
