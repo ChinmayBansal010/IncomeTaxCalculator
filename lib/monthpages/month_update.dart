@@ -1096,10 +1096,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
           final String currentMonth = months[i];
           updatedmonths.add(currentMonth);
 
-          if (currentMonth == 'feb') {
-            monthData['incometax'] = '0';
-          }
-
           if ((currentMonth == 'jun' && mIncrement == 'JULY') ||
               (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
 
@@ -1119,6 +1115,11 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
           bpController.text = originalBp;
           final monthDataForCurrent = await _calculateData(currentMonth);
+
+          if (currentMonth == 'feb') {
+            monthDataForCurrent['incometax'] = '0';
+          }
+
           await monthRef.child(currentMonth).child(widget.biometricId).set(monthDataForCurrent);
         }
       }
