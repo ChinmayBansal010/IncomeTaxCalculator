@@ -1011,13 +1011,11 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if (needsJulyIncrement || needsJanuaryIncrement) {
         String nextIncrementMonth = needsJulyIncrement ? 'jul' : 'jan';
-        String originalBp = bpController.text;
         final incrementedData = await _calculateData(nextIncrementMonth, isIncrement: true);
         DatabaseReference nextMonthNodeRef = userMonthDataRef
             .child(nextIncrementMonth)
             .child(widget.biometricId);
         await nextMonthNodeRef.set(incrementedData);
-        bpController.text = originalBp;
       }
 
       if (mounted) {
@@ -1090,7 +1088,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if (targetIndex != -1) {
         await fetchIncrement();
-        String originalBp = bpController.text;
 
         for (int i = targetIndex; i < months.length; i++) {
           final String currentMonth = months[i];
@@ -1102,7 +1099,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
             String incMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
             final incData = await _calculateData(incMonth, isIncrement: true);
             await monthRef.child(incMonth).child(widget.biometricId).set(incData);
-            bpController.text = originalBp;
           }
 
           bool isStartingMonth = widget.shortMonth == currentMonth;
@@ -1112,8 +1108,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
                   (currentMonth == 'jul' && mIncrement == 'JULY'))) {
             continue;
           }
-
-          bpController.text = originalBp;
           final monthDataForCurrent = await _calculateData(currentMonth);
 
           if (currentMonth == 'feb') {
