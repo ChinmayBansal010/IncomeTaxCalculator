@@ -156,7 +156,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
   @override
   void dispose() {
-    // Dispose of each controller
     biometricidController.dispose();
     nameController.dispose();
     designationController.dispose();
@@ -279,17 +278,16 @@ class _MonthDataPageState extends State<MonthDataPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Info Section
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2), // Box border
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                    border: Border.all(color: Colors.blue, width: 2),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     children: [
                       Text(
-                        'INFO', // The label text
+                        'INFO',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -303,20 +301,19 @@ class _MonthDataPageState extends State<MonthDataPage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                // Percentage Variables Section
                 Container(
 
                   width: getFieldWidth() ,
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2), // Box border
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                    border: Border.all(color: Colors.blue, width: 2),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'PERCENTAGE VARIABLES', // The label text
+                        'PERCENTAGE VARIABLES',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -327,7 +324,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: isWideScreen? 200: 120, // Ensure the width is equal to the textfield's width
+                            width: isWideScreen? 200: 120,
                             child: _buildCheckbox(
                               'DA',
                               'dap',
@@ -341,7 +338,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                           ),
 
                           SizedBox(
-                            width: isWideScreen? 200: 120, // Ensure the width is equal to the textfield's width
+                            width: isWideScreen? 200: 120,
                             child: _buildCheckbox(
                               'HRA',
                               'hrap',
@@ -360,7 +357,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: isWideScreen? 200: 120, // Ensure the width is equal to the textfield's width
+                            width: isWideScreen? 200: 120,
                             child: _buildCheckbox(
                               'TA',
                               'tap',
@@ -373,7 +370,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                             ),
                           ),
                           SizedBox(
-                            width: isWideScreen? 200: 120, // Ensure the width is equal to the textfield's width
+                            width: isWideScreen? 200: 120,
                             child: _buildCheckbox(
                               'NPA',
                               'npap',
@@ -391,17 +388,16 @@ class _MonthDataPageState extends State<MonthDataPage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                // Details of Allowance Section
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2), // Box border
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                    border: Border.all(color: Colors.blue, width: 2),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     children: [
                       Text(
-                        'DETAILS OF ALLOWANCE', // The label text
+                        'DETAILS OF ALLOWANCE',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -433,19 +429,18 @@ class _MonthDataPageState extends State<MonthDataPage> {
                 SizedBox(height: 10),
                 _buildTextField('GROSS SALARY', 'gross', grossController),
                 SizedBox(height: 10),
-                // Details of Deduction Section
                 Container(
                   width: getFieldWidth(),
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2), // Box border
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                    border: Border.all(color: Colors.blue, width: 2),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'DETAILS OF DEDUCTION', // The label text
+                        'DETAILS OF DEDUCTION',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -461,9 +456,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Small Checkbox for GPF
                           SizedBox(
-                            width: 70, // Ensure the width is equal to the textfield's width
+                            width: 70,
                             child: _buildCheckbox(
                               '',
                               'gpfchk',
@@ -476,9 +470,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                             ),
                           ),
 
-                          // Text Field for GPF, width set equal to checkbox width
                           SizedBox(
-                            width: 200, // Set width equal to textfields, same as the checkbox container
+                            width: 200,
                             child: _buildTextField('GPF', 'gpf', gpfController),
                           ),
                         ],
@@ -486,9 +479,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Small Checkbox for NPS
                           SizedBox(
-                            width: 70, // Ensure the width is equal to the textfield's width
+                            width: 70,
                             child: _buildCheckbox(
                               '',
                               'npschk',
@@ -500,9 +492,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                               },
                             ),
                           ),
-                          // Text Field for NPS, width set equal to checkbox width
                           SizedBox(
-                            width: 200, // Set width equal to textfields, same as the checkbox container
+                            width: 200,
                             child: _buildTextField('NPS', 'nps', npsController),
                           ),
                         ],
@@ -510,9 +501,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Small Checkbox for GPF
                           SizedBox(
-                            width: 70, // Ensure the width is equal to the textfield's width
+                            width: 70,
                             child: _buildCheckbox(
                               '',
                               'epfchk',
@@ -525,9 +515,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                             ),
                           ),
 
-                          // Text Field for GPF, width set equal to checkbox width
                           SizedBox(
-                            width: 200, // Set width equal to textfields, same as the checkbox container
+                            width: 200,
                             child: _buildTextField('EPF', 'epf', epfController),
                           ),
                         ],
@@ -535,9 +524,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Small Checkbox for GPF
                           SizedBox(
-                            width: 70, // Ensure the width is equal to the textfield's width
+                            width: 70,
                             child: _buildCheckbox(
                               '',
                               'esichk',
@@ -550,9 +538,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
                             ),
                           ),
 
-                          // Text Field for GPF, width set equal to checkbox width
                           SizedBox(
-                            width: 200, // Set width equal to textfields, same as the checkbox container
+                            width: 200,
                             child: _buildTextField('ESI', 'esi', esiController),
                           ),
                         ],
@@ -567,14 +554,14 @@ class _MonthDataPageState extends State<MonthDataPage> {
                 SizedBox(height: 10),
                 SafeArea(
                   child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+                    scrollDirection: Axis.horizontal,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0), // Outer padding for the entire row
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center, // Center the row
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0), // Padding for individual buttons
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: _buildButton(label: 'CALCULATE', onPressed: () async {
                               await _calculateData(widget.shortMonth);
                             }),
@@ -603,8 +590,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isWideScreen = screenWidth > 600;
 
-    // Set the width to match text field width (smaller size)
-    return isWideScreen ? 612.4 : screenWidth; // Adjusted to 50% of screen width
+    return isWideScreen ? 612.4 : screenWidth;
   }
 
 
@@ -613,18 +599,16 @@ class _MonthDataPageState extends State<MonthDataPage> {
       String key,
       TextEditingController controller,
       ) {
-    // Check if it's one of the fields that should stand out
     bool isSpecialField = key == 'gross' || key == 'totalded' || key == 'netsalary';
 
     double screenWidth = MediaQuery.of(context).size.width;
     bool isWideScreen = screenWidth > 600;
 
-    // Define responsive padding, font size, and height
     double horizontalPadding = isWideScreen ? 32.0 : 16.0;
-    double fontSize = isWideScreen ? 22.0 : 18.0; // Adjusted font size for label
-    double contentPaddingVertical = isWideScreen ? 18.0 : 14.0; // Reduced vertical padding
-    double contentPaddingHorizontal = 25.0; // Constant horizontal padding
-    double fieldWidth = isWideScreen ? 500.0 : screenWidth - 32.0; // Set a fixed width for text field
+    double fontSize = isWideScreen ? 22.0 : 18.0;
+    double contentPaddingVertical = isWideScreen ? 18.0 : 14.0;
+    double contentPaddingHorizontal = 25.0;
+    double fieldWidth = isWideScreen ? 500.0 : screenWidth - 32.0;
 
     final Map<String, bool> enabledStatus = {
       'gpf': isGpfChecked,
@@ -636,14 +620,14 @@ class _MonthDataPageState extends State<MonthDataPage> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: horizontalPadding),
       child: SizedBox(
-        width: fieldWidth, // Set a controlled width for the text field
+        width: fieldWidth,
         child: TextField(
           controller: controller,
           enabled: !enabledStatus.containsKey(key) || enabledStatus[key] == true,
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyle(
-              fontSize: fontSize, // Responsive font size for the label
+              fontSize: fontSize,
               fontWeight: FontWeight.bold,
               color: isSpecialField ? Colors.black : Colors.black87,
             ),
@@ -690,7 +674,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
             ),
           ),
           style: TextStyle(
-            fontSize: fontSize,  // Adjusted font size for input text
+            fontSize: fontSize,
             fontWeight: isSpecialField ? FontWeight.bold : FontWeight.w400,
             color: Colors.black87,
           ),
@@ -713,29 +697,28 @@ class _MonthDataPageState extends State<MonthDataPage> {
       Function(bool) onCheckboxChanged,
       ) {
     double screenWidth = MediaQuery.of(context).size.width;
-    bool isWideScreen = screenWidth > 600; // Check if the screen is wide (like tablets or desktops)
+    bool isWideScreen = screenWidth > 600;
 
-    // Adjusted responsive parameters
-    double checkboxSize = isWideScreen ? 25.0 : 15.0; // Adjust size for wide or narrow screens
-    double fontSize = isWideScreen ? 16.0 : 16.0; // Adjust font size
-    double containerWidth = isWideScreen ? 200.0 : screenWidth / 2 - 24.0; // Dynamic container width
+    double checkboxSize = isWideScreen ? 25.0 : 15.0;
+    double fontSize = isWideScreen ? 16.0 : 16.0;
+    double containerWidth = isWideScreen ? 200.0 : screenWidth / 2 - 24.0;
 
     final smallCheckboxKeys = {'gpfchk', 'npschk', 'epfchk', 'esichk'};
     bool isSmallCheckbox = smallCheckboxKeys.contains(key);
 
     return Padding(
-      padding: EdgeInsets.all(4), // Reduced padding
+      padding: EdgeInsets.all(4),
       child: Container(
-        width: containerWidth, // Dynamically calculated width
-        padding: EdgeInsets.all(8), // Reduced padding inside the container
+        width: containerWidth,
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8), // Smaller radius for corners
-          border: Border.all(color: Colors.blueAccent, width: 1.5), // Thinner border
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.blueAccent, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withAlpha(30),
-              spreadRadius: 0.5, // Subtle shadow
+              spreadRadius: 0.5,
               blurRadius: 3,
               offset: const Offset(0, 1),
             ),
@@ -744,7 +727,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
         child: Row(
           children: [
             Transform.scale(
-              scale: checkboxSize / 14.0, // Adjusted scale for the checkbox
+              scale: checkboxSize / 14.0,
               child: Checkbox(
                 value: chkvalue,
                 onChanged: (bool? value) {
@@ -772,18 +755,18 @@ class _MonthDataPageState extends State<MonthDataPage> {
                 checkColor: Colors.white,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 side: BorderSide(
-                  width: 1.5, // Reduced checkbox border width
+                  width: 1.5,
                   color: Colors.blueAccent,
                 ),
               ),
             ),
             if (!isSmallCheckbox)
-              SizedBox(width: 8), // Reduced spacing between checkbox and label
+              SizedBox(width: 8),
             if (!isSmallCheckbox)
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: fontSize, // Adjusted font size
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.black87,
                 ),
@@ -802,31 +785,30 @@ class _MonthDataPageState extends State<MonthDataPage> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blueAccent, // Background color matching the blue theme
-        padding: EdgeInsets.symmetric(vertical: 18, horizontal: 40), // Larger padding for bigger buttons
+        backgroundColor: Colors.blueAccent,
+        padding: EdgeInsets.symmetric(vertical: 18, horizontal: 40),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), // Rounded corners for modern look
+          borderRadius: BorderRadius.circular(12),
         ),
-        elevation: 5, // Subtle shadow for depth
-        shadowColor: Colors.blue.withValues(alpha: 0.5), // Slight blue shadow
+        elevation: 5,
+        shadowColor: Colors.blue.withValues(alpha: 0.5),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 20, // Larger text size for emphasis
-          fontWeight: FontWeight.bold, // Bold text for prominence
-          color: Colors.white, // White text color for contrast
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
       ),
     );
   }
 
-  Future<void> _calculateData(var month , {bool isIncrement = false}) async {
+  Future<Map<String, String>> _calculateData(String month, {bool isIncrement = false}) async {
     try {
       DatabaseReference percentageRef = _dbRef.child(sharedData.userPlace).child('percentage');
       DatabaseEvent event = await percentageRef.once();
       DataSnapshot snapshot = event.snapshot;
-      // await percentageRef.set(monthData);
       if (snapshot.exists) {
         Map<Object?, Object?> rawData = snapshot.value as Map<Object?, Object?>;
         Map<dynamic, dynamic> percentageData = {};
@@ -848,7 +830,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
     try {
       int dap = 0, hrap = 0, tap = 0, npap = 0;
       int? bp = int.tryParse(bpController.text);
-      int? tempBp = bp;
       int? npa = int.tryParse(npaController.text);
       if (isIncrement) {
         double incrementAmount = bp! * 0.03;
@@ -916,7 +897,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
         daext4Controller,
       ];
 
-      // Sum all values, using 0 for empty or invalid inputs
       double grossTotal = controllers
           .map((controller) => double.tryParse(controller.text) ?? 0)
           .reduce((sum, value) => sum + value);
@@ -939,7 +919,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
             ),
           );
         }
-        return;
+        return {};
       } else if (npschk && !gpfchk) {
         controllers = [
           bpController,
@@ -964,7 +944,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if(epfchk){
         if ((int.tryParse(monthData['gross']) ?? 0) >= 15000){
-          monthData['epf'] = epfController.text = '1800'; // 15000*0.12
+          monthData['epf'] = epfController.text = '1800';
         } else {
           monthData['epf'] = epfController.text = ((int.tryParse(monthData['gross']) ?? 0) *0.12).round().toString();
         }
@@ -996,10 +976,10 @@ class _MonthDataPageState extends State<MonthDataPage> {
           totaldedController.text = dedTotal.round().toString();
       monthData['netsalary'] = netsalaryController.text =
           ((int.tryParse(grossController.text))! -
-                  (int.tryParse(totaldedController.text))!)
+              (int.tryParse(totaldedController.text))!)
               .toString();
 
-      bpController.text = tempBp.toString();
+      return Map<String, String>.from(monthData);
     } catch (error) {
       final String message = "Error: $error";
       if (mounted){
@@ -1007,6 +987,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
           SnackBar(content: Text(message)),
         );
       }
+      return {};
     }
   }
 
@@ -1017,10 +998,11 @@ class _MonthDataPageState extends State<MonthDataPage> {
           .child(sharedData.userPlace)
           .child('monthdata');
 
+      final currentMonthData = await _calculateData(widget.shortMonth);
       DatabaseReference currentMonthNodeRef = userMonthDataRef
           .child(widget.shortMonth)
           .child(widget.biometricId);
-      await currentMonthNodeRef.set(monthData);
+      await currentMonthNodeRef.set(currentMonthData);
 
       await fetchIncrement();
 
@@ -1029,13 +1011,13 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if (needsJulyIncrement || needsJanuaryIncrement) {
         String nextIncrementMonth = needsJulyIncrement ? 'jul' : 'jan';
-
-        await _calculateData(nextIncrementMonth, isIncrement: true);
-
+        String originalBp = bpController.text;
+        final incrementedData = await _calculateData(nextIncrementMonth, isIncrement: true);
         DatabaseReference nextMonthNodeRef = userMonthDataRef
             .child(nextIncrementMonth)
             .child(widget.biometricId);
-        await nextMonthNodeRef.set(monthData);
+        await nextMonthNodeRef.set(incrementedData);
+        bpController.text = originalBp;
       }
 
       if (mounted) {
@@ -1052,23 +1034,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
             ],
           ),
         );
-        return;
-      }
-      if (mounted){
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text("Success"),
-            content: const Text("Data Saved Successfully"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-        return;
       }
     } catch (e) {
       if (mounted) {
@@ -1077,12 +1042,12 @@ class _MonthDataPageState extends State<MonthDataPage> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text("Error"),
-            content: Text("Failed to add data: \n$e"),
+            content: Text("Failed to save data:\n$e"),
             actions: [
               TextButton(
-                onPressed: () => {
-                  Navigator.pop(ctx),
-                  Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.pop(context);
                 },
                 child: const Text("OK"),
               ),
@@ -1092,6 +1057,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
       }
     }
   }
+
 
   Future<void> _saveAll() async {
     showDialog(
@@ -1124,33 +1090,38 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if (targetIndex != -1) {
         await fetchIncrement();
+        String originalBp = bpController.text;
+
         for (int i = targetIndex; i < months.length; i++) {
           final String currentMonth = months[i];
           updatedmonths.add(currentMonth);
-          if (mIncrement == 'JULY' && currentMonth == 'jul') {
-          } else if (mIncrement == 'JANUARY' && currentMonth == 'jan') {
-          } else {
-            await _calculateData(currentMonth);
-            await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
-            if (currentMonth == 'feb'){
-              monthData['incometax'] = '0';
-            }
-            if ((currentMonth == 'jun' && mIncrement == 'JULY') || (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
-              if (mIncrement != '') {
-                String nextMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
-                await _calculateData(currentMonth, isIncrement: true);
-                await monthRef.child(nextMonth).child(widget.biometricId).set(monthData);
-              }
-            }
-          }
-        }
-      } else{
-        final String message = "Invalid month : ${widget.shortMonth}";
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
-      }
 
+          if (currentMonth == 'feb') {
+            monthData['incometax'] = '0';
+          }
+
+          if ((currentMonth == 'jun' && mIncrement == 'JULY') ||
+              (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
+
+            String incMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
+            final incData = await _calculateData(incMonth, isIncrement: true);
+            await monthRef.child(incMonth).child(widget.biometricId).set(incData);
+            bpController.text = originalBp;
+          }
+
+          bool isStartingMonth = widget.shortMonth == currentMonth;
+
+          if (!isStartingMonth &&
+              ((currentMonth == 'jan' && mIncrement == 'JANUARY') ||
+                  (currentMonth == 'jul' && mIncrement == 'JULY'))) {
+            continue;
+          }
+
+          bpController.text = originalBp;
+          final monthDataForCurrent = await _calculateData(currentMonth);
+          await monthRef.child(currentMonth).child(widget.biometricId).set(monthDataForCurrent);
+        }
+      }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
