@@ -74,6 +74,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
   Map<String, dynamic> monthData = {};
   Map<dynamic, dynamic> percentageData = {};
   String mIncrement = '';
+  String dRetierment = '';
   bool isLoading = true;
   String errorMessage = '';
 
@@ -246,6 +247,30 @@ class _MonthDataPageState extends State<MonthDataPage> {
       if(snapshot.exists){
         setState(() {
           mIncrement = snapshot.value.toString();
+          isLoading = false;
+        });
+      }else{
+      }
+    }catch (e) {
+      setState(() {
+        errorMessage = 'Error fetching data: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchRetierment() async{
+    try{
+      DatabaseReference retirementRef = _dbRef
+          .child(sharedData.userPlace)
+          .child('maindata')
+          .child(widget.biometricId)
+          .child('dort');
+      DatabaseEvent event = await retirementRef.once();
+      DataSnapshot snapshot = event.snapshot;
+      if(snapshot.exists){
+        setState(() {
+          dRetierment = snapshot.value.toString();
           isLoading = false;
         });
       }else{
@@ -1088,33 +1113,71 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
       if (targetIndex != -1) {
         await fetchIncrement();
+        await fetchRetierment();
+
+        DateTime? retirementDate;
+        DateTime? fyStartDate;
+        DateTime? fyEndDate;
+
+        if (dRetierment.isNotEmpty) {
+          // Parse retirement date
+          List<String> parts = dRetierment.split("-");
+          int day = int.parse(parts[0]);
+          int month = int.parse(parts[1]);
+          int year = int.parse(parts[2]);
+          retirementDate = DateTime(year, month, day);
+
+          // Parse financial year
+          List<String> years = sharedData.ccurrentYear.split("-");
+          int startYear = int.parse(years[0]);
+          int endYear = int.parse("20${years[1]}");
+
+          fyStartDate = DateTime(startYear, 3, 1);    // Mar 1st
+          fyEndDate = DateTime(endYear, 2, 28);       // Feb 28th
+        }
 
         for (int i = targetIndex; i < months.length; i++) {
-          final String currentMonth = months[i];
-          updatedmonths.add(currentMonth);
+          final currentMonth = months[i];
 
-          if ((currentMonth == 'jun' && mIncrement == 'JULY') ||
-              (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
+          bool shouldClear = retirementDate != null &&
+              fyStartDate != null &&
+              fyEndDate != null &&
+              retirementDate.isAfter(fyStartDate.subtract(Duration(days: 1))) &&
+              retirementDate.isBefore(fyEndDate.add(Duration(days: 1))) &&
+              i > retirementDate.month - 3;
 
-            String incMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
-            final incData = await _calculateData(incMonth, isIncrement: true);
-            await monthRef.child(incMonth).child(widget.biometricId).set(incData);
+          if (shouldClear) {
+            monthData.updateAll((key, value) {
+              if (key == 'biometricid' || key == 'name' || key == 'designation') {
+                return value;
+              }
+              return "0";
+            });
+            await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
+          } else {
+            updatedmonths.add(currentMonth);
+            if ((currentMonth == 'jun' && mIncrement == 'JULY') ||
+                (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
+
+              String incMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
+              final incData = await _calculateData(incMonth, isIncrement: true);
+              await monthRef.child(incMonth).child(widget.biometricId).set(incData);
+            }
+
+            bool isStartingMonth = widget.shortMonth == currentMonth;
+
+            if (!isStartingMonth &&
+                ((currentMonth == 'jan' && mIncrement == 'JANUARY') ||
+                    (currentMonth == 'jul' && mIncrement == 'JULY'))) {
+              continue;
+            }
+            final monthDataForCurrent = await _calculateData(currentMonth);
+
+            if (currentMonth == 'feb') {
+              monthDataForCurrent['incometax'] = '0';
+            }
+            await monthRef.child(currentMonth).child(widget.biometricId).set(monthDataForCurrent);
           }
-
-          bool isStartingMonth = widget.shortMonth == currentMonth;
-
-          if (!isStartingMonth &&
-              ((currentMonth == 'jan' && mIncrement == 'JANUARY') ||
-                  (currentMonth == 'jul' && mIncrement == 'JULY'))) {
-            continue;
-          }
-          final monthDataForCurrent = await _calculateData(currentMonth);
-
-          if (currentMonth == 'feb') {
-            monthDataForCurrent['incometax'] = '0';
-          }
-
-          await monthRef.child(currentMonth).child(widget.biometricId).set(monthDataForCurrent);
         }
       }
     } catch (e) {
