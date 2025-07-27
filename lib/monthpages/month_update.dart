@@ -860,6 +860,9 @@ class _MonthDataPageState extends State<MonthDataPage> {
         double incrementAmount = bp! * 0.03;
         incrementAmount = (incrementAmount / 50).ceil() * 50;
         bp = bp + incrementAmount.toInt();
+        if(bp > 218200){
+          bp = 218200;
+        }
         bpController.text = bp.toString();
       }
       monthData['bp'] = bp.toString();
