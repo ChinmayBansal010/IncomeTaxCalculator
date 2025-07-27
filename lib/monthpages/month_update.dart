@@ -1023,7 +1023,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
           .child(sharedData.userPlace)
           .child('monthdata');
 
-      final currentMonthData = await _calculateData(widget.shortMonth);
+      final currentMonthData = monthData;
       DatabaseReference currentMonthNodeRef = userMonthDataRef
           .child(widget.shortMonth)
           .child(widget.biometricId);
@@ -1120,20 +1120,18 @@ class _MonthDataPageState extends State<MonthDataPage> {
         DateTime? fyEndDate;
 
         if (dRetierment.isNotEmpty) {
-          // Parse retirement date
           List<String> parts = dRetierment.split("-");
           int day = int.parse(parts[0]);
           int month = int.parse(parts[1]);
           int year = int.parse(parts[2]);
           retirementDate = DateTime(year, month, day);
 
-          // Parse financial year
           List<String> years = sharedData.ccurrentYear.split("-");
           int startYear = int.parse(years[0]);
           int endYear = int.parse("20${years[1]}");
 
-          fyStartDate = DateTime(startYear, 3, 1);    // Mar 1st
-          fyEndDate = DateTime(endYear, 2, 28);       // Feb 28th
+          fyStartDate = DateTime(startYear, 3, 1);
+          fyEndDate = DateTime(endYear, 2, 28);
         }
 
         for (int i = targetIndex; i < months.length; i++) {
@@ -1156,8 +1154,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
             await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
           } else {
             updatedmonths.add(currentMonth);
-            if ((currentMonth == 'jun' && mIncrement == 'JULY') ||
-                (currentMonth == 'dec' && mIncrement == 'JANUARY')) {
+            if ((currentMonth == 'jul' && mIncrement == 'JULY') ||
+                (currentMonth == 'jan' && mIncrement == 'JANUARY')) {
 
               String incMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
               final incData = await _calculateData(incMonth, isIncrement: true);
