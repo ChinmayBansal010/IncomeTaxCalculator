@@ -1157,18 +1157,11 @@ class _MonthDataPageState extends State<MonthDataPage> {
             await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
           } else {
             updatedmonths.add(currentMonth);
-            if ((currentMonth == 'jul' && mIncrement == 'JULY') ||
-                (currentMonth == 'jan' && mIncrement == 'JANUARY')) {
+            if ((widget.shortMonth != 'jul' && currentMonth == 'jul' && mIncrement == 'JULY') ||
+                (widget.shortMonth != 'jan' && currentMonth == 'jan' && mIncrement == 'JANUARY')) {
 
               final incData = await _calculateData(currentMonth, isIncrement: true);
               await monthRef.child(currentMonth).child(widget.biometricId).set(incData);
-            }
-
-            bool isStartingMonth = widget.shortMonth == currentMonth;
-
-            if (!isStartingMonth &&
-                ((currentMonth == 'jan' && mIncrement == 'JANUARY') ||
-                    (currentMonth == 'jul' && mIncrement == 'JULY'))) {
               continue;
             }
             final monthDataForCurrent = await _calculateData(currentMonth);
