@@ -1160,9 +1160,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
             if ((currentMonth == 'jul' && mIncrement == 'JULY') ||
                 (currentMonth == 'jan' && mIncrement == 'JANUARY')) {
 
-              String incMonth = (currentMonth == 'jun') ? 'jul' : 'jan';
-              final incData = await _calculateData(incMonth, isIncrement: true);
-              await monthRef.child(incMonth).child(widget.biometricId).set(incData);
+              final incData = await _calculateData(currentMonth, isIncrement: true);
+              await monthRef.child(currentMonth).child(widget.biometricId).set(incData);
             }
 
             bool isStartingMonth = widget.shortMonth == currentMonth;

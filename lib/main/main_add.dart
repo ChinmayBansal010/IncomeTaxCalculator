@@ -152,15 +152,18 @@ class _MainAddPageState extends State<MainAddPage> {
       context: context,
       barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (ctx) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(), // Loading spinner
-              SizedBox(width: 20),
-              Text("Adding...", style: TextStyle(fontSize: 16)),
-            ],
+        child: SizedBox(
+          width: 300,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(), // Loading spinner
+                SizedBox(width: 20),
+                Text("Adding...", style: TextStyle(fontSize: 16)),
+              ],
+            ),
           ),
         ),
       ),
@@ -523,34 +526,38 @@ class _MainAddPageState extends State<MainAddPage> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(isWideScreen ? 16.0 : 8.0),
-          child: SizedBox(
-            width: isWideScreen ? 400.0 : double.infinity, // Set width for wide screens
-            child: ElevatedButton(
-              onPressed: addData,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(
-                  horizontal: isWideScreen ? 32.0 : 24.0,
-                  vertical: isWideScreen ? 16.0 : 12.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: isWideScreen ? 250 : 200, // Set width for wide screens
+                child: ElevatedButton(
+                  onPressed: addData,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isWideScreen ? 32.0 : 24.0,
+                      vertical: isWideScreen ? 16.0 : 12.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(isWideScreen ? 16.0 : 12.0),
+                    ),
+                    elevation: isWideScreen ? 10.0 : 8.0,
+                  ),
+                  child: Text(
+                    "ADD DATA",
+                    style: TextStyle(
+                      fontSize: isWideScreen ? 20.0 : 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(isWideScreen ? 16.0 : 12.0),
-                ),
-                elevation: isWideScreen ? 10.0 : 8.0,
               ),
-              child: Text(
-                "ADD DATA",
-                style: TextStyle(
-                  fontSize: isWideScreen ? 20.0 : 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            ],
           ),
         ),
       ),
-
     );
   }
 

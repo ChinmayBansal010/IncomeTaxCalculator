@@ -98,9 +98,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
       appBar: AppBar(
         title: const Text('MONTH', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blue,
-        leading: BackButton(onPressed: () {
-          Navigator.pop(context, true);
-        }),
       ),
       body: Stack(
         children: [
@@ -162,7 +159,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                                   shadowColor: Colors.transparent,
                                 ),
                                 onPressed: () async {
-                                  bool? result = await Navigator.pushReplacement(
+                                  bool? result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MonthNavigationPage(

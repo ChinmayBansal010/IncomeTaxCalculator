@@ -158,7 +158,7 @@ class _MainDataPageState extends State<MainDataPage> {
                                   shadowColor: Colors.transparent,
                                 ),
                                 onPressed: () async {
-                                  bool? result = await Navigator.pushReplacement(
+                                  bool? result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MainUpdatePage(

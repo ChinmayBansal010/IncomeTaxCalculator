@@ -270,17 +270,20 @@ class MainUpdatePageState extends State<MainUpdatePage> {
 
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
+      barrierDismissible: false,
       builder: (ctx) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(), // Loading spinner
-              SizedBox(width: 20),
-              Text("Updating...", style: TextStyle(fontSize: 16)),
-            ],
+        child: SizedBox(
+          width: 300,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Updating...", style: TextStyle(fontSize: 16)),
+              ],
+            ),
           ),
         ),
       ),
@@ -397,7 +400,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Confirm Export"),
+        title: Text("Confirm Delete"),
         content: Text("Are you sure you want to delete data?"),
         actions: [
           TextButton(
@@ -418,15 +421,18 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         context: context,
         barrierDismissible: false, // Prevent dismissing by tapping outside
         builder: (ctx) => Dialog(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(), // Loading spinner
-                SizedBox(width: 20),
-                Text("Deleting...", style: TextStyle(fontSize: 16)),
-              ],
+          child: SizedBox(
+            width: 300,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(), // Loading spinner
+                  SizedBox(width: 20),
+                  Text("Deleting...", style: TextStyle(fontSize: 16)),
+                ],
+              ),
             ),
           ),
         ),
@@ -661,9 +667,10 @@ class MainUpdatePageState extends State<MainUpdatePage> {
         child: Padding(
           padding: EdgeInsets.all(isWideScreen ? 16.0 : 8.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Space buttons evenly
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
+              SizedBox(
+                width: isWideScreen ? 250: 200,
                 child: ElevatedButton(
                   onPressed: updateData,
                   style: ElevatedButton.styleFrom(
@@ -688,7 +695,8 @@ class MainUpdatePageState extends State<MainUpdatePage> {
                 ),
               ),
               SizedBox(width: isWideScreen ? 16.0 : 8.0), // Space between buttons
-              Expanded(
+              SizedBox(
+                width: isWideScreen ? 250: 200,
                 child: ElevatedButton(
                   onPressed: deleteData,
                   style: ElevatedButton.styleFrom(
