@@ -858,7 +858,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
       int? npa = int.tryParse(npaController.text);
       if (isIncrement) {
         double incrementAmount = bp! * 0.03;
-        incrementAmount = (incrementAmount / 50).ceil() * 50;
+        incrementAmount = ((incrementAmount + 50) ~/ 100) * 100;
         bp = bp + incrementAmount.toInt();
         if(bp > 218200){
           bp = 218200;

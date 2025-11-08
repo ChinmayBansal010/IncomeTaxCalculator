@@ -2345,7 +2345,9 @@ class _ItaxPageState extends State<ItaxPage> {
       int varDdext3feb = int.tryParse(febData['ddext3']?.toString() ?? '0') ?? 0;
       int varDdext4feb = int.tryParse(febData['ddext4']?.toString() ?? '0') ?? 0;
       int varTotaldedfeb = int.tryParse(febData['totalded']?.toString() ?? '0') ?? 0;
+      varTotaldedfeb = isECR? varTotaldedfeb + varIncometaxfeb : varTotaldedfeb;
       int varNetsalaryfeb = int.tryParse(febData['netsalary']?.toString() ?? '0') ?? 0;
+      varNetsalaryfeb = isECR? varNetsalaryfeb - varIncometaxfeb : varNetsalaryfeb;
 
       // ============================= arrearqtr4 ==============================
       int varBparrearqtr4 = int.tryParse('0') ?? 0;
