@@ -1030,7 +1030,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
       DatabaseReference currentMonthNodeRef = userMonthDataRef
           .child(widget.shortMonth)
           .child(widget.biometricId);
-      await currentMonthNodeRef.set(currentMonthData);
+      await currentMonthNodeRef.update(currentMonthData);
 
       await fetchIncrement();
 
@@ -1043,7 +1043,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
         DatabaseReference nextMonthNodeRef = userMonthDataRef
             .child(nextIncrementMonth)
             .child(widget.biometricId);
-        await nextMonthNodeRef.set(incrementedData);
+        await nextMonthNodeRef.update(incrementedData);
       }
 
       if (mounted) {
@@ -1120,7 +1120,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
         DateTime? retirementDate;
         DateTime? fyStartDate;
-        DateTime? fyEndDate;
 
         if (dRetierment.isNotEmpty) {
           List<String> parts = dRetierment.split("-");
@@ -1131,21 +1130,23 @@ class _MonthDataPageState extends State<MonthDataPage> {
 
           List<String> years = sharedData.ccurrentYear.split("-");
           int startYear = int.parse(years[0]);
-          int endYear = int.parse("20${years[1]}");
-
           fyStartDate = DateTime(startYear, 3, 1);
-          fyEndDate = DateTime(endYear, 2, 28);
         }
 
         for (int i = targetIndex; i < months.length; i++) {
           final currentMonth = months[i];
 
-          bool shouldClear = retirementDate != null &&
-              fyStartDate != null &&
-              fyEndDate != null &&
-              retirementDate.isAfter(fyStartDate.subtract(Duration(days: 1))) &&
-              retirementDate.isBefore(fyEndDate.add(Duration(days: 1))) &&
-              i > retirementDate.month - 3;
+          final currentMonthDate = getMonthDate(currentMonth, fyStartDate!.year);
+
+          bool shouldClear =
+              retirementDate != null &&
+                  currentMonthDate.isAfter(
+                    DateTime(
+                      retirementDate.year,
+                      retirementDate.month,
+                      1,
+                    ),
+                  );
 
           if (shouldClear) {
             monthData.updateAll((key, value) {
@@ -1154,14 +1155,14 @@ class _MonthDataPageState extends State<MonthDataPage> {
               }
               return "0";
             });
-            await monthRef.child(currentMonth).child(widget.biometricId).set(monthData);
+            await monthRef.child(currentMonth).child(widget.biometricId).update(monthData);
           } else {
             updatedmonths.add(currentMonth);
             if ((widget.shortMonth != 'jul' && currentMonth == 'jul' && mIncrement == 'JULY') ||
                 (widget.shortMonth != 'jan' && currentMonth == 'jan' && mIncrement == 'JANUARY')) {
 
               final incData = await _calculateData(currentMonth, isIncrement: true);
-              await monthRef.child(currentMonth).child(widget.biometricId).set(incData);
+              await monthRef.child(currentMonth).child(widget.biometricId).update(incData);
               continue;
             }
             final monthDataForCurrent = await _calculateData(currentMonth);
@@ -1169,7 +1170,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
             if (currentMonth == 'feb') {
               monthDataForCurrent['incometax'] = '0';
             }
-            await monthRef.child(currentMonth).child(widget.biometricId).set(monthDataForCurrent);
+            await monthRef.child(currentMonth).child(widget.biometricId).update(monthDataForCurrent);
           }
         }
       }
@@ -1213,5 +1214,19 @@ class _MonthDataPageState extends State<MonthDataPage> {
         );
       }
     }
+  }
+
+  DateTime getMonthDate(String shortMonth, int fyStartYear) {
+    const monthMap = {
+      'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4,
+      'may': 5, 'jun': 6, 'jul': 7, 'aug': 8,
+      'sept': 9, 'oct': 10, 'nov': 11, 'dec': 12,
+    };
+
+    final m = monthMap[shortMonth]!;
+
+    final year = (m == 1 || m == 2) ? fyStartYear + 1 : fyStartYear;
+
+    return DateTime(year, m, 1);
   }
 }
