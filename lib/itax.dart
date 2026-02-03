@@ -5258,10 +5258,10 @@ class _ItaxPageState extends State<ItaxPage> {
           varEc = ((varTt+varSur)*0.04).round();
 
           varTtp = varTt + varEc + varSur;
-          int excess = varTtp - 1190000;
+          int excess = varTtp - 1080000;
 
           if ((varTti - 5000000) < excess){
-            varSur = (varTti - 5000000 - (varTt - 1190000));
+            varSur = (varTti - 5000000 - (varTt - 1080000));
             if (varSur > (varTt * 0.1)){
               varSur = (varTt * 0.1).round();
             }
