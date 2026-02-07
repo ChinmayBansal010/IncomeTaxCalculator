@@ -1357,7 +1357,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcamar = int.tryParse(marData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempmar = 0;
 
-      if ((marData['nps'] is int ? marData['nps'] : int.tryParse(marData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((marData['nps'] is int ? marData['nps'] : int.tryParse(marData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempmar = ([
           int.tryParse(marData['bp']?.toString() ?? '0') ?? 0,
           int.tryParse(marData['da']?.toString() ?? '0') ?? 0,
@@ -1416,7 +1416,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcaapr = int.tryParse(aprData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempapr = 0;
 
-      if ((aprData['nps'] is int ? aprData['nps'] : int.tryParse(aprData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((aprData['nps'] is int ? aprData['nps'] : int.tryParse(aprData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempapr = (([
           int.tryParse(aprData['bp']?.toString() ?? '0') ?? 0,
           int.tryParse(aprData['da']?.toString() ?? '0') ?? 0,
@@ -1475,7 +1475,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcamay = int.tryParse(mayData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempmay = 0;
 
-      if ((mayData['nps'] is int ? mayData['nps'] : int.tryParse(mayData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((mayData['nps'] is int ? mayData['nps'] : int.tryParse(mayData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempmay = (([
           int.tryParse(mayData['bp']?.toString() ?? '0') ?? 0,
           int.tryParse(mayData['da']?.toString() ?? '0') ?? 0,
@@ -1637,7 +1637,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcajun = int.tryParse(junData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempjun = 0;
 
-      if ((junData['nps'] is int ? junData['nps'] : int.tryParse(junData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((junData['nps'] is int ? junData['nps'] : int.tryParse(junData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempjun =(([
           int.tryParse(junData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(junData['bp']?.toString() ?? '0') ?? 0,
@@ -1696,7 +1696,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcajul = int.tryParse(julData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempjul = 0;
 
-      if ((julData['nps'] is int ? julData['nps'] : int.tryParse(julData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((julData['nps'] is int ? julData['nps'] : int.tryParse(julData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempjul = (([
           int.tryParse(julData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(julData['bp']?.toString() ?? '0') ?? 0,
@@ -1755,7 +1755,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcaaug = int.tryParse(augData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempaug = 0;
 
-      if ((augData['nps'] is int ? augData['nps'] : int.tryParse(augData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((augData['nps'] is int ? augData['nps'] : int.tryParse(augData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempaug = (([
           int.tryParse(augData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(augData['bp']?.toString() ?? '0') ?? 0,
@@ -1917,7 +1917,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcasept = int.tryParse(septData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempsept = 0;
 
-      if ((septData['nps'] is int ? septData['nps'] : int.tryParse(septData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((septData['nps'] is int ? septData['nps'] : int.tryParse(septData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempsept = (([
           int.tryParse(septData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(septData['bp']?.toString() ?? '0') ?? 0,
@@ -1976,7 +1976,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcaoct = int.tryParse(octData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempoct = 0;
 
-      if ((octData['nps'] is int ? octData['nps'] : int.tryParse(octData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((octData['nps'] is int ? octData['nps'] : int.tryParse(octData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempoct = (([
           int.tryParse(octData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(octData['bp']?.toString() ?? '0') ?? 0,
@@ -2035,7 +2035,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcanov = int.tryParse(novData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempnov = 0;
 
-      if ((novData['nps'] is int ? novData['nps'] : int.tryParse(novData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((novData['nps'] is int ? novData['nps'] : int.tryParse(novData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempnov = (([
           int.tryParse(novData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(novData['bp']?.toString() ?? '0') ?? 0,
@@ -2194,7 +2194,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varCycledec = int.tryParse(decData['cycle']?.toString() ?? '0') ?? 0;
       int varPcadec = int.tryParse(decData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempdec = 0;
-      if ((decData['nps'] is int ? decData['nps'] : int.tryParse(decData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((decData['nps'] is int ? decData['nps'] : int.tryParse(decData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempdec = (([
           int.tryParse(decData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(decData['bp']?.toString() ?? '0') ?? 0,
@@ -2253,7 +2253,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varPcajan = int.tryParse(janData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempjan = 0;
 
-      if ((janData['nps'] is int ? janData['nps'] : int.tryParse(janData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((janData['nps'] is int ? janData['nps'] : int.tryParse(janData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempjan = (([
           int.tryParse(janData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(janData['bp']?.toString() ?? '0') ?? 0,
@@ -2311,7 +2311,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varCyclefeb = int.tryParse(febData['cycle']?.toString() ?? '0') ?? 0;
       int varPcafeb = int.tryParse(febData['pca']?.toString() ?? '0') ?? 0;
       int varNpsempfeb = 0;
-      if ((febData['nps'] is int ? febData['nps'] : int.tryParse(febData['nps']?.toString() ?? '0') ?? 0) > 0) {
+      if ((febData['nps'] is int ? febData['nps'] : int.tryParse(febData['nps']?.toString() ?? '0') ?? 0) > 0 && !isECR) {
         varNpsempfeb = (([
           int.tryParse(febData['da']?.toString() ?? '0') ?? 0,
           int.tryParse(febData['bp']?.toString() ?? '0') ?? 0,
