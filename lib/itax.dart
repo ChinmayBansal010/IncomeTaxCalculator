@@ -1308,7 +1308,8 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName('B2:C2').cellStyle.fontSize = 20;
 
       sheet.getRangeByName('E2:G2').cellStyle = commontextStyleBold;
-      sheet.getRangeByName('E2:G2').cellStyle.fontSize = 16;
+      sheet.getRangeByName('E2:G2').cellStyle.fontSize = 18;
+      sheet.getRangeByName('E2:G2').cellStyle.wrapText = true;
 
       int mYear = int.tryParse(sharedData.ccurrentYear.substring(2,4)) ?? 0;
 
@@ -4183,10 +4184,15 @@ class _ItaxPageState extends State<ItaxPage> {
       }
 
       if(!isECR){
-        sheet.getRangeByName('A38:B38').merge();
-        sheet.getRangeByName('A38:B38').cellStyle = commontextStyleBold;
-        sheet.getRangeByName('A38:B38').cellStyle.borders.all.lineStyle = xls.LineStyle.none;
-        sheet.getRangeByName('A38').setValue('Signature of Employee');
+        sheet.getRangeByName('A35:C35').merge();
+        sheet.getRangeByName('A35:C35').cellStyle = commontextStyleBold;
+        sheet.getRangeByName('A35:C35').cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+        sheet.getRangeByName('A35').setValue('I have Opted NEW / OLD TAX REGIME');
+
+        sheet.getRangeByName('A39:B39').merge();
+        sheet.getRangeByName('A39:B39').cellStyle = commontextStyleBold;
+        sheet.getRangeByName('A39:B39').cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+        sheet.getRangeByName('A39').setValue('Signature of Employee');
       }
 
 

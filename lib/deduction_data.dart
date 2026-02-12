@@ -326,9 +326,18 @@ class _DeductionPageState extends State<DeductionPage> {
               shouldRefetch = true;
             });
           }
-          Navigator.pop(context, true);
-        },
-        child: Icon(Icons.add),
+          if(context.mounted) {
+              Navigator.pop(context, true);
+            }
+          },
+        child: Text(
+          "ALL",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold
+          ),
+        )
       ),
     );
   }

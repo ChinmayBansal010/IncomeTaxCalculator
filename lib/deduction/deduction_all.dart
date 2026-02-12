@@ -258,6 +258,5 @@ class DeductionAllPage {
     } else {
       maxsav = totalsav;
     }
-    debugPrint(totalsav);
   }
 }
