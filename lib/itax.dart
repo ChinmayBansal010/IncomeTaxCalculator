@@ -5248,13 +5248,13 @@ class _ItaxPageState extends State<ItaxPage> {
         if (varTti > 2000000){
           varT5 = 80000;
         } else if (varTti > 1600000 && varTti <= 2000000){
-          varT5 = ((varTti - 1600000)*0.15).round();
+          varT5 = ((varTti - 1600000)*0.2).round();
         }
         if (varTti > 2400000){
           varT6 = 100000;
           varT7 = ((varTti - 2400000)*0.3).round();
         } else if (varTti > 2000000 && varTti <= 2400000){
-          varT6 = ((varTti - 2000000)*0.2).round();
+          varT6 = ((varTti - 2000000)*0.25).round();
         }
 
         varTt = varT1+varT2+varT3+varT4+varT5+varT6+varT7;
