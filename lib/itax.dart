@@ -4324,7 +4324,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B39:D39").cellStyle.hAlign = xls.HAlignType.center;
       sheet.getRangeByName("B39:D39").cellStyle.borders.all.lineStyle = xls.LineStyle.thick;
 
-      for (int i = 40; i<=52; i++){
+      for (int i = 40; i<=53; i++){
         sheet.getRangeByName("B$i:C$i").merge();
         sheet.getRangeByName("B$i:C$i").cellStyle = commontextStyle;
       }
@@ -4341,7 +4341,8 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("B49").setValue("80E (EDUCATION LOAN)");
       sheet.getRangeByName("B50").setValue("80EE");
       sheet.getRangeByName("B51").setValue("CONVEYANCE AND CONTIGENCY EXEMPTED");
-      sheet.getRangeByName("B52").setValue("OTHER AND UNIFORM EXEMPTED");
+      sheet.getRangeByName("B52").setValue("MEDICAL ALLOWANCE");
+      sheet.getRangeByName("B53").setValue("OTHER AND UNIFORM EXEMPTED");
 
 
 
@@ -4409,7 +4410,7 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("D37").cellStyle = commontextStyleBold;
       sheet.getRangeByName("D37").cellStyle.backColor = "#EEECE1";
 
-      for (int i = 40; i<=52; i++){
+      for (int i = 40; i<=53; i++){
         sheet.getRangeByName("D$i").cellStyle = commontextStyle;
         sheet.getRangeByName("D$i").cellStyle.backColor = "#EEECE1";
       }
@@ -4426,7 +4427,8 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("D49").setValue(int.tryParse(dedData['80e']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D50").setValue(int.tryParse(dedData['80ee']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D51").setValue((int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0));
-      sheet.getRangeByName("D52").setValue((int.tryParse(dedData['other']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0));
+      sheet.getRangeByName("D52").setValue(int.tryParse(dedData['ma']?.toString() ?? '0') ?? 0);
+      sheet.getRangeByName("D53").setValue((int.tryParse(dedData['other']?.toString() ?? '0') ?? 0)+(int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0));
 
       for (int i = 3; i<=18; i++){
         xls.Range rangeValue = sheet.getRangeByName("D$i");
@@ -4458,18 +4460,18 @@ class _ItaxPageState extends State<ItaxPage> {
         rangeNum.cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
       }
 
-      for (int i = 40; i<=52; i++){
+      for (int i = 40; i<=53; i++){
         xls.Range rangeValue = sheet.getRangeByName("D$i");
         xls.Range rangeNum = sheet.getRangeByName("B$i");
         rangeValue.cellStyle.borders.all.lineStyle = xls.LineStyle.none;
         rangeValue.cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
         rangeValue.cellStyle.borders.left.lineStyle = xls.LineStyle.thin;
-        rangeValue.cellStyle.borders.bottom.lineStyle = i != 52 ? xls.LineStyle.thin : xls.LineStyle.thick;
+        rangeValue.cellStyle.borders.bottom.lineStyle = i != 53 ? xls.LineStyle.thin : xls.LineStyle.thick;
         rangeValue.cellStyle.borders.right.lineStyle = xls.LineStyle.thick;
         rangeNum.cellStyle.borders.all.lineStyle = xls.LineStyle.none;
         rangeNum.cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
         rangeNum.cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
-        rangeNum.cellStyle.borders.bottom.lineStyle = i != 52 ? xls.LineStyle.thin : xls.LineStyle.thick;
+        rangeNum.cellStyle.borders.bottom.lineStyle = i != 53 ? xls.LineStyle.thin : xls.LineStyle.thick;
         rangeNum.cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
       }
       
@@ -4484,10 +4486,10 @@ class _ItaxPageState extends State<ItaxPage> {
       sheet.getRangeByName("C37").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
       sheet.getRangeByName("C37").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
 
-      sheet.getRangeByName("C52").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
-      sheet.getRangeByName("C52").cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("C52").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
-      sheet.getRangeByName("C52").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
+      sheet.getRangeByName("C53").cellStyle.borders.all.lineStyle = xls.LineStyle.none;
+      sheet.getRangeByName("C53").cellStyle.borders.right.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("C53").cellStyle.borders.top.lineStyle = xls.LineStyle.thin;
+      sheet.getRangeByName("C53").cellStyle.borders.bottom.lineStyle = xls.LineStyle.thick;
 
     } catch (error) {
       if (mounted) {
