@@ -36,6 +36,7 @@ class DeductionUpdatePage extends StatefulWidget {
   final String atee;
   final String rpaid;
   final String convcontuniform;
+  final String ma;
   final String other;
   final String atccd2;
   final String totalsav;
@@ -80,6 +81,7 @@ class DeductionUpdatePage extends StatefulWidget {
     required this.atee,
     required this.rpaid,
     required this.convcontuniform,
+    required this.ma,
     required this.other,
     required this.atccd2,
     required this.totalsav,
@@ -129,6 +131,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   final ateeController = TextEditingController();
   final rpaidController = TextEditingController();
   final convcontuniformController = TextEditingController();
+  final maController = TextEditingController();
   final otherController = TextEditingController();
   final atccd2Controller = TextEditingController();
   final totalsavController = TextEditingController();
@@ -205,6 +208,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     ateeController.text = widget.atee;
     rpaidController.text = widget.rpaid;
     convcontuniformController.text = widget.convcontuniform;
+    maController.text = widget.ma;
     otherController.text = widget.other;
     totalsavController.text = widget.totalsav;
     maxsavController.text = widget.maxsav;
@@ -255,6 +259,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     ateeController.dispose();
     rpaidController.dispose();
     convcontuniformController.dispose();
+    maController.dispose();
     otherController.dispose();
     atccd2Controller.dispose();
     totalsavController.dispose();
@@ -264,8 +269,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     ext3Controller.dispose();
     ext4Controller.dispose();
     ext5Controller.dispose();
-
-
 
     super.dispose();
   }
@@ -464,6 +467,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
                     _buildTextBox(label: "80E", controller: ateController),
                     _buildTextBox(label: "80EE", controller: ateeController),
                     _buildTextBox(label: "CONVEYANCE & CONTIGENCY & UNIFORM", controller: convcontuniformController),
+                    _buildTextBox(label: "MEDICAL ALLOWANCE", controller: maController),
                     _buildTextBox(label: "OTHER", controller: otherController),
                   ],
                 ),
@@ -805,6 +809,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         '80ee': ateeController.text,
         'rpaid': rpaidController.text,
         'taexem': convcontuniformController.text,
+        'ma': maController.text,
         'other': otherController.text,
         '80ccd2': atccd2Controller.text,
         'totalsav': totalsavController.text,

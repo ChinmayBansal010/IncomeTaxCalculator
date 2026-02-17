@@ -35,6 +35,7 @@ class DeductionAllPage {
   String atee;
   String rpaid;
   String convcontuniform;
+  String ma;
   String other;
   String atccd2;
   String totalsav;
@@ -78,6 +79,7 @@ class DeductionAllPage {
     required this.atee,
     required this.rpaid,
     required this.convcontuniform,
+    required this.ma,
     required this.other,
     required this.atccd2,
     required this.totalsav,
@@ -205,6 +207,7 @@ class DeductionAllPage {
         '80ee': atee,
         'rpaid': rpaid,
         'taexem': convcontuniform,
+        'ma': ma,
         'other': other,
         '80ccd2': atccd2,
         'totalsav': totalsav,
