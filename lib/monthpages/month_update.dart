@@ -53,6 +53,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
   final TextEditingController societyController = TextEditingController();
   final TextEditingController recoveryController = TextEditingController();
   final TextEditingController wfController = TextEditingController();
+  final TextEditingController medController = TextEditingController();
   final TextEditingController otherController = TextEditingController();
   final TextEditingController ddext1Controller = TextEditingController();
   final TextEditingController ddext2Controller = TextEditingController();
@@ -130,6 +131,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
     societyController.text = monthData['society'] ?? '';
     recoveryController.text = monthData['recovery'] ?? '';
     wfController.text = monthData['wf'] ?? '';
+    medController.text = monthData['med'] ?? '';
     otherController.text = monthData['other'] ?? '';
     ddext1Controller.text = monthData['ddext1'] ?? '';
     ddext2Controller.text = monthData['ddext2'] ?? '';
@@ -195,6 +197,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
     societyController.dispose();
     recoveryController.dispose();
     wfController.dispose();
+    medController.dispose();
     otherController.dispose();
     ddext1Controller.dispose();
     ddext2Controller.dispose();
@@ -477,6 +480,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       _buildTextField('SOCIETY', 'society', societyController),
                       _buildTextField('RECOVERY', 'recovery', recoveryController),
                       _buildTextField('WIDOW WELFARE FUND', 'wf', wfController),
+                      _buildTextField('MEDICAL', 'med', medController),
                       _buildTextField('OTHER', 'other', otherController),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -989,6 +993,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
         societyController,
         recoveryController,
         wfController,
+        medController,
         otherController,
         ddext1Controller,
         ddext2Controller,
