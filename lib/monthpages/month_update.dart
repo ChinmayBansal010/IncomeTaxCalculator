@@ -133,7 +133,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
     recoveryController.text = monthData['recovery'] ?? '';
     wfController.text = monthData['wf'] ?? '';
     medController.text = monthData['med'] ?? '';
-    medController.text = monthData['water'] ?? '';
+    waterController.text = monthData['water'] ?? '';
     otherController.text = monthData['other'] ?? '';
     ddext1Controller.text = monthData['ddext1'] ?? '';
     ddext2Controller.text = monthData['ddext2'] ?? '';

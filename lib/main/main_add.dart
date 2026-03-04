@@ -628,7 +628,7 @@ class _MainAddPageState extends State<MainAddPage> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: isWideScreen ? 32.0 : 16.0),
       child: DropdownButtonFormField<String?>(
-        value: currentValue,
+        initialValue: currentValue,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(fontSize: isWideScreen ? 22.0 : 18.0, fontWeight: FontWeight.bold, color: Colors.black87),
@@ -675,19 +675,13 @@ class DateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     String newText = newValue.text;
-
-    // Remove any non-numeric characters
     newText = newText.replaceAll(RegExp(r'[^0-9]'), '');
-
-    // Add dashes after the appropriate positions
     if (newText.length >= 3) {
       newText = '${newText.substring(0, 2)}-${newText.substring(2)}';
     }
     if (newText.length >= 6) {
       newText = '${newText.substring(0, 5)}-${newText.substring(5)}';
     }
-
-    // Ensure the text length does not exceed 10 (dd-mm-yyyy)
     if (newText.length > 10) {
       newText = newText.substring(0, 10);
     }

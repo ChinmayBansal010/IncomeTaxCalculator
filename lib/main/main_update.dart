@@ -841,19 +841,13 @@ class DateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     String newText = newValue.text;
-
-    // Remove any non-numeric characters
     newText = newText.replaceAll(RegExp(r'[^0-9]'), '');
-
-    // Add dashes after the appropriate positions
     if (newText.length >= 3) {
       newText = '${newText.substring(0, 2)}-${newText.substring(2)}';
     }
     if (newText.length >= 6) {
       newText = '${newText.substring(0, 5)}-${newText.substring(5)}';
     }
-
-    // Ensure the text length does not exceed 10 (dd-mm-yyyy)
     if (newText.length > 10) {
       newText = newText.substring(0, 10);
     }
@@ -868,26 +862,17 @@ class DateInputFormatter extends TextInputFormatter {
 class MobileNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    String newText = newValue.text.replaceAll(RegExp(r'\D'), ''); // Remove non-digit characters
+    String newText = newValue.text.replaceAll(RegExp(r'\D'), '');
 
     if (newText.length > 10) {
       newText = newText.substring(0, 10); // Limit to 10 digits
     }
 
-    String formattedText = '';
-    for (int i = 0; i < newText.length; i++) {
-      if (i == 3 || i == 6) {
-        formattedText += '-';
-      }
-      formattedText += newText[i];
-    }
-
     return newValue.copyWith(
-      text: formattedText,
-      selection: TextSelection.collapsed(offset: formattedText.length),
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }
-
 
 
