@@ -408,6 +408,7 @@ class _ItaxPageState extends State<ItaxPage> {
         int varEpfgross,
         int varEsigross,
         int varMedgross,
+        int varWatergross,
         int varOther2gross,
         int varDdext1gross,
         int varDdext2gross,
@@ -471,6 +472,7 @@ class _ItaxPageState extends State<ItaxPage> {
         'tepf': varEpfgross,
         'tesi': varEsigross,
         'tmed': varMedgross,
+        'twater': varWatergross,
         'tother2': varOther2gross,
 
       });
@@ -1389,6 +1391,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfmar = int.tryParse(marData['epf']?.toString() ?? '0') ?? 0;
       int varEsimar = int.tryParse(marData['esi']?.toString() ?? '0') ?? 0;
       int varMedmar = int.tryParse(marData['med']?.tooString() ?? '0') ?? 0;
+      int varWatermar = int.tryParse(marData['water']?.toString() ?? '0') ?? 0;
       int varOther2mar = int.tryParse(marData['other']?.toString() ?? '0') ?? 0;
       int varDdext1mar = int.tryParse(marData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2mar = int.tryParse(marData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1449,6 +1452,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfapr = int.tryParse(aprData['epf']?.toString() ?? '0') ?? 0;
       int varEsiapr = int.tryParse(aprData['esi']?.toString() ?? '0') ?? 0;
       int varMedapr = int.tryParse(aprData['med']?.tooString() ?? '0') ?? 0;
+      int varWaterapr = int.tryParse(aprData['water']?.toString() ?? '0') ?? 0;
       int varOther2apr = int.tryParse(aprData['other']?.toString() ?? '0') ?? 0;
       int varDdext1apr = int.tryParse(aprData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2apr = int.tryParse(aprData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1509,6 +1513,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfmay = int.tryParse(mayData['epf']?.toString() ?? '0') ?? 0;
       int varEsimay = int.tryParse(mayData['esi']?.toString() ?? '0') ?? 0;
       int varMedmay = int.tryParse(mayData['med']?.tooString() ?? '0') ?? 0;
+      int varWatermay = int.tryParse(mayData['water']?.toString() ?? '0') ?? 0;
       int varOther2may = int.tryParse(mayData['other']?.toString() ?? '0') ?? 0;
       int varDdext1may = int.tryParse(mayData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2may = int.tryParse(mayData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1563,6 +1568,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfarrearqtr1 = int.tryParse('0') ?? 0;
       int varEsiarrearqtr1 = int.tryParse('0') ?? 0;
       int varMedarrearqtr1 = int.tryParse('0') ?? 0;
+      int varWaterarrearqtr1 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr1 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr1 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr1 = int.tryParse('0') ?? 0;
@@ -1614,6 +1620,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfqtr1 = [varEpfmar, varEpfapr, varEpfmay, varEpfarrearqtr1].fold(0, (sum, value) => sum + value);
       int varEsiqtr1 = [varEsimar, varEsiapr, varEsimay, varEsiarrearqtr1].fold(0, (sum, value) => sum + value);
       int varMedqtr1 = [varMedmar, varMedapr, varMedmay, varMedarrearqtr1].fold(0, (sum, value) => sum + value);
+      int varWaterqtr1 = [varWatermar, varWaterapr, varWatermay, varWaterarrearqtr1].fold(0, (sum, value) => sum + value);
       int varOther2qtr1 = [varOther2mar, varOther2apr, varOther2may, varOther2arrearqtr1].fold(0, (sum, value) => sum + value);
       int varDdext1qtr1 = [varDdext1mar, varDdext1apr, varDdext1may, varDdext1arrearqtr1].fold(0, (sum, value) => sum + value);
       int varDdext2qtr1 = [varDdext2mar, varDdext2apr, varDdext2may, varDdext2arrearqtr1].fold(0, (sum, value) => sum + value);
@@ -1674,6 +1681,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfjun = int.tryParse(junData['epf']?.toString() ?? '0') ?? 0;
       int varEsijun = int.tryParse(junData['esi']?.toString() ?? '0') ?? 0;
       int varMedjun = int.tryParse(junData['med']?.tooString() ?? '0') ?? 0;
+      int varWaterjun = int.tryParse(junData['water']?.toString() ?? '0') ?? 0;
       int varOther2jun = int.tryParse(junData['other']?.toString() ?? '0') ?? 0;
       int varDdext1jun = int.tryParse(junData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2jun = int.tryParse(junData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1734,6 +1742,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfjul = int.tryParse(julData['epf']?.toString() ?? '0') ?? 0;
       int varEsijul = int.tryParse(julData['esi']?.toString() ?? '0') ?? 0;
       int varMedjul = int.tryParse(julData['med']?.tooString() ?? '0') ?? 0;
+      int varWaterjul = int.tryParse(julData['water']?.toString() ?? '0') ?? 0;
       int varOther2jul = int.tryParse(julData['other']?.toString() ?? '0') ?? 0;
       int varDdext1jul = int.tryParse(julData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2jul = int.tryParse(julData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1794,6 +1803,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfaug = int.tryParse(augData['epf']?.toString() ?? '0') ?? 0;
       int varEsiaug = int.tryParse(augData['esi']?.toString() ?? '0') ?? 0;
       int varMedaug = int.tryParse(augData['med']?.tooString() ?? '0') ?? 0;
+      int varWateraug = int.tryParse(augData['water']?.toString() ?? '0') ?? 0;
       int varOther2aug = int.tryParse(augData['other']?.toString() ?? '0') ?? 0;
       int varDdext1aug = int.tryParse(augData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2aug = int.tryParse(augData['ddext2']?.toString() ?? '0') ?? 0;
@@ -1848,6 +1858,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfarrearqtr2 = int.tryParse('0') ?? 0;
       int varEsiarrearqtr2 = int.tryParse('0') ?? 0;
       int varMedarrearqtr2 = int.tryParse('0') ?? 0;
+      int varWaterarrearqtr2 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr2 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr2 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr2 = int.tryParse('0') ?? 0;
@@ -1899,6 +1910,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfqtr2 = [varEpfjun, varEpfjul, varEpfaug, varEpfarrearqtr2].fold(0, (sum, value) => sum + value);
       int varEsiqtr2 = [varEsijun, varEsijul, varEsiaug, varEsiarrearqtr2].fold(0, (sum, value) => sum + value);
       int varMedqtr2 = [varMedjun, varMedjul, varMedaug, varMedarrearqtr2].fold(0, (sum, value) => sum + value);
+      int varWaterqtr2 = [varWaterjun, varWaterjul, varWateraug, varWaterarrearqtr2].fold(0, (sum, value) => sum + value);
       int varOther2qtr2 = [varOther2jun, varOther2jul, varOther2aug, varOther2arrearqtr2].fold(0, (sum, value) => sum + value);
       int varDdext1qtr2 = [varDdext1jun, varDdext1jul, varDdext1aug, varDdext1arrearqtr2].fold(0, (sum, value) => sum + value);
       int varDdext2qtr2 = [varDdext2jun, varDdext2jul, varDdext2aug, varDdext2arrearqtr2].fold(0, (sum, value) => sum + value);
@@ -1958,6 +1970,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWfsept = int.tryParse(septData['wf']?.toString() ?? '0') ?? 0;
       int varEpfsept = int.tryParse(septData['epf']?.toString() ?? '0') ?? 0;
       int varEsisept = int.tryParse(septData['esi']?.toString() ?? '0') ?? 0;
+      int varWatersept = int.tryParse(septData['water']?.toString() ?? '0') ?? 0;
       int varOther2sept = int.tryParse(septData['other']?.toString() ?? '0') ?? 0;
       int varMedsept = int.tryParse(septData['med']?.toString() ?? '0') ?? 0;
       int varDdext1sept = int.tryParse(septData['ddext1']?.toString() ?? '0') ?? 0;
@@ -2018,6 +2031,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWfoct = int.tryParse(octData['wf']?.toString() ?? '0') ?? 0;
       int varEpfoct = int.tryParse(octData['epf']?.toString() ?? '0') ?? 0;
       int varEsioct = int.tryParse(octData['esi']?.toString() ?? '0') ?? 0;
+      int varWateroct = int.tryParse(octData['water']?.toString() ?? '0') ?? 0;
       int varOther2oct = int.tryParse(octData['other']?.toString() ?? '0') ?? 0;
       int varMedoct = int.tryParse(octData['med']?.toString() ?? '0') ?? 0;
       int varDdext1oct = int.tryParse(octData['ddext1']?.toString() ?? '0') ?? 0;
@@ -2078,6 +2092,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varWfnov = int.tryParse(novData['wf']?.toString() ?? '0') ?? 0;
       int varEpfnov = int.tryParse(novData['epf']?.toString() ?? '0') ?? 0;
       int varEsinov = int.tryParse(novData['esi']?.toString() ?? '0') ?? 0;
+      int varWaternov = int.tryParse(novData['water']?.toString() ?? '0') ?? 0;
       int varOther2nov = int.tryParse(novData['other']?.toString() ?? '0') ?? 0;
       int varMednov = int.tryParse(novData['med']?.toString() ?? '0') ?? 0;
       int varDdext1nov = int.tryParse(novData['ddext1']?.toString() ?? '0') ?? 0;
@@ -2131,6 +2146,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfarrearqtr3 = int.tryParse('0') ?? 0;
       int varEsiarrearqtr3 = int.tryParse('0') ?? 0;
       int varMedarrearqtr3 = int.tryParse('0') ?? 0;
+      int varWaterarrearqtr3 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr3 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr3 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr3 = int.tryParse('0') ?? 0;
@@ -2182,6 +2198,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfqtr3 = [varEpfsept, varEpfoct, varEpfnov, varEpfarrearqtr3].fold(0, (sum, value) => sum + value);
       int varEsiqtr3 = [varEsisept, varEsioct, varEsinov, varEsiarrearqtr3].fold(0, (sum, value) => sum + value);
       int varMedqtr3 = [varMedsept, varMedoct, varMednov, varMedarrearqtr3].fold(0, (sum, value) => sum + value);
+      int varWaterqtr3 = [varWatersept, varWateroct, varWaternov, varWaterarrearqtr3].fold(0, (sum, value) => sum + value);
       int varOther2qtr3 = [varOther2sept, varOther2oct, varOther2nov, varOther2arrearqtr3].fold(0, (sum, value) => sum + value);
       int varDdext1qtr3 = [varDdext1sept, varDdext1oct, varDdext1nov, varDdext1arrearqtr3].fold(0, (sum, value) => sum + value);
       int varDdext2qtr3 = [varDdext2sept, varDdext2oct, varDdext2nov, varDdext2arrearqtr3].fold(0, (sum, value) => sum + value);
@@ -2241,6 +2258,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfdec = int.tryParse(decData['epf']?.toString() ?? '0') ?? 0;
       int varEsidec = int.tryParse(decData['esi']?.toString() ?? '0') ?? 0;
       int varMeddec = int.tryParse(decData['med']?.toString() ?? '0') ?? 0;
+      int varWaterdec = int.tryParse(decData['water']?.toString() ?? '0') ?? 0;
       int varOther2dec = int.tryParse(decData['other']?.toString() ?? '0') ?? 0;
       int varDdext1dec = int.tryParse(decData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2dec = int.tryParse(decData['ddext2']?.toString() ?? '0') ?? 0;
@@ -2301,6 +2319,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfjan = int.tryParse(janData['epf']?.toString() ?? '0') ?? 0;
       int varEsijan = int.tryParse(janData['esi']?.toString() ?? '0') ?? 0;
       int varMedjan = int.tryParse(janData['med']?.toString() ?? '0') ?? 0;
+      int varWaterjan = int.tryParse(janData['water']?.toString() ?? '0') ?? 0;
       int varOther2jan = int.tryParse(janData['other']?.toString() ?? '0') ?? 0;
       int varDdext1jan = int.tryParse(janData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2jan = int.tryParse(janData['ddext2']?.toString() ?? '0') ?? 0;
@@ -2360,6 +2379,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpffeb = int.tryParse(febData['epf']?.toString() ?? '0') ?? 0;
       int varEsifeb = int.tryParse(febData['esi']?.toString() ?? '0') ?? 0;
       int varMedfeb = int.tryParse(febData['med']?.toString() ?? '0') ?? 0;
+      int varWaterfeb = int.tryParse(febData['water']?.toString() ?? '0') ?? 0;
       int varOther2feb = int.tryParse(febData['other']?.toString() ?? '0') ?? 0;
       int varDdext1feb = int.tryParse(febData['ddext1']?.toString() ?? '0') ?? 0;
       int varDdext2feb = int.tryParse(febData['ddext2']?.toString() ?? '0') ?? 0;
@@ -2414,6 +2434,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfarrearqtr4 = int.tryParse('0') ?? 0;
       int varEsiarrearqtr4 = int.tryParse('0') ?? 0;
       int varMedarrearqtr4 = int.tryParse('0') ?? 0;
+      int varWaterarrearqtr4 = int.tryParse('0') ?? 0;
       int varOther2arrearqtr4 = int.tryParse('0') ?? 0;
       int varDdext1arrearqtr4 = int.tryParse('0') ?? 0;
       int varDdext2arrearqtr4 = int.tryParse('0') ?? 0;
@@ -2471,6 +2492,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfqtr4 = [varEpfdec, varEpfjan, varEpffeb, varEpfarrearqtr4].fold(0, (sum, value) => sum + value);
       int varEsiqtr4 = [varEsidec, varEsijan, varEsifeb, varEsiarrearqtr4].fold(0, (sum, value) => sum + value);
       int varMedqtr4 = [varMeddec, varMedjan, varMedfeb, varMedarrearqtr4].fold(0, (sum, value) => sum + value);
+      int varWaterqtr4 = [varWaterdec, varWaterjan, varWaterfeb, varWaterarrearqtr4].fold(0, (sum, value) => sum + value);
       int varOther2qtr4 = [varOther2dec, varOther2jan, varOther2feb, varOther2arrearqtr4].fold(0, (sum, value) => sum + value);
       int varDdext1qtr4 = [varDdext1dec, varDdext1jan, varDdext1feb, varDdext1arrearqtr4].fold(0, (sum, value) => sum + value);
       int varDdext2qtr4 = [varDdext2dec, varDdext2jan, varDdext2feb, varDdext2arrearqtr4].fold(0, (sum, value) => sum + value);
@@ -2522,6 +2544,7 @@ class _ItaxPageState extends State<ItaxPage> {
       int varEpfgross = [varEpfqtr1, varEpfqtr2, varEpfqtr3, varEpfqtr4].fold(0, (sum, value) => sum + value);
       int varEsigross = [varEsiqtr1, varEsiqtr2, varEsiqtr3, varEsiqtr4].fold(0, (sum, value) => sum + value);
       int varMedgross = [varMedqtr1, varMedqtr2, varMedqtr3, varMedqtr4].fold(0, (sum, value) => sum + value);
+      int varWatergross = [varWaterqtr1, varWaterqtr2, varWaterqtr3, varWaterqtr4].fold(0, (sum, value) => sum + value);
       int varOther2gross = [varOther2qtr1, varOther2qtr2, varOther2qtr3, varOther2qtr4].fold(0, (sum, value) => sum + value);
       int varDdext1gross = [varDdext1qtr1, varDdext1qtr2, varDdext1qtr3, varDdext1qtr4].fold(0, (sum, value) => sum + value);
       int varDdext2gross = [varDdext2qtr1, varDdext2qtr2, varDdext2qtr3, varDdext2qtr4].fold(0, (sum, value) => sum + value);
@@ -2572,6 +2595,7 @@ class _ItaxPageState extends State<ItaxPage> {
           varEpfgross,
           varEsigross,
           varMedgross,
+          varWatergross,
           varOther2gross,
           varDdext1gross,
           varDdext2gross,
@@ -4085,6 +4109,50 @@ class _ItaxPageState extends State<ItaxPage> {
         sheet.getRangeByName("${columns[end]}31").setValue('0');
         sheet.getRangeByName("${columns[end]}32").setValue(varMedqtr4);
         sheet.getRangeByName("${columns[end]}33").setValue(varMedgross);
+
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15','20','25','32'];
+        for (String cols in qtrcolumns){
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle = totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end+=1;
+
+      }
+
+      if (varWatergross > 0 && isECR){
+
+        sheet.getRangeByName("${columns[end]}10").setValue("WATER");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varWatermar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varWaterapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varWatermay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varWaterarrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varWaterqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varWaterjun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varWaterjul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varWateraug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varWaterarrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varWaterqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varWatersept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varWateroct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varWaternov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varWaterarrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varWaterqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varWaterdec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varWaterjan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varWaterfeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varWaterarrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varWaterqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varWatergross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle = commontextStyle;
         sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle = commontextStyle;

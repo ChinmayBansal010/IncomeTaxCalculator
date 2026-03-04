@@ -486,7 +486,7 @@ class _MainAddPageState extends State<MainAddPage> {
                         ),
                         _buildTextField("ADDRESS", addressController),
                         _buildTextField("AADHAAR NUMBER", aadhaarController),
-                        _buildTextField("MOBILE NUMBER", mobileController, keyboardType: TextInputType.phone, inputFormatters: [MobileNumberFormatter()]),
+                        _buildTextField("MOBILE NUMBER", mobileController, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
                         _buildTextField("ACCOUNT NUMBER", accountController),
                         _buildTextField("BRANCH", branchController),
                         _buildTextField("BANK NAME", bankNameController),
@@ -510,7 +510,7 @@ class _MainAddPageState extends State<MainAddPage> {
                               bloodGroupController = newValue;
                             });
                           },),
-                        _buildTextField("EMERGENCY NUMBER", emergencyNoController, keyboardType: TextInputType.phone, inputFormatters: [MobileNumberFormatter()]),
+                        _buildTextField("EMERGENCY NUMBER", emergencyNoController, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
                         _buildTextField("NIC EMAIL ID", nicEmailController),
                         _buildTextField("DATE OF RESIGNATION", dornController, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                         _buildTextField("EDUCATION QUALIFICATION", educationController),
@@ -702,23 +702,15 @@ class DateInputFormatter extends TextInputFormatter {
 class MobileNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    String newText = newValue.text.replaceAll(RegExp(r'\D'), ''); // Remove non-digit characters
+    String newText = newValue.text.replaceAll(RegExp(r'\D'), '');
 
     if (newText.length > 10) {
       newText = newText.substring(0, 10); // Limit to 10 digits
     }
 
-    String formattedText = '';
-    for (int i = 0; i < newText.length; i++) {
-      if (i == 3 || i == 6) {
-        formattedText += '-';
-      }
-      formattedText += newText[i];
-    }
-
     return newValue.copyWith(
-      text: formattedText,
-      selection: TextSelection.collapsed(offset: formattedText.length),
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }

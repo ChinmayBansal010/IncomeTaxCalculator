@@ -365,7 +365,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text("Error"),
-            content: Text("Failed to add data: \n$error"),
+            content: Text("Failed to update data: \n$error"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
@@ -474,7 +474,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text("Error"),
-            content: Text("Failed to add data: \n$error"),
+            content: Text("Failed to update data: \n$error"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
@@ -542,7 +542,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text("Error"),
-            content: Text("Failed to add data: \n$error"),
+            content: Text("Failed to update data: \n$error"),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx),
@@ -563,7 +563,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ADD DATA',
+          'UPDATE DATA',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.blue,
@@ -626,7 +626,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
                         ),
                         _buildTextField("ADDRESS", addressController),
                         _buildTextField("AADHAAR NUMBER", aadhaarController),
-                        _buildTextField("MOBILE NUMBER", mobileController, keyboardType: TextInputType.phone, inputFormatters: [MobileNumberFormatter()]),
+                        _buildTextField("MOBILE NUMBER", mobileController, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
                         _buildTextField("ACCOUNT NUMBER", accountController),
                         _buildTextField("BRANCH", branchController),
                         _buildTextField("BANK NAME", bankNameController),
@@ -650,7 +650,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
                               bloodGroupController = newValue;
                             });
                           },),
-                        _buildTextField("EMERGENCY NUMBER", emergencyNoController, keyboardType: TextInputType.phone, inputFormatters: [MobileNumberFormatter()]),
+                        _buildTextField("EMERGENCY NUMBER", emergencyNoController, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
                         _buildTextField("NIC EMAIL ID", nicEmailController),
                         _buildTextField("DATE OF RESIGNATION", dornController, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                         _buildTextField("EDUCATION QUALIFICATION", educationController),
@@ -794,7 +794,7 @@ class MainUpdatePageState extends State<MainUpdatePage> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: isWideScreen ? 32.0 : 16.0),
       child: DropdownButtonFormField<String?>(
-        value: currentValue,
+        initialValue: currentValue,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(fontSize: isWideScreen ? 22.0 : 18.0, fontWeight: FontWeight.bold, color: Colors.black87),

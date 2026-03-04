@@ -54,6 +54,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
   final TextEditingController recoveryController = TextEditingController();
   final TextEditingController wfController = TextEditingController();
   final TextEditingController medController = TextEditingController();
+  final TextEditingController waterController = TextEditingController();
   final TextEditingController otherController = TextEditingController();
   final TextEditingController ddext1Controller = TextEditingController();
   final TextEditingController ddext2Controller = TextEditingController();
@@ -132,6 +133,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
     recoveryController.text = monthData['recovery'] ?? '';
     wfController.text = monthData['wf'] ?? '';
     medController.text = monthData['med'] ?? '';
+    medController.text = monthData['water'] ?? '';
     otherController.text = monthData['other'] ?? '';
     ddext1Controller.text = monthData['ddext1'] ?? '';
     ddext2Controller.text = monthData['ddext2'] ?? '';
@@ -198,6 +200,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
     recoveryController.dispose();
     wfController.dispose();
     medController.dispose();
+    waterController.dispose();
     otherController.dispose();
     ddext1Controller.dispose();
     ddext2Controller.dispose();
@@ -481,6 +484,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       _buildTextField('RECOVERY', 'recovery', recoveryController),
                       _buildTextField('WIDOW WELFARE FUND', 'wf', wfController),
                       _buildTextField('MEDICAL', 'med', medController),
+                      _buildTextField('WATER CHARGES', 'water', waterController),
                       _buildTextField('OTHER', 'other', otherController),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -994,6 +998,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
         recoveryController,
         wfController,
         medController,
+        waterController,
         otherController,
         ddext1Controller,
         ddext2Controller,
