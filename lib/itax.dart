@@ -1202,6 +1202,12 @@ class _ItaxPageState extends State<ItaxPage> {
     try{
 
       // --------------------- Itax Form ----------------------------
+      sheet.pageSetup.orientation = xls.ExcelPageOrientation.landscape;
+      sheet.pageSetup.fitToPagesWide = 1;
+      sheet.pageSetup.fitToPagesTall = 1;
+      sheet.pageSetup.topMargin = 0.5;
+      sheet.pageSetup.bottomMargin = 0.5;
+
       sheet.getRangeByName('A1').setValue(sharedData.zone);
       sheet.getRangeByName('A1:K1').merge();
       sheet.getRangeByName('A1').rowHeight = 18.60;
@@ -4381,7 +4387,13 @@ class _ItaxPageState extends State<ItaxPage> {
       ])
   async{
     try{
+      sheet.pageSetup.orientation = xls.ExcelPageOrientation.portrait;
+      sheet.pageSetup.fitToPagesWide = 1;
+      sheet.pageSetup.fitToPagesTall = 1;
+      sheet.pageSetup.topMargin = 0.5;
+      sheet.pageSetup.bottomMargin = 0.5;
       sheet.showGridlines = false;
+
       sheet.getRangeByName("A1").columnWidth = 4.11;
       sheet.getRangeByName("B1").columnWidth = 4.11;
       sheet.getRangeByName("C1").columnWidth = 54.11;
@@ -4677,6 +4689,11 @@ class _ItaxPageState extends State<ItaxPage> {
       ])
   async{
     try{
+      sheet.pageSetup.orientation = xls.ExcelPageOrientation.portrait;
+      sheet.pageSetup.fitToPagesWide = 1;
+      sheet.pageSetup.fitToPagesTall = 1;
+      sheet.pageSetup.topMargin = 0.5;
+      sheet.pageSetup.bottomMargin = 0.5;
       sheet.showGridlines = false;
       sheet.getRangeByName("A1").columnWidth = 7.11;
       sheet.getRangeByName("B1:C1").columnWidth = 3.78;
@@ -5157,6 +5174,11 @@ class _ItaxPageState extends State<ItaxPage> {
       ])
   async{
     try{
+      sheet.pageSetup.orientation = xls.ExcelPageOrientation.portrait;
+      sheet.pageSetup.fitToPagesWide = 1;
+      sheet.pageSetup.fitToPagesTall = 1;
+      sheet.pageSetup.topMargin = 0.5;
+      sheet.pageSetup.bottomMargin = 0.5;
       sheet.showGridlines = false;
       sheet.getRangeByName("A1").columnWidth = 7.11;
       sheet.getRangeByName("B1:C1").columnWidth = 3.78;
@@ -5237,7 +5259,7 @@ class _ItaxPageState extends State<ItaxPage> {
         sheet.getRangeByName("D16").setValue("Rs. 10,00,001/- To Rs. 12,00,000          15%");
         sheet.getRangeByName("D17").setValue("Rs. 12,00,001/- To Rs. 15,00,000          20%");
         sheet.getRangeByName("D18").setValue("ABOVE Rs. 15,00,001                               30%");
-      } else if (sharedData.ccurrentYear == '2025-26'){
+      } else if (sharedData.ccurrentYear == '2025-26' || sharedData.ccurrentYear == '2026-27'){
         sheet.getRangeByName("D13").setValue("Upto Rs. 4,00,000/-                                NIL");
         sheet.getRangeByName("D14").setValue("Rs. 4,00,001/- To 8,00,000                     5%");
         sheet.getRangeByName("D15").setValue("Rs. 8,00,001/- To Rs. 12,00,000            10%");
