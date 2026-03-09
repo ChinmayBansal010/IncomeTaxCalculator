@@ -5401,7 +5401,7 @@ class _ItaxPageState extends State<ItaxPage> {
           varTtl = varTl - varTre;
         }
 
-      } else if(sharedData.ccurrentYear == '2025-26'){
+      } else if(sharedData.ccurrentYear == '2025-26' || sharedData.ccurrentYear == '2026-27'){
         if (varTti > 800000){
           varT2 = 20000;
         } else if (varTti > 400000 && varTti <= 800000){
