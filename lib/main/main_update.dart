@@ -447,6 +447,8 @@ class MainUpdatePageState extends State<MainUpdatePage> {
       await bioRef.child('arrdata').child(biometricIdController.text).remove();
       await bioRef.child('deddata').child(biometricIdController.text).remove();
       await bioRef.child('itfdata').child(biometricIdController.text).remove();
+      await bioRef.child('itaxnew').child(biometricIdController.text).remove();
+      await bioRef.child('itaxold').child(biometricIdController.text).remove();
 
       if(mounted) {
         Navigator.pop(context);
