@@ -4110,7 +4110,7 @@ class _ItaxPageState extends State<ItaxPage> {
 
       if (varMedgross > 0 && isECR){
 
-        sheet.getRangeByName("${columns[end]}10").setValue("MEDICAL");
+        sheet.getRangeByName("${columns[end]}10").setValue("MCD-EHS");
         sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
 
         sheet.getRangeByName("${columns[end]}11").setValue(varMedmar);
