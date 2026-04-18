@@ -212,7 +212,7 @@ List<List<dynamic>> getOptimizedData(
         parseValue(monthEntry["conv"]) -
         parseValue(monthEntry["drive"]) -
         parseValue(monthEntry["uniform"]) +
-        parseValue(dedEntry["atccd2"]);
+        parseValue(dedEntry["80ccd2"]);
 
     int tax = parseValue(monthEntry["incometax"]);
 
