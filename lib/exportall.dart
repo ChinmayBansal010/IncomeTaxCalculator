@@ -306,7 +306,7 @@ Future<Map<String, dynamic>> fetchitaxNewData() async {
         'tti': 'Total Taxable Income', 't1': 'Tax Slab 1', 't2': 'Tax Slab 2', 't3': 'Tax Slab 3',
         't4': 'Tax Slab 4', 't5': 'Tax Slab 5', 't6': 'Tax Slab 6', 't7': 'Tax Slab 7', 'tt': 'Total Tax',
         'sur': 'Surcharge', 'tl': 'Tax Liability', 'tre': 'Tax Rebate', 'ttl': 'Total Tax Liability',
-        'ec': 'Cess', 'ttp': 'Total Tax Payble', 'deduct': 'Tax Payble', 'nitp': 'Net Taxable Income',
+        'ec': 'Cess', 'ttp': 'Total Tax Payble', 'deduct': 'Tax Payble', 'nitp': 'Tax Already Paid',
         'relief': 'tax Relief', 'nitpi': 'Net Tax Payble', 'ep': 'Excess'
       };
 

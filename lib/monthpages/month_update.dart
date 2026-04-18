@@ -483,7 +483,7 @@ class _MonthDataPageState extends State<MonthDataPage> {
                       _buildTextField('SOCIETY', 'society', societyController),
                       _buildTextField('RECOVERY', 'recovery', recoveryController),
                       _buildTextField('WIDOW WELFARE FUND', 'wf', wfController),
-                      _buildTextField('MEDICAL', 'med', medController),
+                      _buildTextField('MCD-EHS', 'med', medController),
                       _buildTextField('WATER CHARGES', 'water', waterController),
                       _buildTextField('OTHER', 'other', otherController),
                       Row(
