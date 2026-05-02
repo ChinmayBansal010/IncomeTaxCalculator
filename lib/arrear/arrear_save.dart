@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/shared.dart';
-
 
 class ArrearUpdatePage extends StatefulWidget {
   final String biometricId;
@@ -93,14 +93,13 @@ class ArrearUpdatePage extends StatefulWidget {
     required this.dfext2,
     required this.dfext3,
     required this.bonus,
-
   });
+
   @override
   State<ArrearUpdatePage> createState() => ArrearUpdatePageState();
 }
 
-class ArrearUpdatePageState extends State<ArrearUpdatePage> {
-  // Text controllers for form inputs
+class ArrearUpdatePageState extends State<ArrearUpdatePage> with SingleTickerProviderStateMixin {
   final biometricIdController = TextEditingController();
   final nameController = TextEditingController();
   final mmdaController = TextEditingController();
@@ -145,9 +144,20 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
   final dfext3Controller = TextEditingController();
   final bonusController = TextEditingController();
 
+  late AnimationController _entranceController;
+  final DatabaseReference database = FirebaseDatabase.instance.ref();
+  late DatabaseReference bioRef = database.child(sharedData.userPlace);
+  List<String> month = ['mar','apr','may','jun','jul','aug','sept','oct','nov','dec','jan','feb'];
+
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _entranceController.forward();
+
     biometricIdController.text = widget.biometricId;
     nameController.text = widget.name;
     mmdaController.text = widget.mmda;
@@ -191,19 +201,11 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     dfext2Controller.text = widget.dfext2;
     dfext3Controller.text = widget.dfext3;
     bonusController.text = widget.bonus;
-
   }
-
-  List<String> month = ['mar','apr','may','jun','jul','aug','sept','oct','nov','dec','jan','feb'];
-
-  // String? npschk = '0',gpfchk = '0';
-
-  // Reference to Firebase Database
-  final DatabaseReference database = FirebaseDatabase.instance.ref();
-  late DatabaseReference bioRef = database.child(sharedData.userPlace);
 
   @override
   void dispose() {
+    _entranceController.dispose();
     biometricIdController.dispose();
     nameController.dispose();
     mmdaController.dispose();
@@ -247,345 +249,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     dfext2Controller.dispose();
     dfext3Controller.dispose();
     bonusController.dispose();
-
     super.dispose();
-  }
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ARREAR DATA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blue,
-        leading: BackButton(onPressed: () {
-          Navigator.pop(context, true);
-        }),
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(16.0),
-        children: [
-          Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'INFO',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-                    _buildTextBox(label: "BIOMETRIC ID", controller: biometricIdController),
-                    _buildTextBox(label: "NAME", controller: nameController),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'MARCH TO MAY',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-
-                    _buildTextBox(label: "DA", controller: mmdaController),
-                    _buildTextBox(label: "HRA", controller: mmhraController),
-                    _buildTextBox(label: "DA ON TA", controller: mmdaontaController),
-                    _buildTextBox(label: "PCA", controller: mmpcaController),
-                    _buildTextBox(label: "NPA", controller: mmnpaController),
-                    _buildTextBox(label: "TUTION", controller: mmtutionController),
-                    _buildTextBox(label: "OTHER", controller: mmotherController),
-                    _buildTextBox(label: "TAX", controller: mmext1Controller),
-                    Visibility(visible: false,
-                      child: Column(
-                        children: [
-                          _buildTextBox(label: "EXT2", controller: mmext2Controller),
-                          _buildTextBox(label: "EXT3", controller: mmext3Controller),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'JUNE TO AUGUST',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-
-                    _buildTextBox(label: "DA", controller: jadaController),
-                    _buildTextBox(label: "HRA", controller: jahraController),
-                    _buildTextBox(label: "DA ON TA", controller: jadaontaController),
-                    _buildTextBox(label: "PCA", controller: japcaController),
-                    _buildTextBox(label: "NPA", controller: janpaController),
-                    _buildTextBox(label: "TUTION", controller: jatutionController),
-                    _buildTextBox(label: "OTHER", controller: jaotherController),
-                    _buildTextBox(label: "TAX", controller: jaext1Controller),
-
-                    Visibility(visible: false,
-                      child: Column(
-                        children: [
-                          _buildTextBox(label: "EXT2", controller: jaext2Controller),
-                          _buildTextBox(label: "EXT3", controller: jaext3Controller),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'SEPTEMBER TO NOVEMBER',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-                    _buildTextBox(label: "DA", controller: sndaController),
-                    _buildTextBox(label: "HRA", controller: snhraController),
-                    _buildTextBox(label: "DA ON TA", controller: sndaontaController),
-                    _buildTextBox(label: "PCA", controller: snpcaController),
-                    _buildTextBox(label: "NPA", controller: snnpaController),
-                    _buildTextBox(label: "TUTION", controller: sntutionController),
-                    _buildTextBox(label: "OTHER", controller: snotherController),
-                    _buildTextBox(label: "TAX", controller: snext1Controller),
-                    Visibility(visible: false,
-                      child: Column(
-                        children: [
-                          _buildTextBox(label: "EXT3", controller: snext3Controller),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'DECEMBER TO FEBRUARY',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-                    _buildTextBox(label: "DA", controller: dfdaController),
-                    _buildTextBox(label: "HRA", controller: dfhraController),
-                    _buildTextBox(label: "DA ON TA", controller: dfdaontaController),
-                    _buildTextBox(label: "PCA", controller: dfpcaController),
-                    _buildTextBox(label: "NPA", controller: dfnpaController),
-                    _buildTextBox(label: "TUTION", controller: dftutionController),
-                    _buildTextBox(label: "OTHER", controller: dfotherController),
-                    _buildTextBox(label: "TAX", controller: dfext1Controller),
-                    Visibility(visible: false,
-                      child: Column(
-                        children: [
-                          _buildTextBox(label: "EXT2", controller: dfext2Controller),
-                          _buildTextBox(label: "EXT3", controller: dfext3Controller),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              _buildTextBox(label: "BONUS", controller: bonusController),
-
-              SizedBox(height: 10),
-
-              // _buildTextBox(label: "INCOME FROM OTHER SOURCES", controller: snext2Controller),
-            ],
-          ),
-
-          SizedBox(height: 10),
-
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                width: double.infinity, // Optional background for button area
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center, // Center buttons horizontally
-                  children: [
-                    // First button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: _saveData,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent, // Button color
-                          foregroundColor: Colors.white, // Text color
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          elevation: 8.0,
-                        ),
-                        child: const Text(
-                          "SAVE",
-                          style: TextStyle(
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextBox({
-    required String label,
-    required TextEditingController controller,
-  }) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isWideScreen = screenWidth > 600;
-
-    // Define responsive padding, font size, and height
-    double horizontalPadding = isWideScreen ? 32.0 : 16.0;
-    double fontSize = isWideScreen ? 22.0 : 18.0; // Adjusted font size for label
-    double contentPaddingVertical = isWideScreen ? 18.0 : 14.0; // Reduced vertical padding
-    double contentPaddingHorizontal = 25.0; // Constant horizontal padding
-    double fieldWidth = isWideScreen ? 500.0 : screenWidth - 32.0;
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: horizontalPadding),
-      child: SizedBox(
-        width: fieldWidth,
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: label,
-            labelStyle: TextStyle(
-              fontSize: fontSize, // Responsive font size for the label
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(
-              vertical: contentPaddingVertical,
-              horizontal: contentPaddingHorizontal,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Colors.blueGrey,
-                width: 3,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Colors.blueAccent,
-                width: 4,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Colors.blueGrey,
-                width: 3,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Colors.red,
-                width: 3,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Colors.red[700]!,
-                width: 4,
-              ),
-            ),
-          ),
-          style: TextStyle(
-            fontSize: fontSize,  // Adjusted font size for input text
-            fontWeight: FontWeight.w400,
-            color: Colors.black87,
-          ),
-          onChanged: (value) {
-            setState(() {
-              controller.value = TextEditingValue(
-                  text: value,
-                  selection: TextSelection.collapsed(offset: value.length),
-              );
-            });
-          },
-        ),
-      )
-    );
   }
 
   Future<void> _saveData() async {
@@ -611,7 +275,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
       barrierDismissible: false,
       builder: (ctx) => Dialog(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 300), // limit width for web
+          constraints: BoxConstraints(maxWidth: 300),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
@@ -626,7 +290,6 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
         ),
       ),
     );
-
 
     try {
       await bioRef.child('arrdata').child(biometricIdController.text).update({
@@ -673,7 +336,6 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
         'dfext2': dfext2Controller.text,
         'dfext3': dfext3Controller.text,
         'bonus': bonusController.text,
-
       });
       if(mounted) {
         Navigator.pop(context);
@@ -711,4 +373,560 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> {
     }
   }
 
+  Widget _buildAnimatedSection(int index, Widget child) {
+    final delay = (index * 0.1).clamp(0.0, 1.0);
+    final animation = CurvedAnimation(
+      parent: _entranceController,
+      curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
+    );
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(0, 0.2),
+        end: Offset.zero,
+      ).animate(animation),
+      child: FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F5F9),
+      body: Stack(
+        children: [
+          Container(
+            height: 240,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -60,
+                  right: -60,
+                  child: Container(
+                    height: 250,
+                    width: 250,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -80,
+                  left: -40,
+                  child: Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Update Arrears",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "ID: ${widget.biometricId} - ${widget.name}",
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+                        physics: const BouncingScrollPhysics(),
+                        children: [
+                          _buildAnimatedSection(
+                            0,
+                            _buildSectionCard(
+                              "Employee Information",
+                              Icons.badge_rounded,
+                              [
+                                AnimatedInputField(label: "BIOMETRIC ID", controller: biometricIdController, icon: Icons.fingerprint_rounded, readOnly: true),
+                                AnimatedInputField(label: "NAME", controller: nameController, icon: Icons.person_outline_rounded, readOnly: true),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            1,
+                            _buildSectionCard(
+                              "Quarter 1: March to May",
+                              Icons.looks_one_rounded,
+                              [
+                                AnimatedInputField(label: "DA", controller: mmdaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "HRA", controller: mmhraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "DA ON TA", controller: mmdaontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "PCA", controller: mmpcaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "NPA", controller: mmnpaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TUTION", controller: mmtutionController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "OTHER", controller: mmotherController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TAX", controller: mmext1Controller, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            2,
+                            _buildSectionCard(
+                              "Quarter 2: June to August",
+                              Icons.looks_two_rounded,
+                              [
+                                AnimatedInputField(label: "DA", controller: jadaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "HRA", controller: jahraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "DA ON TA", controller: jadaontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "PCA", controller: japcaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "NPA", controller: janpaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TUTION", controller: jatutionController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "OTHER", controller: jaotherController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TAX", controller: jaext1Controller, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            3,
+                            _buildSectionCard(
+                              "Quarter 3: September to November",
+                              Icons.looks_3_rounded,
+                              [
+                                AnimatedInputField(label: "DA", controller: sndaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "HRA", controller: snhraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "DA ON TA", controller: sndaontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "PCA", controller: snpcaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "NPA", controller: snnpaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TUTION", controller: sntutionController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "OTHER", controller: snotherController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TAX", controller: snext1Controller, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            4,
+                            _buildSectionCard(
+                              "Quarter 4: December to February",
+                              Icons.looks_4_rounded,
+                              [
+                                AnimatedInputField(label: "DA", controller: dfdaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "HRA", controller: dfhraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "DA ON TA", controller: dfdaontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "PCA", controller: dfpcaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "NPA", controller: dfnpaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TUTION", controller: dftutionController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "OTHER", controller: dfotherController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                                AnimatedInputField(label: "TAX", controller: dfext1Controller, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            5,
+                            _buildSectionCard(
+                              "Additional Adjustments",
+                              Icons.add_card_rounded,
+                              [
+                                AnimatedInputField(label: "BONUS", controller: bonusController, icon: Icons.monetization_on_rounded, keyboardType: TextInputType.number),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: _entranceController,
+                curve: const Interval(0.5, 1.0, curve: Curves.easeOutCubic),
+              )),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: const Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, -8),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: _AnimatedActionButton(
+                      label: "SAVE ARREARS DATA",
+                      icon: Icons.save_rounded,
+                      gradientColors: const [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                      onPressed: _saveData,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(String title, IconData icon, List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF64748B).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(22), topRight: Radius.circular(22)),
+              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFDBEAFE), width: 1.5),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF2563EB), size: 22),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount = constraints.maxWidth > 800 ? 3 : (constraints.maxWidth > 500 ? 2 : 1);
+                double spacing = 20.0;
+                double itemWidth = (constraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: 24.0,
+                  children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AnimatedInputField extends StatefulWidget {
+  final String label;
+  final TextEditingController controller;
+  final IconData icon;
+  final TextInputType keyboardType;
+  final List<TextInputFormatter> inputFormatters;
+  final bool readOnly;
+
+  const AnimatedInputField({
+    super.key,
+    required this.label,
+    required this.controller,
+    required this.icon,
+    this.keyboardType = TextInputType.text,
+    this.inputFormatters = const [],
+    this.readOnly = false,
+  });
+
+  @override
+  State<AnimatedInputField> createState() => _AnimatedInputFieldState();
+}
+
+class _AnimatedInputFieldState extends State<AnimatedInputField> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform: Matrix4.identity()..translate(0.0, _isHovered && !widget.readOnly ? -2.0 : 0.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Text(
+                widget.label,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF475569),
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  if (_isHovered && !widget.readOnly)
+                    BoxShadow(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                ],
+              ),
+              child: TextField(
+                readOnly: widget.readOnly,
+                keyboardType: widget.keyboardType,
+                inputFormatters: widget.inputFormatters,
+                controller: widget.controller,
+                style: TextStyle(
+                  color: widget.readOnly ? const Color(0xFF64748B) : const Color(0xFF0F172A),
+                  fontSize: 15,
+                  fontWeight: widget.readOnly ? FontWeight.w700 : FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: widget.readOnly
+                      ? const Color(0xFFF1F5F9)
+                      : (_isHovered ? Colors.white : const Color(0xFFF8FAFC)),
+                  prefixIcon: Icon(
+                    widget.icon,
+                    color: widget.readOnly
+                        ? const Color(0xFF94A3B8)
+                        : (_isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8)),
+                    size: 20,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: _isHovered && !widget.readOnly ? const Color(0xFF93C5FD) : const Color(0xFFCBD5E1),
+                      width: 1.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
+                  ),
+                ),
+                onChanged: (value) {
+                  if (widget.controller.text != value) {
+                    final cursorPosition = widget.controller.selection;
+                    widget.controller.value = TextEditingValue(
+                      text: value,
+                      selection: cursorPosition,
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedActionButton extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final List<Color> gradientColors;
+  final VoidCallback onPressed;
+
+  const _AnimatedActionButton({
+    required this.label,
+    required this.icon,
+    required this.gradientColors,
+    required this.onPressed,
+  });
+
+  @override
+  State<_AnimatedActionButton> createState() => _AnimatedActionButtonState();
+}
+
+class _AnimatedActionButtonState extends State<_AnimatedActionButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => _controller.forward(),
+        onTapUp: (_) {
+          _controller.reverse();
+          widget.onPressed();
+        },
+        onTapCancel: () => _controller.reverse(),
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 60,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: widget.gradientColors,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.gradientColors.first.withValues(alpha: _isHovered ? 0.4 : 0.2),
+                      blurRadius: _isHovered ? 20 : 10,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(widget.icon, color: Colors.white, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      widget.label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 }

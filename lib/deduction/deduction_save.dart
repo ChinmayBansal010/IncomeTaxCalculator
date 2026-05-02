@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/shared.dart';
 
-
 class DeductionUpdatePage extends StatefulWidget {
   final String biometricId;
   final String name;
@@ -91,14 +90,13 @@ class DeductionUpdatePage extends StatefulWidget {
     required this.ext3,
     required this.ext4,
     required this.ext5,
-
   });
+
   @override
   State<DeductionUpdatePage> createState() => DeductionUpdatePageState();
 }
 
-class DeductionUpdatePageState extends State<DeductionUpdatePage> {
-  // Text controllers for form inputs
+class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTickerProviderStateMixin {
   final biometricIdController = TextEditingController();
   final nameController = TextEditingController();
   final hrrController = TextEditingController();
@@ -148,6 +146,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   bool shouldRefetch = true;
   bool isEnabled = true;
   String errorMessage = '';
+
+  late AnimationController _entranceController;
   final DatabaseReference database = FirebaseDatabase.instance.ref();
   late DatabaseReference bioRef = database.child(sharedData.userPlace);
   final List<String> months = ['mar','apr','may','jun','jul','aug','sept','oct','nov','dec','jan','feb'];
@@ -155,6 +155,10 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
     _initializeData();
   }
 
@@ -164,11 +168,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     htypeController = widget.htype;
   }
 
-
-
   Future<void> _initializeData() async {
     await Future.wait(months.map((month) => fetchMonthData(month)));
-
     await fetchArrData();
 
     setState(() {
@@ -222,11 +223,13 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       setState(() {
         isLoading = false;
       });
+      _entranceController.forward();
     }
   }
 
   @override
   void dispose() {
+    _entranceController.dispose();
     biometricIdController.dispose();
     nameController.dispose();
     hrrController.dispose();
@@ -264,12 +267,10 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     atccd2Controller.dispose();
     totalsavController.dispose();
     maxsavController.dispose();
-    // htypeController.dispose();
     rentController.dispose();
     ext3Controller.dispose();
     ext4Controller.dispose();
     ext5Controller.dispose();
-
     super.dispose();
   }
 
@@ -281,7 +282,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       if (snapshot.exists) {
         Map<dynamic, dynamic> monthData = snapshot.value as Map<dynamic, dynamic>;
 
-        // Parse values with default 0 if parsing fails
         final nps = int.tryParse(monthData['nps'] ?? '0') ?? 0;
         final bp = int.tryParse(monthData['bp'] ?? '0') ?? 0;
         final da = int.tryParse(monthData['da'] ?? '0') ?? 0;
@@ -292,7 +292,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         final conv = int.tryParse(monthData['conv'] ?? '0') ?? 0;
         final uniform = int.tryParse(monthData['uniform'] ?? '0') ?? 0;
 
-        // Update fields conditionally
         if (nps > 0) {
           atccd2 += ((bp + da + npa)*0.14).round();
         }
@@ -305,7 +304,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("No Data Found")),
+            const SnackBar(content: Text("No Data Found")),
           );
         }
       }
@@ -318,20 +317,17 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     }
   }
 
-
   Future<void> fetchArrData() async {
     try {
       DatabaseEvent event = await database.child(sharedData.userPlace).child('arrdata').child(widget.biometricId).once();
       DataSnapshot snapshot = event.snapshot;
       if (snapshot.exists) {
         Map<dynamic, dynamic> arrData = snapshot.value as Map<dynamic, dynamic>;
-        // Parse the values once and check for null
         final mmtution = int.tryParse(arrData['mmtution'] ?? '0') ?? 0;
         final jatution = int.tryParse(arrData['jatution'] ?? '0') ?? 0;
         final sntution = int.tryParse(arrData['sntution'] ?? '0') ?? 0;
         final dftution = int.tryParse(arrData['dftution'] ?? '0') ?? 0;
 
-        // Set isCea based on the sum of values
         isCea = (mmtution + jatution + sntution + dftution) > 0;
       }
     } catch (e) {
@@ -342,376 +338,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       }
     }
   }
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('DEDUCTION DATA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blue,
-        leading: BackButton(onPressed: () {
-          Navigator.pop(context, true);
-        }),
-      ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-          ? Center(child: Text(errorMessage))
-          : ListView(
-        padding: EdgeInsets.all(16.0),
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'INFO',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-                    _buildTextBox(label: "BIOMETRIC ID", controller: biometricIdController),
-                    _buildTextBox(label: "NAME", controller: nameController),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'SAVINGS (80C)',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-
-                    _buildTextBox(label: "POST OFFICE", controller: poController),
-                    _buildTextBox(label: "PPF", controller: ppfController),
-                    _buildTextBox(label: "LIC", controller: licController),
-                    _buildTextBox(label: "HOUSE LOAN PRINCIPLE", controller: hlpController),
-                    _buildTextBox(label: "FD", controller: fdController),
-                    _buildTextBox(label: "NSC", controller: nscController),
-                    _buildTextBox(label: "80C", controller: atcController),
-                    _buildTextBox(label: "ULIP", controller: ulipController),
-                    _buildTextBox(label: "80CCD(1)NPS", controller: atccd1Controller),
-                    _buildTextBox(label: "GPF", controller: gpfController),
-                    _buildTextBox(label: "GIS", controller: gisController),
-                    _buildTextBox(label: "ELSS", controller: elssController),
-                    _buildTextBox(label: "SUKANYA SAMRIDHI YOJNA", controller: ssyController),
-                    _buildTextBox(label: "TUTION FEES RECIEPT", controller: tutionController),
-                    _buildTextBox(label: "OTHER", controller: ext3Controller),
-                    _buildTextBox(label: "MAX SAVINGS", controller: maxsavController),
-                    _buildTextBox(label: "TOTAL SAVINGS", controller: totalsavController),
-
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'EXEMPTIONS',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10,width: 10,),
-
-                    _buildTextBox(label: "80CCD(2) NPS EMPLOYER", controller: atccd2Controller),
-                    //
-                    // _buildDropdown('SELECT HOUSE TYPE', htypeController, ['','SELF','RENT']),
-                    //
-                    // _buildTextBox(label: "RENT RECIEVED", controller: rentController),
-                    _buildTextBox(label: "HOUSING LOAN INETREST", controller: hliController),
-                    _buildTextBox(label: "80G", controller: atgController),
-                    _buildTextBox(label: "CEA", controller: ceaController),
-                    _buildTextBox(label: "80CCD(1B)", controller: atccdnpsController),
-                    _buildTextBox(label: "80D", controller: atdController),
-                    _buildTextBox(label: "80DP", controller: atdpController),
-                    _buildTextBox(label: "80DPS", controller: atdpsController),
-                    _buildTextBox(label: "80U", controller: atuController),
-                    _buildTextBox(label: "80E", controller: ateController),
-                    _buildTextBox(label: "80EE", controller: ateeController),
-                    _buildTextBox(label: "CONVEYANCE & CONTIGENCY & UNIFORM", controller: convcontuniformController),
-                    _buildTextBox(label: "MEDICAL ALLOWANCE", controller: maController),
-                    _buildTextBox(label: "OTHER", controller: otherController),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'HRA REBATE',  // The label text
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-
-                    _buildTextBox(label: "HOUSE RENT RECIEPT", controller: hrrController),
-                    _buildTextBox(label: "OWNER NAME", controller: onameController),
-                    _buildTextBox(label: "OWNER PAN NUMBER", controller: opanController),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), // Box border
-                  borderRadius: BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: Column(
-                  children: [
-
-                    _buildTextBox(label: "RELIEF U/S 89", controller: reliefController),
-                    // _buildTextBox(label: "RENT PAID 80GG", controller: rpaidController),
-
-                    Visibility(visible: false,
-                      child: Column(
-                        children: [
-                          _buildTextBox(label: "EXT 4", controller: ext4Controller),
-                          _buildTextBox(label: "EXT 5", controller: ext5Controller),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            ],
-          ),
-
-          SizedBox(height: 10),
-
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                width: double.infinity, // Optional background for button area
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center, // Center buttons horizontally
-                  children: [
-                    // First button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: _saveData,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent, // Button color
-                          foregroundColor: Colors.white, // Text color
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          elevation: 8.0,
-                        ),
-                        child: const Text(
-                          "SAVE",
-                          style: TextStyle(
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextBox({
-    required String label,
-    required TextEditingController controller,
-  }) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isWideScreen = screenWidth > 600;
-
-    // Define responsive padding, font size, and height
-    double horizontalPadding = isWideScreen ? 32.0 : 16.0;
-    double fontSize = isWideScreen ? 22.0 : 18.0; // Adjusted font size for label
-    double contentPaddingVertical = isWideScreen ? 18.0 : 14.0; // Reduced vertical padding
-    double contentPaddingHorizontal = 25.0; // Constant horizontal padding
-    double fieldWidth = isWideScreen ? 500.0 : screenWidth - 32.0;
-
-    bool isEnabled = controller == rentController ? htypeController != 'SELF' : true;
-    _validateValue(controller, controller.text);
-    return Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: horizontalPadding),
-        child: SizedBox(
-          width: fieldWidth,
-          child: TextField(
-            enabled: isEnabled,
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: label,
-              labelStyle: TextStyle(
-                fontSize: fontSize, // Responsive font size for the label
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: EdgeInsets.symmetric(
-                vertical: contentPaddingVertical,
-                horizontal: contentPaddingHorizontal,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.blueGrey,
-                  width: 3,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.blueAccent,
-                  width: 4,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.blueGrey,
-                  width: 3,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.red,
-                  width: 3,
-                ),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.red[700]!,
-                  width: 4,
-                ),
-              ),
-            ),
-            style: TextStyle(
-              fontSize: fontSize,  // Adjusted font size for input text
-              fontWeight: FontWeight.w400,
-              color: Colors.black87,
-            ),
-            onChanged: (value) {
-              setState(() {
-                if (!_validateValue(controller, value)) {
-                  controller.text = controller.text;
-                  controller.selection = TextSelection.collapsed(offset: controller.text.length);
-                }
-              });
-            },
-          ),
-        )
-    );
-  }
-
-  // Widget _buildDropdown(String label, String? value, List<String> items) {
-  //   double screenWidth = MediaQuery.of(context).size.width;
-  //   bool isWideScreen = screenWidth > 600;
-  //
-  //   // Define a fixed width for the dropdown (you can adjust this value)
-  //   double dropdownWidth = isWideScreen ? 500.0 : screenWidth - 32.0;
-  //
-  //   return Padding(
-  //     padding: EdgeInsets.symmetric(vertical: 8, horizontal: isWideScreen ? 32.0 : 16.0),
-  //     child: SizedBox(
-  //       width: dropdownWidth,  // Set the width of the dropdown container
-  //       child: DropdownButtonFormField<String?>(
-  //         value: value,
-  //         onChanged: (String? newValue) {
-  //           setState(() {
-  //             htypeController = newValue!;
-  //             // Recalculate isEnabled every time htypeController changes
-  //             isEnabled = htypeController != 'SELF';
-  //           });
-  //         },
-  //         decoration: InputDecoration(
-  //           labelText: label,
-  //           labelStyle: TextStyle(fontSize: isWideScreen ? 22.0 : 18.0, fontWeight: FontWeight.bold, color: Colors.black87),
-  //           filled: true,
-  //           fillColor: Colors.white,
-  //           contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 25),
-  //           border: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(12),
-  //             borderSide: BorderSide(color: Colors.blueGrey, width: 3),
-  //           ),
-  //           focusedBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(12),
-  //             borderSide: BorderSide(color: Colors.blueAccent, width: 4),
-  //           ),
-  //           enabledBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(12),
-  //             borderSide: BorderSide(color: Colors.blueGrey, width: 3),
-  //           ),
-  //         ),
-  //         items: items.map<DropdownMenuItem<String?>>((String value) {
-  //           return DropdownMenuItem<String?>(
-  //             value: value,
-  //             child: Text(value),
-  //           );
-  //         }).toList(),
-  //       ),
-  //     ),
-  //   );
-  // }
-
 
   bool _validateValue(TextEditingController controller, String value) {
     final parsedValue = int.tryParse(value);
@@ -741,11 +367,6 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       return;
     }
 
-    // if (htypeController == 'RENT' && rentController.text.isEmpty){
-    //   _showDialog("Error", "RENT CANNONT BE BLANK WHEN HOUSE TYPE IS RENT");
-    //   return;
-    // }
-
     if (ceaController.text == '0' && isCea) {
       _showDialog("Error", "CEA cannot be blank when tuition fees are present.");
       return;
@@ -755,23 +376,26 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 300), // limit width for web
+          constraints: const BoxConstraints(maxWidth: 300),
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(24.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 20),
-                Text("Saving...", style: TextStyle(fontSize: 16)),
+              children: const [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
+                  strokeWidth: 3,
+                ),
+                SizedBox(width: 24),
+                Text("Saving...", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
               ],
             ),
           ),
         ),
       ),
     );
-
 
     _calculateData();
 
@@ -833,7 +457,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
     }
   }
 
-  void _calculateData(){
+  void _calculateData() {
     final po = int.tryParse(poController.text) ?? 0;
     final ppf = int.tryParse(ppfController.text) ?? 0;
     final lic = int.tryParse(licController.text) ?? 0;
@@ -864,17 +488,585 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text(title),
-            content: Text(content),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+            content: Text(content, style: const TextStyle(fontSize: 15, color: Color(0xFF475569))),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text("OK"),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text("OK", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ],
           ),
         );
       });
     }
+  }
+
+  Widget _buildAnimatedSection(int index, Widget child) {
+    final delay = (index * 0.15).clamp(0.0, 1.0);
+    final animation = CurvedAnimation(
+      parent: _entranceController,
+      curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
+    );
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(0, 0.2),
+        end: Offset.zero,
+      ).animate(animation),
+      child: FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F5F9),
+      body: Stack(
+        children: [
+          Container(
+            height: 240,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -60,
+                  right: -60,
+                  child: Container(
+                    height: 250,
+                    width: 250,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -80,
+                  left: -40,
+                  child: Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Update Deductions",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "ID: ${widget.biometricId} - ${widget.name}",
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: isLoading
+                          ? const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+                        physics: const BouncingScrollPhysics(),
+                        children: [
+                          _buildAnimatedSection(
+                            0,
+                            _buildSectionCard(
+                              "Employee Identity",
+                              Icons.badge_rounded,
+                              [
+                                _AnimatedInputField(label: "BIOMETRIC ID", controller: biometricIdController, icon: Icons.fingerprint_rounded, readOnly: true),
+                                _AnimatedInputField(label: "NAME", controller: nameController, icon: Icons.person_outline_rounded, readOnly: true),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            1,
+                            _buildSectionCard(
+                              "Savings (Section 80C)",
+                              Icons.savings_rounded,
+                              [
+                                _AnimatedInputField(label: "POST OFFICE", controller: poController, icon: Icons.local_post_office_rounded),
+                                _AnimatedInputField(label: "PPF", controller: ppfController, icon: Icons.account_balance_rounded),
+                                _AnimatedInputField(label: "LIC", controller: licController, icon: Icons.health_and_safety_rounded),
+                                _AnimatedInputField(label: "HOUSE LOAN PRINCIPLE", controller: hlpController, icon: Icons.real_estate_agent_rounded),
+                                _AnimatedInputField(label: "FD", controller: fdController, icon: Icons.account_balance_wallet_rounded),
+                                _AnimatedInputField(label: "NSC", controller: nscController, icon: Icons.receipt_long_rounded),
+                                _AnimatedInputField(label: "80C", controller: atcController, icon: Icons.article_rounded),
+                                _AnimatedInputField(label: "ULIP", controller: ulipController, icon: Icons.trending_up_rounded),
+                                _AnimatedInputField(label: "80CCD(1)NPS", controller: atccd1Controller, icon: Icons.shield_rounded),
+                                _AnimatedInputField(label: "GPF", controller: gpfController, icon: Icons.monetization_on_rounded),
+                                _AnimatedInputField(label: "GIS", controller: gisController, icon: Icons.security_rounded),
+                                _AnimatedInputField(label: "ELSS", controller: elssController, icon: Icons.pie_chart_rounded),
+                                _AnimatedInputField(label: "SUKANYA SAMRIDHI YOJNA", controller: ssyController, icon: Icons.girl_rounded),
+                                _AnimatedInputField(label: "TUTION FEES RECIEPT", controller: tutionController, icon: Icons.school_rounded),
+                                _AnimatedInputField(label: "OTHER", controller: ext3Controller, icon: Icons.more_horiz_rounded),
+                                _AnimatedInputField(label: "MAX SAVINGS", controller: maxsavController, icon: Icons.verified_rounded, readOnly: true),
+                                _AnimatedInputField(label: "TOTAL SAVINGS", controller: totalsavController, icon: Icons.functions_rounded, readOnly: true),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            2,
+                            _buildSectionCard(
+                              "Exemptions & Allowances",
+                              Icons.receipt_long_rounded,
+                              [
+                                _AnimatedInputField(label: "80CCD(2) NPS EMPLOYER", controller: atccd2Controller, icon: Icons.business_rounded),
+                                _AnimatedInputField(label: "HOUSING LOAN INTEREST", controller: hliController, icon: Icons.house_rounded, onChanged: (v) => _validateValue(hliController, v)),
+                                _AnimatedInputField(label: "80G", controller: atgController, icon: Icons.volunteer_activism_rounded),
+                                _AnimatedInputField(label: "CEA", controller: ceaController, icon: Icons.child_care_rounded),
+                                _AnimatedInputField(label: "80CCD(1B)", controller: atccdnpsController, icon: Icons.account_balance_rounded, onChanged: (v) => _validateValue(atccdnpsController, v)),
+                                _AnimatedInputField(label: "80D", controller: atdController, icon: Icons.health_and_safety_rounded, onChanged: (v) => _validateValue(atdController, v)),
+                                _AnimatedInputField(label: "80DP", controller: atdpController, icon: Icons.medical_services_rounded, onChanged: (v) => _validateValue(atdpController, v)),
+                                _AnimatedInputField(label: "80DPS", controller: atdpsController, icon: Icons.local_hospital_rounded, onChanged: (v) => _validateValue(atdpsController, v)),
+                                _AnimatedInputField(label: "80U", controller: atuController, icon: Icons.accessible_rounded),
+                                _AnimatedInputField(label: "80E", controller: ateController, icon: Icons.school_rounded),
+                                _AnimatedInputField(label: "80EE", controller: ateeController, icon: Icons.home_rounded),
+                                _AnimatedInputField(label: "CONVEYANCE & CONTIGENCY", controller: convcontuniformController, icon: Icons.directions_car_rounded),
+                                _AnimatedInputField(label: "MEDICAL ALLOWANCE", controller: maController, icon: Icons.medication_rounded),
+                                _AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            3,
+                            _buildSectionCard(
+                              "HRA Rebate Details",
+                              Icons.home_work_rounded,
+                              [
+                                _AnimatedInputField(label: "HOUSE RENT RECIEPT", controller: hrrController, icon: Icons.receipt_rounded),
+                                _AnimatedInputField(label: "OWNER NAME", controller: onameController, icon: Icons.person_rounded),
+                                _AnimatedInputField(label: "OWNER PAN NUMBER", controller: opanController, icon: Icons.credit_card_rounded),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildAnimatedSection(
+                            4,
+                            _buildSectionCard(
+                              "Additional Relief",
+                              Icons.add_circle_outline_rounded,
+                              [
+                                _AnimatedInputField(label: "RELIEF U/S 89", controller: reliefController, icon: Icons.verified_user_rounded),
+                                Visibility(
+                                  visible: false,
+                                  child: Column(
+                                    children: [
+                                      _AnimatedInputField(label: "EXT 4", controller: ext4Controller, icon: Icons.extension_rounded),
+                                      _AnimatedInputField(label: "EXT 5", controller: ext5Controller, icon: Icons.extension_rounded),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: _entranceController,
+                curve: const Interval(0.5, 1.0, curve: Curves.easeOutCubic),
+              )),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: const Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, -8),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: _AnimatedActionButton(
+                      label: "SAVE DEDUCTION DATA",
+                      icon: Icons.save_rounded,
+                      gradientColors: const [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                      onPressed: _saveData,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(String title, IconData icon, List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF64748B).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(22), topRight: Radius.circular(22)),
+              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFDBEAFE), width: 1.5),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF2563EB), size: 22),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount = constraints.maxWidth > 800 ? 3 : (constraints.maxWidth > 500 ? 2 : 1);
+                double spacing = 20.0;
+                double itemWidth = (constraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: 24.0,
+                  children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedInputField extends StatefulWidget {
+  final String label;
+  final TextEditingController controller;
+  final IconData icon;
+  final bool readOnly;
+  final Function(String)? onChanged;
+
+  const _AnimatedInputField({
+    required this.label,
+    required this.controller,
+    required this.icon,
+    this.readOnly = false,
+    this.onChanged,
+  });
+
+  @override
+  State<_AnimatedInputField> createState() => _AnimatedInputFieldState();
+}
+
+class _AnimatedInputFieldState extends State<_AnimatedInputField> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform: Matrix4.identity()..translate(0.0, _isHovered && !widget.readOnly ? -2.0 : 0.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Text(
+                widget.label,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF475569),
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  if (_isHovered && !widget.readOnly)
+                    BoxShadow(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                ],
+              ),
+              child: TextField(
+                readOnly: widget.readOnly,
+                controller: widget.controller,
+                style: TextStyle(
+                  color: widget.readOnly ? const Color(0xFF64748B) : const Color(0xFF0F172A),
+                  fontSize: 15,
+                  fontWeight: widget.readOnly ? FontWeight.w700 : FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: widget.readOnly
+                      ? const Color(0xFFF1F5F9)
+                      : (_isHovered ? Colors.white : const Color(0xFFF8FAFC)),
+                  prefixIcon: Icon(
+                    widget.icon,
+                    color: widget.readOnly
+                        ? const Color(0xFF94A3B8)
+                        : (_isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8)),
+                    size: 20,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: _isHovered && !widget.readOnly ? const Color(0xFF93C5FD) : const Color(0xFFCBD5E1),
+                      width: 1.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
+                  ),
+                ),
+                onChanged: (value) {
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(value);
+                  } else {
+                    if (widget.controller.text != value) {
+                      final cursorPosition = widget.controller.selection;
+                      widget.controller.value = TextEditingValue(
+                        text: value,
+                        selection: cursorPosition,
+                      );
+                    }
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedActionButton extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final List<Color> gradientColors;
+  final VoidCallback onPressed;
+
+  const _AnimatedActionButton({
+    required this.label,
+    required this.icon,
+    required this.gradientColors,
+    required this.onPressed,
+  });
+
+  @override
+  State<_AnimatedActionButton> createState() => _AnimatedActionButtonState();
+}
+
+class _AnimatedActionButtonState extends State<_AnimatedActionButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => _controller.forward(),
+        onTapUp: (_) {
+          _controller.reverse();
+          widget.onPressed();
+        },
+        onTapCancel: () => _controller.reverse(),
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 60,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: widget.gradientColors,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.gradientColors.first.withValues(alpha: _isHovered ? 0.4 : 0.2),
+                      blurRadius: _isHovered ? 20 : 10,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(widget.icon, color: Colors.white, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      widget.label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

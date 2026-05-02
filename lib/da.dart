@@ -33,12 +33,11 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
         _controllers["$month-$field"] = TextEditingController(text: "0");
       }
     }
-    fetchData();
-
     _animationController = AnimationController(
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
+    fetchData();
   }
 
   Future<void> fetchData() async {
@@ -56,18 +55,19 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
             }
           }
         }
+        if (mounted) {
+          _animationController.forward(from: 0.0);
+        }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("No Data Found")),
-          );
+          _showModernSnackbar("No Data Found", Icons.info_outline_rounded, const Color(0xFF3B82F6));
+          _animationController.forward(from: 0.0);
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to fetch data: $e")),
-        );
+        _showModernSnackbar("Failed to fetch data: $e", Icons.error_outline_rounded, const Color(0xFFEF4444));
+        _animationController.forward(from: 0.0);
       }
     }
   }
@@ -98,14 +98,22 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(24.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text("Updating...", style: TextStyle(fontSize: 16)),
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
+                strokeWidth: 3,
+              ),
+              SizedBox(width: 24),
+              Text(
+                "Updating Rates...",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+              ),
             ],
           ),
         ),
@@ -124,262 +132,409 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
 
         if (mounted) {
           Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text("Success"),
-              content: const Text(
-                  "% data has been successfully added."),
-              actions: [
-                TextButton(
-                  onPressed: () => { Navigator.pop(ctx) },
-                  child: const Text("OK"),
-                ),
-              ],
-            ),
+          _showResultDialog(
+            "Success",
+            "Percentage data has been successfully updated.",
+            Icons.check_circle_rounded,
+            const Color(0xFF10B981),
           );
         }
       } catch (e) {
         if (mounted) {
           Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text("Error"),
-              content: Text("Failed to add data: \n$e"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text("OK"),
-                ),
-              ],
-            ),
+          _showResultDialog(
+            "Error",
+            "Failed to add data: \n$e",
+            Icons.error_rounded,
+            const Color(0xFFEF4444),
           );
         }
       }
     } else {
       if (mounted) {
         Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text("Error"),
-            content: Text("Invalid! All values must be between 0-100"),
-            actions: [
-              TextButton(
-                onPressed: () => { Navigator.pop(ctx) },
-                child: const Text("OK"),
-              ),
-            ],
-          ),
+        _showResultDialog(
+          "Invalid Input",
+          "All values must be valid numbers between 0 and 100.",
+          Icons.warning_rounded,
+          const Color(0xFFF59E0B),
         );
       }
     }
   }
 
-  @override
+  void _showResultDialog(String title, String content, IconData icon, Color color) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(width: 12),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20)),
+          ],
+        ),
+        content: Text(
+          content,
+          style: const TextStyle(fontSize: 15, color: Color(0xFF475569), height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("OK", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showModernSnackbar(String message, IconData icon, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text("DA% Management", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        centerTitle: true,
         elevation: 0,
+        backgroundColor: const Color(0xFF1E3A8A),
+        centerTitle: true,
+        title: const Text(
+          "Allowance Rates Formulation",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical, // Only vertical scroll
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Ensure the table is inside a horizontally scrollable container
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal, // Enable horizontal scrolling
-                      child: Table(
-                        columnWidths: {
-                          0: FixedColumnWidth(150),
-                          1: FixedColumnWidth(120),
-                          2: FixedColumnWidth(120),
-                          3: FixedColumnWidth(120),
+      body: Stack(
+        children: [
+          Container(
+            height: 160,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        ),
+                        child: const Icon(Icons.percent_rounded, color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(width: 20),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "DA, HRA & NPA Rates",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              "Configure monthly percentages for accurate calculations",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+                        physics: const BouncingScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 380,
+                          mainAxisExtent: 160,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                        ),
+                        itemCount: months.length,
+                        itemBuilder: (context, index) {
+                          final delay = (index * 0.05).clamp(0.0, 1.0);
+                          final animation = CurvedAnimation(
+                            parent: _animationController,
+                            curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
+                          );
+
+                          return SlideTransition(
+                            position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: _buildMonthCard(months[index]),
+                            ),
+                          );
                         },
-                        border: TableBorder.all(color: Colors.black, width: 1),
-                        children: [
-                          TableRow(
-                            decoration: BoxDecoration(color: Colors.blueAccent),
-                            children: [
-                              _buildHeaderCell("MONTH"),
-                              _buildHeaderCell("DA%"),
-                              _buildHeaderCell("HRA%"),
-                              _buildHeaderCell("NPA%"),
-                            ],
-                          ),
-                          ...months.map((month) {
-                            return TableRow(
-                              children: [
-                                _buildMonthCell(month),
-                                _buildTextField("$month-DA"),
-                                _buildTextField("$month-HRA"),
-                                _buildTextField("$month-NPA"),
-                              ],
-                            );
-                          }),
-                        ],
                       ),
                     ),
                   ),
-                  // Buttons with animations
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildAnimatedButton("SAVE", Colors.green[300], saveData),
-                        SizedBox(width: 20),
-                        _buildAnimatedButton("RESET", Colors.red[300], resetFields),
-                      ],
-                    ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, -5),
                   ),
+                ],
+                border: const Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: OutlinedButton.icon(
+                          onPressed: resetFields,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFFDC2626),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            side: const BorderSide(color: Color(0xFFFECACA), width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            backgroundColor: const Color(0xFFFEF2F2),
+                          ),
+                          icon: const Icon(Icons.refresh_rounded, size: 20),
+                          label: const Text(
+                            "RESET ALL",
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          onPressed: saveData,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2563EB),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            elevation: 0,
+                          ),
+                          icon: const Icon(Icons.save_rounded, size: 20),
+                          label: const Text(
+                            "SAVE CONFIGURATION",
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMonthCard(String month) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF64748B).withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+              ),
+              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+            ),
+            child: Text(
+              month,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF334155),
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Expanded(child: _buildPercentField("$month-DA", "DA%")),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildPercentField("$month-HRA", "HRA%")),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildPercentField("$month-NPA", "NPA%")),
                 ],
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeaderCell(String text) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blueAccent.withValues(alpha: 0.3),
-            blurRadius: 10.0,
-            offset: Offset(4, 4),
-          ),
-        ],
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 18,
-          color: Colors.white,
-          letterSpacing: 1.2,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  Widget _buildMonthCell(String month) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue[50]!.withValues(alpha: 0.5),
-            blurRadius: 8.0,
-            offset: Offset(2, 2),
-          ),
-        ],
-      ),
-      child: Align(
-        alignment: Alignment.center,
-        child: Text(
-          month,
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            letterSpacing: 1.0,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String key) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.4),
-            blurRadius: 8.0,
-            offset: Offset(2, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: _controllers[key],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.blueAccent,
-              width: 1.5,
-            ),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          hintText: 'Enter value',
-          hintStyle: TextStyle(
-            color: Colors.grey[500],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.w600,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnimatedButton(String label, Color? color, VoidCallback onPressed) {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            color: color?.withValues(alpha: 0.5) ?? Colors.transparent,
-            spreadRadius: 5,
-            blurRadius: 7,
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-        ),
-        child: Text(
+  Widget _buildPercentField(String key, String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
           label,
-          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF64748B),
+          ),
         ),
-      ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFE2E8F0).withValues(alpha: 0.5),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: _controllers[key],
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+            ),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              suffixText: "%",
+              suffixStyle: const TextStyle(
+                color: Color(0xFF94A3B8),
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
-
 }

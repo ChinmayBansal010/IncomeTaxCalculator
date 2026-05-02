@@ -16,16 +16,16 @@ class CalcArrearPage extends StatefulWidget {
   State<CalcArrearPage> createState() => _CalcArrearPageState();
 }
 
-class _CalcArrearPageState extends State<CalcArrearPage> {
+class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProviderStateMixin {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
-  
+
   final TextEditingController newDaPercentController = TextEditingController();
   final TextEditingController newHraPercentController = TextEditingController();
   final TextEditingController newNpaPercentController = TextEditingController();
   bool recalculateDa = false;
   bool recalculateHra = false;
   bool recalculateNpa = false;
-  
+
   Map<String, bool> selectedTargetMonths = {
     'jan_p': false, 'feb_p': false,
     'mar': false, 'apr': false, 'may': false, 'jun': false,
@@ -70,10 +70,17 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
   bool isEmployeesExpanded = false;
 
   Timer? _debounce;
+  late AnimationController _entranceController;
 
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _entranceController.forward();
+
     searchController.addListener(_onSearchChanged);
     for (var allow in valueAllowances) {
       newValControllers[allow['key']!] = TextEditingController();
@@ -109,12 +116,14 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
         }
       }
       employees.sort((a, b) => a['name']!.compareTo(b['name']!));
-      setState(() {
-        allEmployees = employees;
-        for (var emp in allEmployees) {
-          selectedEmployees[emp['id']!] = true;
-        }
-      });
+      if (mounted) {
+        setState(() {
+          allEmployees = employees;
+          for (var emp in allEmployees) {
+            selectedEmployees[emp['id']!] = true;
+          }
+        });
+      }
     } catch (e) {
       debugPrint("Error fetching employees: $e");
     }
@@ -150,6 +159,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
 
   @override
   void dispose() {
+    _entranceController.dispose();
     _debounce?.cancel();
     newDaPercentController.dispose();
     newHraPercentController.dispose();
@@ -172,12 +182,12 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
     setState(() {
       filteredResults = calculationResults.where((r) {
         bool matchesPerson = r['name'].toString().toLowerCase().contains(query) ||
-                             r['bioId'].toString().toLowerCase().contains(query);
-        
-        bool matchesMonth = (r['monthlyData'] as List).any((m) => 
-          m['month'].toString().toLowerCase().contains(query)
+            r['bioId'].toString().toLowerCase().contains(query);
+
+        bool matchesMonth = (r['monthlyData'] as List).any((m) =>
+            m['month'].toString().toLowerCase().contains(query)
         );
-        
+
         return matchesPerson || matchesMonth;
       }).toList();
     });
@@ -185,9 +195,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
 
   Future<void> _calculateArrears() async {
     if (recalculateDa && newDaPercentController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the new DA %')),
-      );
+      _showModernSnackbar('Please enter the new DA %', Icons.warning_rounded, const Color(0xFFF59E0B));
       return;
     }
 
@@ -197,9 +205,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
         .toList();
 
     if (activeTargetMonths.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one target month')),
-      );
+      _showModernSnackbar('Please select at least one target month', Icons.calendar_today_rounded, const Color(0xFFF59E0B));
       return;
     }
 
@@ -209,9 +215,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
         .toList();
 
     if (activeEmployeeIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one employee')),
-      );
+      _showModernSnackbar('Please select at least one employee', Icons.people_alt_rounded, const Color(0xFFF59E0B));
       return;
     }
 
@@ -244,80 +248,80 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
         }
       }
 
-    Map<String, Map<String, dynamic>> groupedResults = {};
+      Map<String, Map<String, dynamic>> groupedResults = {};
 
-    final List<Future<DatabaseEvent>> futures = activeTargetMonths.map((m) {
-      String pathYear = sharedData.userPlace;
-      String monthName = m;
-      if (m.endsWith('_p')) {
-        String currentYearStr = sharedData.ccurrentYear;
-        List<String> parts = currentYearStr.split('-');
-        int startYear = int.parse(parts[0]);
-        String prevYearStr = "${startYear - 1}-${startYear.toString().substring(2)}";
-        pathYear = sharedData.userPlace.replaceFirst(sharedData.ccurrentYear, prevYearStr);
-        monthName = m.split('_')[0];
-      }
-      return _dbRef.child(pathYear).child('monthdata').child(monthName).once();
-    }).toList();
-
-    final List<DatabaseEvent> events = await Future.wait(futures);
-
-    for (int i = 0; i < activeTargetMonths.length; i++) {
-      final String targetMonth = activeTargetMonths[i];
-      final DatabaseEvent monthEvent = events[i];
-      
-      if (monthEvent.snapshot.exists) {
-        dynamic rawMonthData = monthEvent.snapshot.value;
-        
-        void process(String bId, Map d) {
-          if (!activeEmployeeIds.contains(bId)) return;
-          var entry = _calculateMonthEntry(
-            bId, 
-            d, 
-            targetMonth, 
-            employeeNames, 
-            recalculateDa: recalculateDa,
-            newDaPercent: newDaPercent,
-            recalculateHra: recalculateHra,
-            newHraPercent: newHraPercent,
-            recalculateNpa: recalculateNpa,
-            newNpaPercent: newNpaPercent,
-            recalcFlags: recalcFlags,
-            newValControllers: newValControllers,
-          );
-          if (!groupedResults.containsKey(bId)) {
-            groupedResults[bId] = {
-              'bioId': bId,
-              'name': entry['name'],
-              'totalArrear': 0.0,
-              'monthlyData': [],
-              'totals': <String, double>{},
-            };
-          }
-          var p = groupedResults[bId]!;
-          Map<String, double> totals = p['totals'];
-
-          void addTotal(String key, double oldVal, double newVal, double diff) {
-            totals['old_$key'] = (totals['old_$key'] ?? 0) + oldVal;
-            totals['new_$key'] = (totals['new_$key'] ?? 0) + newVal;
-            totals['diff_$key'] = (totals['diff_$key'] ?? 0) + diff;
-          }
-
-          addTotal('da', entry['oldDa'], entry['newDa'], entry['daDiff']);
-          addTotal('hra', entry['oldHra'], entry['newHra'], entry['hraDiff']);
-          addTotal('npa', entry['oldNpa'], entry['newNpa'], entry['npaDiff']);
-          addTotal('daonta', entry['oldDaOnTa'], entry['newDaOnTa'], entry['daontaDiff']);
-          addTotal('bp', entry['bp'], entry['bp'], 0);
-          addTotal('ta', entry['ta'], entry['ta'], 0);
-
-          for (var allow in valueAllowances) {
-            String k = allow['key']!;
-            addTotal(k, entry[k], entry['new$k'], entry['${k}Diff']);
-          }
-
-          p['monthlyData'].add(entry);
-          p['totalArrear'] += entry['totalArrear'];
+      final List<Future<DatabaseEvent>> futures = activeTargetMonths.map((m) {
+        String pathYear = sharedData.userPlace;
+        String monthName = m;
+        if (m.endsWith('_p')) {
+          String currentYearStr = sharedData.ccurrentYear;
+          List<String> parts = currentYearStr.split('-');
+          int startYear = int.parse(parts[0]);
+          String prevYearStr = "${startYear - 1}-${startYear.toString().substring(2)}";
+          pathYear = sharedData.userPlace.replaceFirst(sharedData.ccurrentYear, prevYearStr);
+          monthName = m.split('_')[0];
         }
+        return _dbRef.child(pathYear).child('monthdata').child(monthName).once();
+      }).toList();
+
+      final List<DatabaseEvent> events = await Future.wait(futures);
+
+      for (int i = 0; i < activeTargetMonths.length; i++) {
+        final String targetMonth = activeTargetMonths[i];
+        final DatabaseEvent monthEvent = events[i];
+
+        if (monthEvent.snapshot.exists) {
+          dynamic rawMonthData = monthEvent.snapshot.value;
+
+          void process(String bId, Map d) {
+            if (!activeEmployeeIds.contains(bId)) return;
+            var entry = _calculateMonthEntry(
+              bId,
+              d,
+              targetMonth,
+              employeeNames,
+              recalculateDa: recalculateDa,
+              newDaPercent: newDaPercent,
+              recalculateHra: recalculateHra,
+              newHraPercent: newHraPercent,
+              recalculateNpa: recalculateNpa,
+              newNpaPercent: newNpaPercent,
+              recalcFlags: recalcFlags,
+              newValControllers: newValControllers,
+            );
+            if (!groupedResults.containsKey(bId)) {
+              groupedResults[bId] = {
+                'bioId': bId,
+                'name': entry['name'],
+                'totalArrear': 0.0,
+                'monthlyData': [],
+                'totals': <String, double>{},
+              };
+            }
+            var p = groupedResults[bId]!;
+            Map<String, double> totals = p['totals'];
+
+            void addTotal(String key, double oldVal, double newVal, double diff) {
+              totals['old_$key'] = (totals['old_$key'] ?? 0) + oldVal;
+              totals['new_$key'] = (totals['new_$key'] ?? 0) + newVal;
+              totals['diff_$key'] = (totals['diff_$key'] ?? 0) + diff;
+            }
+
+            addTotal('da', entry['oldDa'], entry['newDa'], entry['daDiff']);
+            addTotal('hra', entry['oldHra'], entry['newHra'], entry['hraDiff']);
+            addTotal('npa', entry['oldNpa'], entry['newNpa'], entry['npaDiff']);
+            addTotal('daonta', entry['oldDaOnTa'], entry['newDaOnTa'], entry['daontaDiff']);
+            addTotal('bp', entry['bp'], entry['bp'], 0);
+            addTotal('ta', entry['ta'], entry['ta'], 0);
+
+            for (var allow in valueAllowances) {
+              String k = allow['key']!;
+              addTotal(k, entry[k], entry['new$k'], entry['${k}Diff']);
+            }
+
+            p['monthlyData'].add(entry);
+            p['totalArrear'] += entry['totalArrear'];
+          }
 
           if (rawMonthData is Map) {
             rawMonthData.forEach((bioId, data) {
@@ -333,40 +337,44 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
 
       List<Map<String, dynamic>> finalResults = groupedResults.values.toList();
       finalResults.sort((a, b) => a['name'].compareTo(b['name']));
-      
+
       for (var person in finalResults) {
-        (person['monthlyData'] as List).sort((a, b) => 
-          monthList.indexOf(a['monthKey']).compareTo(monthList.indexOf(b['monthKey']))
+        (person['monthlyData'] as List).sort((a, b) =>
+            monthList.indexOf(a['monthKey']).compareTo(monthList.indexOf(b['monthKey']))
         );
       }
 
-      setState(() {
-        calculationResults = finalResults;
-        _filterResults();
-      });
+      if (mounted) {
+        setState(() {
+          calculationResults = finalResults;
+          _filterResults();
+        });
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) _showModernSnackbar('Error: $e', Icons.error_rounded, const Color(0xFFEF4444));
     } finally {
-      setState(() { isLoading = false; });
+      if (mounted) {
+        setState(() { isLoading = false; });
+      }
     }
   }
 
   Map<String, dynamic> _calculateMonthEntry(
-    String bioId, 
-    Map data, 
-    String targetMonth, 
-    Map<String, String> employeeNames, {
-    bool recalculateDa = false,
-    double newDaPercent = 0,
-    bool recalculateHra = false,
-    double newHraPercent = 0,
-    bool recalculateNpa = false,
-    double newNpaPercent = 0,
-    Map<String, bool>? recalcFlags,
-    Map<String, TextEditingController>? newValControllers,
-  }) {
+      String bioId,
+      Map data,
+      String targetMonth,
+      Map<String, String> employeeNames, {
+        bool recalculateDa = false,
+        double newDaPercent = 0,
+        bool recalculateHra = false,
+        double newHraPercent = 0,
+        bool recalculateNpa = false,
+        double newNpaPercent = 0,
+        Map<String, bool>? recalcFlags,
+        Map<String, TextEditingController>? newValControllers,
+      }) {
     String name = employeeNames[bioId] ?? 'Unknown';
-    
+
     Map<String, double> oldVals = {};
     for (var allow in valueAllowances) {
       oldVals[allow['key']!] = double.tryParse(data[allow['key']]?.toString() ?? '0') ?? 0;
@@ -445,7 +453,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
 
   Future<void> _exportToExcel() async {
     if (calculationResults.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No results to export')));
+      _showModernSnackbar('No results to export', Icons.info_outline_rounded, const Color(0xFF3B82F6));
       return;
     }
 
@@ -455,7 +463,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
     int rowIdx = 1;
     for (var person in calculationResults) {
       Map totals = person['totals'];
-      
+
       bool showNpa = recalculateNpa && (totals['old_npa'] ?? 0) > 0;
       bool showHra = recalculateHra && (totals['old_hra'] ?? 0) > 0;
       bool showDa = recalculateDa && (totals['old_da'] ?? 0) > 0;
@@ -490,7 +498,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
         sheet.getRangeByIndex(rowIdx, 1).setText(person['bioId'].toString());
         sheet.getRangeByIndex(rowIdx, 2).setText(person['name']);
         sheet.getRangeByIndex(rowIdx, 3).setText(m['month']);
-        
+
         int currentCol = 4;
         sheet.getRangeByIndex(rowIdx, currentCol++).setNumber(m['bp']);
 
@@ -501,7 +509,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
           npaDiffCell.setNumber(m['npaDiff']);
           if (m['npaDiff'] < 0) npaDiffCell.cellStyle.fontColor = '#FF0000';
         }
-        
+
         if (showHra) {
           sheet.getRangeByIndex(rowIdx, currentCol++).setNumber(m['oldHra']);
           sheet.getRangeByIndex(rowIdx, currentCol++).setNumber(m['newHra']);
@@ -538,7 +546,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
         final totalCell = sheet.getRangeByIndex(rowIdx, currentCol++);
         totalCell.setNumber(m['totalArrear']);
         if (m['totalArrear'] < 0) totalCell.cellStyle.fontColor = '#FF0000';
-        
+
         rowIdx++;
       }
 
@@ -549,7 +557,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
       totalCellRange.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
 
       sheet.getRangeByIndex(rowIdx, 2).setText("${person['name']} TOTAL");
-      
+
       int currentTotalCol = 4;
       sheet.getRangeByIndex(rowIdx, currentTotalCol++).setNumber(totals['old_bp'] ?? 0);
 
@@ -597,7 +605,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
       final sumTotalCell = sheet.getRangeByIndex(rowIdx, currentTotalCol++);
       sumTotalCell.setNumber(person['totalArrear']);
       if (person['totalArrear'] < 0) sumTotalCell.cellStyle.fontColor = '#FF0000';
-      
+
       rowIdx += 2;
     }
 
@@ -626,73 +634,198 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
     }
   }
 
+  void _showModernSnackbar(String message, IconData icon, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('ARREAR CALCULATOR', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18)),
-        backgroundColor: Colors.blueAccent,
-        elevation: 0,
-        actions: [
+      backgroundColor: const Color(0xFFF1F5F9),
+      body: Stack(
+        children: [
+          Container(
+            height: 180,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                _buildCustomAppBar(),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      bool isWide = constraints.maxWidth > 900;
+                      if (isWide) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 400,
+                                margin: const EdgeInsets.only(right: 20),
+                                child: _buildInputSection(),
+                              ),
+                              Expanded(
+                                child: _buildResultsSection(),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return _buildMobileLayout();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomAppBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
+              onPressed: () => Navigator.pop(context, true),
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Arrear Calculator",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Calculate and export monthly arrears",
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
           if (calculationResults.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: TextButton.icon(
-                onPressed: _exportToExcel,
-                icon: const Icon(Icons.file_download, color: Colors.white, size: 20),
-                label: const Text('EXCEL', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: _exportToExcel,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.file_download_rounded, color: Color(0xFF2563EB), size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          "EXPORT",
+                          style: TextStyle(
+                            color: Color(0xFF2563EB),
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Processing data...', style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w500)),
-              ],
-            ))
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                bool isWide = constraints.maxWidth > 900;
-                if (isWide) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 350,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border(right: BorderSide(color: Colors.grey.shade200)),
-                        ),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(20.0),
-                          child: _buildInputSection(isWide: true),
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildResultsSection(),
-                      ),
-                    ],
-                  );
-                } else {
-                  return _buildMobileLayout();
-                }
-              },
-            ),
     );
   }
 
   Widget _buildMobileLayout() {
     return ListView.builder(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      physics: const BouncingScrollPhysics(),
       itemCount: calculationResults.isEmpty ? 1 : filteredResults.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
-          return _buildInputSection(isWide: false);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: _buildInputSection(),
+          );
         }
         return _buildResultCard(filteredResults[index - 1]);
       },
@@ -700,54 +833,93 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
   }
 
   Widget _buildResultsSection() {
-    return Column(
-      children: [
-        if (calculationResults.isNotEmpty) _buildSearchAndHeader(),
-        Expanded(
-          child: filteredResults.isEmpty
-              ? _buildEmptyState()
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: filteredResults.length,
-                  cacheExtent: 1500,
-                  itemBuilder: (context, index) => _buildResultCard(filteredResults[index]),
-                ),
-        ),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF64748B).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          if (calculationResults.isNotEmpty) _buildSearchAndHeader(),
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : filteredResults.isEmpty
+                ? _buildEmptyState()
+                : ListView.builder(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              physics: const BouncingScrollPhysics(),
+              itemCount: filteredResults.length,
+              cacheExtent: 1500,
+              itemBuilder: (context, index) => _buildResultCard(filteredResults[index]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildSearchAndHeader() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.white,
-      child: Column(
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9), width: 2)),
+      ),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search by Name or ID...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          Expanded(
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search results...',
+                hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.w500),
+                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF64748B)),
+                filled: true,
+                fillColor: const Color(0xFFF8FAFC),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEFF6FF),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.list_alt_rounded, color: Color(0xFF2563EB), size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  '${filteredResults.length} Records',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1E3A8A),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
-                child: Text(
-                  '${filteredResults.length} Records',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -759,327 +931,370 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.calculate_outlined, size: 64, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
+            ),
+            child: Icon(
+              Icons.calculate_outlined,
+              size: 64,
+              color: const Color(0xFF94A3B8),
+            ),
+          ),
+          const SizedBox(height: 24),
           Text(
-            calculationResults.isEmpty 
-              ? 'Select months and click Calculate' 
-              : 'No records match your search',
-            style: const TextStyle(color: Colors.grey, fontSize: 16),
+            calculationResults.isEmpty
+                ? 'Ready to Calculate'
+                : 'No matches found',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            calculationResults.isEmpty
+                ? 'Adjust parameters and click Calculate'
+                : 'Try a different search term',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF64748B),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInputSection({required bool isWide}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-    Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+  Widget _buildInputSection() {
+    return AnimatedBuilder(
+      animation: _entranceController,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, 50 * (1 - _entranceController.value)),
+          child: Opacity(
+            opacity: _entranceController.value,
+            child: child,
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(
+              color: const Color(0xFF64748B).withValues(alpha: 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
           ],
         ),
-        child: ExpansionTile(
-          title: const Text('ALLOWANCES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blueAccent, letterSpacing: 1.2)),
-          leading: const Icon(Icons.account_balance_wallet_outlined, color: Colors.blueAccent, size: 20),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            _buildSwitchTile('DA Percentage', recalculateDa, (v) => setState(() => recalculateDa = v)),
-            if (recalculateDa)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: TextField(
-                  controller: newDaPercentController,
-                  decoration: _inputDecoration('NEW DA %', Icons.percent_rounded),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF8FAFC),
+                  border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                ),
+                child: const Text(
+                  "Parameters Configuration",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                 ),
               ),
-            _buildSwitchTile('HRA Percentage', recalculateHra, (v) => setState(() => recalculateHra = v)),
-            if (recalculateHra)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: TextField(
-                  controller: newHraPercentController,
-                  decoration: _inputDecoration('New HRA %', Icons.home_work_outlined),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                ),
-              ),
-            _buildSwitchTile('NPA Percentage', recalculateNpa, (v) => setState(() => recalculateNpa = v)),
-            if (recalculateNpa)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: TextField(
-                  controller: newNpaPercentController,
-                  decoration: _inputDecoration('New NPA %', Icons.medical_services_outlined),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                ),
-              ),
-            const Divider(indent: 16, endIndent: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text('OTHER ALLOWANCES (FIXED VALUE)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.grey)),
-            ),
-            ...valueAllowances.map((allow) {
-              String k = allow['key']!;
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Row(
+              Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  title: const Text('Allowances', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
+                  leading: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF64748B), size: 20),
+                  childrenPadding: const EdgeInsets.only(bottom: 16),
                   children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Checkbox(
-                        value: recalcFlags[k],
-                        onChanged: (v) => setState(() => recalcFlags[k] = v ?? false),
-                        activeColor: Colors.blueAccent,
+                    _buildSwitchTile('DA Percentage', recalculateDa, (v) => setState(() => recalculateDa = v)),
+                    if (recalculateDa)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                        child: TextField(
+                          controller: newDaPercentController,
+                          decoration: _inputDecoration('New DA %', Icons.percent_rounded),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                    _buildSwitchTile('HRA Percentage', recalculateHra, (v) => setState(() => recalculateHra = v)),
+                    if (recalculateHra)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                        child: TextField(
+                          controller: newHraPercentController,
+                          decoration: _inputDecoration('New HRA %', Icons.home_work_rounded),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                    _buildSwitchTile('NPA Percentage', recalculateNpa, (v) => setState(() => recalculateNpa = v)),
+                    if (recalculateNpa)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                        child: TextField(
+                          controller: newNpaPercentController,
+                          decoration: _inputDecoration('New NPA %', Icons.medical_services_rounded),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                    const Divider(height: 32, indent: 20, endIndent: 20, color: Color(0xFFE2E8F0)),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      child: Text('OTHER ALLOWANCES (FIXED VALUE)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: Color(0xFF94A3B8), letterSpacing: 0.5)),
+                    ),
+                    ...valueAllowances.map((allow) {
+                      String k = allow['key']!;
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Checkbox(
+                                value: recalcFlags[k],
+                                onChanged: (v) => setState(() => recalcFlags[k] = v ?? false),
+                                activeColor: const Color(0xFF2563EB),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(allow['label']!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155)))),
+                            SizedBox(
+                              width: 120,
+                              height: 40,
+                              child: TextField(
+                                controller: newValControllers[k],
+                                enabled: recalcFlags[k],
+                                decoration: InputDecoration(
+                                  hintText: 'Amount',
+                                  hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                                  filled: true,
+                                  fillColor: recalcFlags[k]! ? Colors.white : const Color(0xFFF1F5F9),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5)),
+                                ),
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: Color(0xFFE2E8F0)),
+              Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  initiallyExpanded: true,
+                  title: const Text('Target Months', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
+                  leading: const Icon(Icons.calendar_month_rounded, color: Color(0xFF64748B), size: 20),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => true)),
+                            style: TextButton.styleFrom(foregroundColor: const Color(0xFF2563EB)),
+                            child: const Text('Select All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          ),
+                          TextButton(
+                            onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => false)),
+                            style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+                            child: const Text('Clear All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(allow['label']!, style: const TextStyle(fontSize: 12))),
-                    SizedBox(
-                      width: 100,
-                      height: 36,
-                      child: TextField(
-                        controller: newValControllers[k],
-                        enabled: recalcFlags[k],
-                        decoration: InputDecoration(
-                          hintText: 'Value',
-                          isDense: true,
-                          filled: true,
-                          fillColor: recalcFlags[k]! ? Colors.white : Colors.grey.shade100,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                        ),
-                        style: const TextStyle(fontSize: 12),
-                        keyboardType: TextInputType.number,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: monthList.map((m) {
+                          bool isSelected = selectedTargetMonths[m]!;
+                          String label = _getMonthLabel(m);
+                          return FilterChip(
+                            label: Text(label, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600, color: isSelected ? Colors.white : const Color(0xFF475569))),
+                            selected: isSelected,
+                            selectedColor: const Color(0xFF2563EB),
+                            backgroundColor: const Color(0xFFF1F5F9),
+                            checkmarkColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFE2E8F0))),
+                            onSelected: (selected) => setState(() => selectedTargetMonths[m] = selected),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],
                 ),
-              );
-            }),
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
-    ),
-    const SizedBox(height: 16),
+              ),
+              const Divider(height: 1, color: Color(0xFFE2E8F0)),
+              Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  title: const Text('Employee Selection', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
+                  leading: const Icon(Icons.people_alt_rounded, color: Color(0xFF64748B), size: 20),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                      child: TextField(
+                        controller: empSearchController,
+                        onChanged: (v) => setState(() {}),
+                        decoration: InputDecoration(
+                          hintText: 'Search by name or ID...',
+                          hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                          prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF94A3B8)),
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5)),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  final query = empSearchController.text.toLowerCase();
+                                  setState(() {
+                                    for (var emp in allEmployees) {
+                                      if (query.isEmpty || emp['name']!.toLowerCase().contains(query) || emp['id']!.toLowerCase().contains(query)) {
+                                        selectedEmployees[emp['id']!] = true;
+                                      }
+                                    }
+                                  });
+                                },
+                                style: TextButton.styleFrom(foregroundColor: const Color(0xFF2563EB)),
+                                child: const Text('Select Visible', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  final query = empSearchController.text.toLowerCase();
+                                  setState(() {
+                                    for (var emp in allEmployees) {
+                                      if (query.isEmpty || emp['name']!.toLowerCase().contains(query) || emp['id']!.toLowerCase().contains(query)) {
+                                        selectedEmployees[emp['id']!] = false;
+                                      }
+                                    }
+                                  });
+                                },
+                                style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+                                child: const Text('Clear Visible', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
+                            child: Text(
+                              '${selectedEmployees.values.where((v) => v).length}/${allEmployees.length}',
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      constraints: const BoxConstraints(maxHeight: 250),
+                      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Builder(
+                          builder: (context) {
+                            final query = empSearchController.text.toLowerCase();
+                            final visibleEmployees = allEmployees.where((emp) =>
+                            query.isEmpty || emp['name']!.toLowerCase().contains(query) || emp['id']!.toLowerCase().contains(query)
+                            ).toList();
 
-    Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
-          ],
-        ),
-        child: ExpansionTile(
-          initiallyExpanded: true,
-          title: const Text('Target Months', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueAccent)),
-          leading: const Icon(Icons.calendar_month, color: Colors.blueAccent, size: 20),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => true)),
-                    child: const Text('Select All', style: TextStyle(fontSize: 12)),
-                  ),
-                  TextButton(
-                    onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => false)),
-                    child: const Text('Clear All', style: TextStyle(fontSize: 12, color: Colors.red)),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: monthList.map((m) {
-                  bool isSelected = selectedTargetMonths[m]!;
-                  String label = _getMonthLabel(m);
-                  return FilterChip(
-                    label: Text(label, style: TextStyle(fontSize: 11, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? Colors.white : Colors.black87)),
-                    selected: isSelected,
-                    selectedColor: Colors.blueAccent,
-                    checkmarkColor: Colors.white,
-                    onSelected: (selected) => setState(() => selectedTargetMonths[m] = selected),
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-    const SizedBox(height: 16),
-    Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
-          ],
-        ),
-        child: ExpansionTile(
-          title: const Text('Employee Selection', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueAccent)),
-          leading: const Icon(Icons.people_alt_rounded, color: Colors.blueAccent, size: 20),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: TextField(
-                controller: empSearchController,
-                onChanged: (v) => setState(() {}),
-                decoration: InputDecoration(
-                  hintText: 'Search by name or ID...',
-                  prefixIcon: const Icon(Icons.search, size: 18),
-                  isDense: true,
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade200)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade100)),
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: visibleEmployees.length,
+                              separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              itemBuilder: (context, index) {
+                                final emp = visibleEmployees[index];
+                                final id = emp['id']!;
+                                return CheckboxListTile(
+                                  title: Text(emp['name']!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                                  subtitle: Text('ID: $id', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+                                  value: selectedEmployees[id] ?? false,
+                                  onChanged: (val) => setState(() => selectedEmployees[id] = val ?? false),
+                                  activeColor: const Color(0xFF2563EB),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                );
+                              },
+                            );
+                          }
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          final query = empSearchController.text.toLowerCase();
-                          setState(() {
-                            for (var emp in allEmployees) {
-                              if (query.isEmpty || 
-                                  emp['name']!.toLowerCase().contains(query) || 
-                                  emp['id']!.toLowerCase().contains(query)) {
-                                selectedEmployees[emp['id']!] = true;
-                              }
-                            }
-                          });
-                        },
-                        child: const Text('Select Visible', style: TextStyle(fontSize: 11)),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          final query = empSearchController.text.toLowerCase();
-                          setState(() {
-                            for (var emp in allEmployees) {
-                              if (query.isEmpty || 
-                                  emp['name']!.toLowerCase().contains(query) || 
-                                  emp['id']!.toLowerCase().contains(query)) {
-                                selectedEmployees[emp['id']!] = false;
-                              }
-                            }
-                          });
-                        },
-                        child: const Text('Clear Visible', style: TextStyle(fontSize: 11, color: Colors.red)),
-                      ),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF8FAFC),
+                  border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                ),
+                child: ElevatedButton(
+                  onPressed: _calculateArrears,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.calculate_rounded, size: 20),
+                      SizedBox(width: 8),
+                      Text('CALCULATE ARREARS', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 0.5)),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Text(
-                      '${selectedEmployees.values.where((v) => v).length}/${allEmployees.length}',
-                      style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            Container(
-              constraints: const BoxConstraints(maxHeight: 250),
-              child: Builder(
-                builder: (context) {
-                  final query = empSearchController.text.toLowerCase();
-                  final visibleEmployees = allEmployees.where((emp) => 
-                    query.isEmpty || 
-                    emp['name']!.toLowerCase().contains(query) || 
-                    emp['id']!.toLowerCase().contains(query)
-                  ).toList();
-
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: visibleEmployees.length,
-                    separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade50),
-                    itemBuilder: (context, index) {
-                      final emp = visibleEmployees[index];
-                      final id = emp['id']!;
-                      return CheckboxListTile(
-                        title: Text(emp['name']!, 
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                        subtitle: Text('ID: $id', style: const TextStyle(fontSize: 10, color: Colors.blueGrey)),
-                        value: selectedEmployees[id] ?? false,
-                        onChanged: (val) => setState(() => selectedEmployees[id] = val ?? false),
-                        dense: true,
-                        activeColor: Colors.blueAccent,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                      );
-                    },
-                  );
-                }
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    ),
-
-    const SizedBox(height: 24),
-    SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: _calculateArrears,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              elevation: 0,
-            ),
-            child: const Text('CALCULATE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+            ],
           ),
         ),
-        if (!isWide && calculationResults.isNotEmpty) ...[
-          const SizedBox(height: 20),
-          const Divider(),
-          _buildSearchAndHeader(),
-        ],
-      ],
+      ),
     );
   }
 
   Widget _buildResultCard(Map<String, dynamic> person) {
     List monthlyData = person['monthlyData'];
     Map totals = person['totals'];
-    
+
     bool showNpa = recalculateNpa && (totals['old_npa'] ?? 0) > 0;
     bool showHra = recalculateHra && (totals['old_hra'] ?? 0) > 0;
     bool showDa = recalculateDa && (totals['old_da'] ?? 0) > 0;
@@ -1089,190 +1304,248 @@ class _CalcArrearPageState extends State<CalcArrearPage> {
       String k = a['key']!;
       return recalcFlags[k] == true && (totals['old_$k'] ?? 0) > 0;
     }).toList();
-    
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.blue.shade50),
-      ),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        title: Text(person['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, letterSpacing: 0.5)),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 6.0),
-          child: Wrap(
-            spacing: 12,
-            children: [
-              _buildBadge('ID: ${person['bioId']}', Colors.grey.shade100, Colors.black87),
-              _buildBadge('${monthlyData.length} Months', Colors.blue.shade50, Colors.blueAccent),
-            ],
+
+    Color amountColor = person['totalArrear'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF64748B).withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            const Text('TOTAL DIFF', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
-            Text('₹${person['totalArrear'].toStringAsFixed(0)}', 
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19, color: person['totalArrear'] < 0 ? Colors.red : Colors.green)),
-          ],
-        ),
-        childrenPadding: const EdgeInsets.all(0),
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(color: Colors.grey.shade50),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                headingRowHeight: 45,
-                dataRowHeight: 50,
-                columnSpacing: 18,
-                horizontalMargin: 16,
-                columns: [
-                  const DataColumn(label: Text('MONTH', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  const DataColumn(label: Text('BP', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-
-                  if (showNpa) ...[
-                    const DataColumn(label: Text('OLD NPA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('NEW NPA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('NPA DIFF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  ],
-                  if (showHra) ...[
-                    const DataColumn(label: Text('OLD HRA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('NEW HRA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('HRA DIFF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  ],
-                  if (showDa) ...[
-                    const DataColumn(label: Text('OLD DA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('NEW DA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('DA DIFF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  ],
-                  if (showDaOnTa) ...[
-                    const DataColumn(label: Text('OLD DAonTA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('NEW DAonTA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    const DataColumn(label: Text('DAonTA DIFF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  ],
-                  for (var allow in personActiveExtraAllowances) ...[
-                    DataColumn(label: Text('OLD ${allow['label']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    DataColumn(label: Text('NEW ${allow['label']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    DataColumn(label: Text('${allow['label']} DIFF', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                  ],
-                  const DataColumn(label: Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                ],
-                rows: [
-                  ...monthlyData.map((m) => DataRow(
-                    cells: [
-                      DataCell(Text(m['month'], style: const TextStyle(fontWeight: FontWeight.bold))),
-                      DataCell(Text(m['bp'].toStringAsFixed(0))),
-
-                      if (showNpa) ...[
-                        DataCell(Text(m['oldNpa'].toStringAsFixed(0))),
-                        DataCell(Text(m['newNpa'].toStringAsFixed(0))),
-                        DataCell(Text(m['npaDiff'].toStringAsFixed(0), style: TextStyle(color: m['npaDiff'] < 0 ? Colors.red : Colors.green, fontWeight: FontWeight.bold))),
-                      ],
-                      if (showHra) ...[
-                        DataCell(Text(m['oldHra'].toStringAsFixed(0))),
-                        DataCell(Text(m['newHra'].toStringAsFixed(0))),
-                        DataCell(Text(m['hraDiff'].toStringAsFixed(0), style: TextStyle(color: m['hraDiff'] < 0 ? Colors.red : Colors.green, fontWeight: FontWeight.bold))),
-                      ],
-                      if (showDa) ...[
-                        DataCell(Text(m['oldDa'].toStringAsFixed(0))),
-                        DataCell(Text(m['newDa'].toStringAsFixed(0))),
-                        DataCell(Text(m['daDiff'].toStringAsFixed(0), style: TextStyle(color: m['daDiff'] < 0 ? Colors.red : Colors.green, fontWeight: FontWeight.bold))),
-                      ],
-                      if (showDaOnTa) ...[
-                        DataCell(Text(m['oldDaOnTa'].toStringAsFixed(0))),
-                        DataCell(Text(m['newDaOnTa'].toStringAsFixed(0))),
-                        DataCell(Text(m['daontaDiff'].toStringAsFixed(0), style: TextStyle(color: m['daontaDiff'] < 0 ? Colors.red : Colors.green, fontWeight: FontWeight.bold))),
-                      ],
-                      for (var allow in personActiveExtraAllowances) ...[
-                        DataCell(Text(m[allow['key']!].toStringAsFixed(0))),
-                        DataCell(Text(m['new${allow['key']!}'].toStringAsFixed(0))),
-                        DataCell(Text(m['${allow['key']!}Diff'].toStringAsFixed(0), 
-                          style: TextStyle(color: m['${allow['key']!}Diff'] < 0 ? Colors.red : Colors.green, fontWeight: FontWeight.bold))),
-                      ],
-                      DataCell(Text(m['totalArrear'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.bold, color: m['totalArrear'] < 0 ? Colors.red : Colors.blueAccent))),
-                    ],
-                  )),
-                  DataRow(
-                    color: WidgetStateProperty.all(Colors.blue.shade50.withOpacity(0.5)),
-                    cells: [
-                      const DataCell(Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent))),
-                      DataCell(Text(totals['old_bp']?.toStringAsFixed(0) ?? '', style: const TextStyle(fontWeight: FontWeight.bold))),
-
-                      if (showNpa) ...[
-                        DataCell(Text(totals['old_npa'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['new_npa'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['diff_npa'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.bold, color: totals['diff_npa'] < 0 ? Colors.red : Colors.green))),
-                      ],
-                      if (showHra) ...[
-                        DataCell(Text(totals['old_hra'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['new_hra'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['diff_hra'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.bold, color: totals['diff_hra'] < 0 ? Colors.red : Colors.green))),
-                      ],
-                      if (showDa) ...[
-                        DataCell(Text(totals['old_da'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['new_da'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['diff_da'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.bold, color: totals['diff_da'] < 0 ? Colors.red : Colors.green))),
-                      ],
-                      if (showDaOnTa) ...[
-                        DataCell(Text(totals['old_daonta'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['new_daonta'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['diff_daonta'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.bold, color: totals['diff_daonta'] < 0 ? Colors.red : Colors.green))),
-                      ],
-                      for (var allow in personActiveExtraAllowances) ...[
-                        DataCell(Text(totals['old_${allow['key']!}'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['new_${allow['key']!}'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(totals['diff_${allow['key']!}'].toStringAsFixed(0), 
-                          style: TextStyle(fontWeight: FontWeight.bold, color: totals['diff_${allow['key']!}'] < 0 ? Colors.red : Colors.green))),
-                      ],
-                      DataCell(Text(person['totalArrear'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.bold, color: person['totalArrear'] < 0 ? Colors.red : Colors.blueAccent))),
-                    ],
-                  ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            title: Text(person['name'], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A))),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  _buildBadge('ID: ${person['bioId']}', const Color(0xFFF1F5F9), const Color(0xFF475569), Icons.fingerprint_rounded),
+                  _buildBadge('${monthlyData.length} Months', const Color(0xFFEFF6FF), const Color(0xFF2563EB), Icons.calendar_month_rounded),
                 ],
               ),
             ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: amountColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: amountColor.withValues(alpha: 0.2)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('TOTAL DIFF', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: amountColor.withValues(alpha: 0.8))),
+                  const SizedBox(height: 2),
+                  Text('₹${person['totalArrear'].toStringAsFixed(0)}',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: amountColor)),
+                ],
+              ),
+            ),
+            children: [
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF8FAFC),
+                  border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: DataTable(
+                    headingRowHeight: 50,
+                    dataRowHeight: 56,
+                    columnSpacing: 24,
+                    horizontalMargin: 24,
+                    headingTextStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF475569)),
+                    dataTextStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF0F172A)),
+                    headingRowColor: WidgetStateProperty.all(Colors.white),
+                    columns: [
+                      const DataColumn(label: Text('MONTH')),
+                      const DataColumn(label: Text('BP')),
+
+                      if (showNpa) ...[
+                        const DataColumn(label: Text('OLD NPA')),
+                        const DataColumn(label: Text('NEW NPA')),
+                        const DataColumn(label: Text('NPA DIFF', style: TextStyle(color: Color(0xFF334155)))),
+                      ],
+                      if (showHra) ...[
+                        const DataColumn(label: Text('OLD HRA')),
+                        const DataColumn(label: Text('NEW HRA')),
+                        const DataColumn(label: Text('HRA DIFF', style: TextStyle(color: Color(0xFF334155)))),
+                      ],
+                      if (showDa) ...[
+                        const DataColumn(label: Text('OLD DA')),
+                        const DataColumn(label: Text('NEW DA')),
+                        const DataColumn(label: Text('DA DIFF', style: TextStyle(color: Color(0xFF334155)))),
+                      ],
+                      if (showDaOnTa) ...[
+                        const DataColumn(label: Text('OLD DAonTA')),
+                        const DataColumn(label: Text('NEW DAonTA')),
+                        const DataColumn(label: Text('DAonTA DIFF', style: TextStyle(color: Color(0xFF334155)))),
+                      ],
+                      for (var allow in personActiveExtraAllowances) ...[
+                        DataColumn(label: Text('OLD ${allow['label']}')),
+                        DataColumn(label: Text('NEW ${allow['label']}')),
+                        DataColumn(label: Text('${allow['label']} DIFF', style: const TextStyle(color: Color(0xFF334155)))),
+                      ],
+                      const DataColumn(label: Text('TOTAL', style: TextStyle(color: Color(0xFF1D4ED8)))),
+                    ],
+                    rows: [
+                      ...monthlyData.map((m) => DataRow(
+                        cells: [
+                          DataCell(Text(m['month'], style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF334155)))),
+                          DataCell(Text(m['bp'].toStringAsFixed(0))),
+
+                          if (showNpa) ...[
+                            DataCell(Text(m['oldNpa'].toStringAsFixed(0))),
+                            DataCell(Text(m['newNpa'].toStringAsFixed(0))),
+                            DataCell(Text(m['npaDiff'].toStringAsFixed(0), style: TextStyle(color: m['npaDiff'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981), fontWeight: FontWeight.w800))),
+                          ],
+                          if (showHra) ...[
+                            DataCell(Text(m['oldHra'].toStringAsFixed(0))),
+                            DataCell(Text(m['newHra'].toStringAsFixed(0))),
+                            DataCell(Text(m['hraDiff'].toStringAsFixed(0), style: TextStyle(color: m['hraDiff'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981), fontWeight: FontWeight.w800))),
+                          ],
+                          if (showDa) ...[
+                            DataCell(Text(m['oldDa'].toStringAsFixed(0))),
+                            DataCell(Text(m['newDa'].toStringAsFixed(0))),
+                            DataCell(Text(m['daDiff'].toStringAsFixed(0), style: TextStyle(color: m['daDiff'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981), fontWeight: FontWeight.w800))),
+                          ],
+                          if (showDaOnTa) ...[
+                            DataCell(Text(m['oldDaOnTa'].toStringAsFixed(0))),
+                            DataCell(Text(m['newDaOnTa'].toStringAsFixed(0))),
+                            DataCell(Text(m['daontaDiff'].toStringAsFixed(0), style: TextStyle(color: m['daontaDiff'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981), fontWeight: FontWeight.w800))),
+                          ],
+                          for (var allow in personActiveExtraAllowances) ...[
+                            DataCell(Text(m[allow['key']!].toStringAsFixed(0))),
+                            DataCell(Text(m['new${allow['key']!}'].toStringAsFixed(0))),
+                            DataCell(Text(m['${allow['key']!}Diff'].toStringAsFixed(0),
+                                style: TextStyle(color: m['${allow['key']!}Diff'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981), fontWeight: FontWeight.w800))),
+                          ],
+                          DataCell(
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: m['totalArrear'] < 0 ? const Color(0xFFFEF2F2) : const Color(0xFFECFDF5),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(m['totalArrear'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.w900, color: m['totalArrear'] < 0 ? const Color(0xFFDC2626) : const Color(0xFF059669))),
+                              )
+                          ),
+                        ],
+                      )),
+                      DataRow(
+                        color: WidgetStateProperty.all(const Color(0xFFEFF6FF)),
+                        cells: [
+                          const DataCell(Text('TOTAL', style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF1D4ED8)))),
+                          DataCell(Text(totals['old_bp']?.toStringAsFixed(0) ?? '', style: const TextStyle(fontWeight: FontWeight.w800))),
+
+                          if (showNpa) ...[
+                            DataCell(Text(totals['old_npa'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['new_npa'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['diff_npa'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.w900, color: totals['diff_npa'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981)))),
+                          ],
+                          if (showHra) ...[
+                            DataCell(Text(totals['old_hra'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['new_hra'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['diff_hra'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.w900, color: totals['diff_hra'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981)))),
+                          ],
+                          if (showDa) ...[
+                            DataCell(Text(totals['old_da'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['new_da'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['diff_da'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.w900, color: totals['diff_da'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981)))),
+                          ],
+                          if (showDaOnTa) ...[
+                            DataCell(Text(totals['old_daonta'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['new_daonta'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['diff_daonta'].toStringAsFixed(0), style: TextStyle(fontWeight: FontWeight.w900, color: totals['diff_daonta'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981)))),
+                          ],
+                          for (var allow in personActiveExtraAllowances) ...[
+                            DataCell(Text(totals['old_${allow['key']!}'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['new_${allow['key']!}'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w800))),
+                            DataCell(Text(totals['diff_${allow['key']!}'].toStringAsFixed(0),
+                                style: TextStyle(fontWeight: FontWeight.w900, color: totals['diff_${allow['key']!}'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981)))),
+                          ],
+                          DataCell(
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: person['totalArrear'] < 0 ? const Color(0xFFDC2626) : const Color(0xFF059669),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(person['totalArrear'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 14)),
+                              )
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBadge(String label, Color bgColor, Color textColor, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(6)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: textColor),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: textColor)),
         ],
       ),
     );
   }
 
-  Widget _buildBadge(String label, Color bgColor, Color textColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(6)),
-      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textColor)),
-    );
-  }
-
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return SwitchListTile(
-      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
       value: value,
       onChanged: onChanged,
-      activeColor: Colors.blueAccent,
+      activeThumbColor: const Color(0xFF2563EB),
+      activeTrackColor: const Color(0xFFBFDBFE),
       dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
     );
   }
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.w600, fontSize: 13),
       suffixText: '%',
+      suffixStyle: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w800),
       filled: true,
-      fillColor: Colors.grey.shade50,
+      fillColor: Colors.white,
       isDense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade200)),
-      prefixIcon: Icon(icon, size: 18, color: Colors.blueAccent),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5)),
+      prefixIcon: Icon(icon, size: 20, color: const Color(0xFF64748B)),
     );
   }
 }
