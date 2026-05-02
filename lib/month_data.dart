@@ -101,12 +101,6 @@ class _MonthDataPageState extends State<MonthDataPage> {
       ),
       body: Stack(
         children: [
-          Image.asset(
-            'assets/images/bg.jpg',
-            fit: BoxFit.cover,
-            height: double.infinity,
-            width: double.infinity,
-          ),
           Center( // Centering the content
             child: Column(
               children: [

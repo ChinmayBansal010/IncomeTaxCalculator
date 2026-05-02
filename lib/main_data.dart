@@ -101,12 +101,6 @@ class _MainDataPageState extends State<MainDataPage> {
       ),
       body: Stack(
         children: [
-          Image.asset(
-            'assets/images/bg.jpg',
-            fit: BoxFit.cover,
-            height: double.infinity,
-            width: double.infinity,
-          ),
           Center(
             child: Padding(
               padding: EdgeInsets.all(padding),

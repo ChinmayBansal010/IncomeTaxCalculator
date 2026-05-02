@@ -94,69 +94,67 @@ class _MonthDataPageState extends State<MonthDataPage> {
   }
 
   void _setInitialValue(){
-    biometricidController.text = monthData['biometricid'] ?? '';
-    nameController.text = monthData['name'] ?? '';
-    designationController.text = monthData['designation'] ?? '';
-    bpController.text = monthData['bp'] ?? '';
-    daController.text = monthData['da'] ?? '';
-    hraController.text = monthData['hra'] ?? '';
-    npaController.text = monthData['npa'] ?? '';
-    splpayController.text = monthData['splpay'] ?? '';
-    convController.text = monthData['conv'] ?? '';
-    pgController.text = monthData['pg'] ?? '';
-    annualController.text = monthData['annual'] ?? '';
-    uniformController.text = monthData['uniform'] ?? '';
-    nursingController.text = monthData['nursing'] ?? '';
-    taController.text = monthData['ta'] ?? '';
-    daontaController.text = monthData['daonta'] ?? '';
-    medicalController.text = monthData['medical'] ?? '';
-    dirtController.text = monthData['dirt'] ?? '';
-    washingController.text = monthData['washing'] ?? '';
-    tbController.text = monthData['tb'] ?? '';
-    nightController.text = monthData['night'] ?? '';
-    driveController.text = monthData['drive'] ?? '';
-    cycleController.text = monthData['cycle'] ?? '';
-    pcaController.text = monthData['pca'] ?? '';
-    daext1Controller.text = monthData['daext1'] ?? '';
-    daext2Controller.text = monthData['daext2'] ?? '';
-    daext3Controller.text = monthData['daext3'] ?? '';
-    daext4Controller.text = monthData['daext4'] ?? '';
-    grossController.text = monthData['gross'] ?? '';
-    incometaxController.text = monthData['incometax'] ?? '';
-    gisController.text = monthData['gis'] ?? '';
-    gpfController.text = monthData['gpf'] ?? '';
-    npsController.text = monthData['nps'] ?? '';
-    epfController.text = monthData['epf'] ?? '';
-    esiController.text = monthData['esi'] ?? '';
-    slfController.text = monthData['slf'] ?? '';
-    societyController.text = monthData['society'] ?? '';
-    recoveryController.text = monthData['recovery'] ?? '';
-    wfController.text = monthData['wf'] ?? '';
+    biometricidController.text = monthData['biometricid']?.toString() ?? '';
+    nameController.text = monthData['name']?.toString() ?? '';
+    designationController.text = monthData['designation']?.toString() ?? '';
+    bpController.text = monthData['bp']?.toString() ?? '';
+    daController.text = monthData['da']?.toString() ?? '';
+    hraController.text = monthData['hra']?.toString() ?? '';
+    npaController.text = monthData['npa']?.toString() ?? '';
+    splpayController.text = monthData['splpay']?.toString() ?? '';
+    convController.text = monthData['conv']?.toString() ?? '';
+    pgController.text = monthData['pg']?.toString() ?? '';
+    annualController.text = monthData['annual']?.toString() ?? '';
+    uniformController.text = monthData['uniform']?.toString() ?? '';
+    nursingController.text = monthData['nursing']?.toString() ?? '';
+    taController.text = monthData['ta']?.toString() ?? '';
+    daontaController.text = monthData['daonta']?.toString() ?? '';
+    medicalController.text = monthData['medical']?.toString() ?? '';
+    dirtController.text = monthData['dirt']?.toString() ?? '';
+    washingController.text = monthData['washing']?.toString() ?? '';
+    tbController.text = monthData['tb']?.toString() ?? '';
+    nightController.text = monthData['night']?.toString() ?? '';
+    driveController.text = monthData['drive']?.toString() ?? '';
+    cycleController.text = monthData['cycle']?.toString() ?? '';
+    pcaController.text = monthData['pca']?.toString() ?? '';
+    daext1Controller.text = monthData['daext1']?.toString() ?? '';
+    daext2Controller.text = monthData['daext2']?.toString() ?? '';
+    daext3Controller.text = monthData['daext3']?.toString() ?? '';
+    daext4Controller.text = monthData['daext4']?.toString() ?? '';
+    grossController.text = monthData['gross']?.toString() ?? '';
+    incometaxController.text = monthData['incometax']?.toString() ?? '';
+    gisController.text = monthData['gis']?.toString() ?? '';
+    gpfController.text = monthData['gpf']?.toString() ?? '';
+    npsController.text = monthData['nps']?.toString() ?? '';
+    epfController.text = monthData['epf']?.toString() ?? '';
+    esiController.text = monthData['esi']?.toString() ?? '';
+    slfController.text = monthData['slf']?.toString() ?? '';
+    societyController.text = monthData['society']?.toString() ?? '';
+    recoveryController.text = monthData['recovery']?.toString() ?? '';
+    wfController.text = monthData['wf']?.toString() ?? '';
     medController.text = monthData['med'] ?? '';
-    waterController.text = monthData['water'] ?? '';
-    otherController.text = monthData['other'] ?? '';
-    ddext1Controller.text = monthData['ddext1'] ?? '';
-    ddext2Controller.text = monthData['ddext2'] ?? '';
-    ddext3Controller.text = monthData['ddext3'] ?? '';
-    ddext4Controller.text = monthData['ddext4'] ?? '';
-    totaldedController.text = monthData['totalded'] ?? '';
-    netsalaryController.text = monthData['netsalary'] ?? '';
+    waterController.text = monthData['water']?.toString() ?? '';
+    otherController.text = monthData['other']?.toString() ?? '';
+    ddext1Controller.text = monthData['ddext1']?.toString() ?? '';
+    ddext2Controller.text = monthData['ddext2']?.toString() ?? '';
+    ddext3Controller.text = monthData['ddext3']?.toString() ?? '';
+    ddext4Controller.text = monthData['ddext4']?.toString() ?? '';
+    totaldedController.text = monthData['totalded']?.toString() ?? '';
+    netsalaryController.text = monthData['netsalary']?.toString() ?? '';
 
-    dachk = monthData['dap'] == '1'? true: false;
-    hrachk = monthData['hrap'] == '1'? true: false;
-    tachk = monthData['tap'] == '1'? true: false;
-    npachk = monthData['npap'] == '1'? true: false;
-    gpfchk = monthData['gpfchk'] == '1'? true: false;
-    npschk = monthData['npschk'] == '1'? true: false;
-    epfchk = monthData['epfchk'] == '1'? true: false;
-    esichk = monthData['esichk'] == '1'? true: false;
+    dachk = monthData['dap']?.toString() == '1';
+    hrachk = monthData['hrap']?.toString() == '1';
+    tachk = monthData['tap']?.toString() == '1';
+    npachk = monthData['npap']?.toString() == '1';
+    gpfchk = monthData['gpfchk']?.toString() == '1';
+    npschk = monthData['npschk']?.toString() == '1';
+    epfchk = monthData['epfchk']?.toString() == '1';
+    esichk = monthData['esichk']?.toString() == '1';
 
-    isGpfChecked = monthData['gpfchk'] == '1'? true: false;
-    isNpsChecked = monthData['npschk'] == '1'? true: false;
-    isEpfChecked = monthData['epfchk'] == '1'? true: false;
-    isEsiChecked = monthData['esichk'] == '1'? true: false;
-
-
+    isGpfChecked = monthData['gpfchk']?.toString() == '1';
+    isNpsChecked = monthData['npschk']?.toString() == '1';
+    isEpfChecked = monthData['epfchk']?.toString() == '1';
+    isEsiChecked = monthData['esichk']?.toString() == '1';
   }
 
   @override
@@ -865,9 +863,9 @@ class _MonthDataPageState extends State<MonthDataPage> {
       int? bp = int.tryParse(bpController.text);
       int? npa = int.tryParse(npaController.text);
       if (isIncrement) {
-        double incrementAmount = bp! * 0.03;
+        double incrementAmount = (bp ?? 0) * 0.03;
         incrementAmount = ((incrementAmount + 50) ~/ 100) * 100;
-        bp = bp + incrementAmount.toInt();
+        bp = (bp ?? 0) + incrementAmount.toInt();
         if(bp > 218200){
           bp = 218200;
         }
@@ -875,33 +873,33 @@ class _MonthDataPageState extends State<MonthDataPage> {
       }
       monthData['bp'] = bp.toString();
       if (npachk) {
-        npap = int.tryParse(percentageData['${month}n'])!;
-        npa = (bp! * (npap / 100)).round();
-        if (npa + bp > 237500) {
-          npa = npa - (bp + npa - 237500);
+        npap = int.tryParse(percentageData['${month}n']?.toString() ?? '0') ?? 0;
+        npa = ((bp ?? 0) * (npap / 100)).round();
+        if (npa + (bp ?? 0) > 237500) {
+          npa = npa - ((bp ?? 0) + npa - 237500);
         }
         monthData['npa'] = npaController.text = npa.toString();
       } else {
         monthData['npa'] = npaController.text = '0';
       }
       if (dachk) {
-        dap = int.tryParse(percentageData['${month}d'])!;
+        dap = int.tryParse(percentageData['${month}d']?.toString() ?? '0') ?? 0;
         monthData['da'] =
-            daController.text = ((bp! + npa!) * (dap / 100)).round().toString();
+            daController.text = (((bp ?? 0) + (npa ?? 0)) * (dap / 100)).round().toString();
       } else {
         monthData['da'] = daController.text = '0';
       }
       if (hrachk) {
-        hrap = int.tryParse(percentageData['${month}h'])!;
+        hrap = int.tryParse(percentageData['${month}h']?.toString() ?? '0') ?? 0;
         monthData['hra'] =
-            hraController.text = ((bp)! * (hrap / 100)).round().toString();
+            hraController.text = ((bp ?? 0) * (hrap / 100)).round().toString();
       } else {
         monthData['hra'] = hraController.text = '0';
       }
       if (tachk) {
-        tap = int.tryParse(percentageData['${month}d'])!;
+        tap = int.tryParse(percentageData['${month}d']?.toString() ?? '0') ?? 0;
         monthData['daonta'] = daontaController.text =
-            (int.tryParse(taController.text)! * (tap / 100)).round().toString();
+            ((int.tryParse(taController.text) ?? 0) * (tap / 100)).round().toString();
       } else {
         monthData['daonta'] = daontaController.text = '0';
       }
@@ -973,16 +971,16 @@ class _MonthDataPageState extends State<MonthDataPage> {
       monthData['epf'] = monthData['esi'] = '0';
 
       if (esichk){
-        if ((int.tryParse(monthData['gross']) ?? 0) <= 21000){
-          monthData['esi'] = esiController.text = ((int.tryParse(monthData['gross']) ?? 0) *0.0075).ceil().toString();
+        if ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) <= 21000){
+          monthData['esi'] = esiController.text = ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) *0.0075).ceil().toString();
         }
       }
 
       if(epfchk){
-        if ((int.tryParse(monthData['gross']) ?? 0) >= 15000){
+        if ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) >= 15000){
           monthData['epf'] = epfController.text = '1800';
         } else {
-          monthData['epf'] = epfController.text = ((int.tryParse(monthData['gross']) ?? 0) *0.12).round().toString();
+          monthData['epf'] = epfController.text = ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) *0.12).round().toString();
         }
       }
       if (month == 'feb') incometaxController.text = '0';
@@ -1013,8 +1011,8 @@ class _MonthDataPageState extends State<MonthDataPage> {
       monthData['totalded'] =
           totaldedController.text = dedTotal.round().toString();
       monthData['netsalary'] = netsalaryController.text =
-          ((int.tryParse(grossController.text))! -
-              (int.tryParse(totaldedController.text))!)
+          ((int.tryParse(grossController.text) ?? 0) -
+              (int.tryParse(totaldedController.text) ?? 0))
               .toString();
 
       return Map<String, String>.from(monthData);

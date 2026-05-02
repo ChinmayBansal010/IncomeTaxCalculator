@@ -9,7 +9,7 @@ import 'itax.dart';
 import 'arrear_data.dart';
 import 'deduction_data.dart';
 import 'tax.dart';
-import 'calc.dart';
+import 'arrear_calc.dart';
 import 'exportall.dart';
 import 'package:flutter/foundation.dart';
 
@@ -38,12 +38,6 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/bg.jpg"), // Background image
-                fit: BoxFit.cover,
-              ),
-            ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
