@@ -306,6 +306,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           elevation: 0,
           backgroundColor: Colors.transparent,
           child: Container(
+            width: MediaQuery.of(context).size.width > 900 ? 700 : 500,
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: Colors.white,
