@@ -711,7 +711,6 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   controller: grossController,
                                   icon: Icons.account_balance_rounded,
                                   keyboardType: TextInputType.number,
-                                  readOnly: true,
                                   onChanged: (val) => _onFieldChanged('gross', val),
                                 ),
                               ],
@@ -808,7 +807,6 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   controller: totaldedController,
                                   icon: Icons.remove_circle_outline_rounded,
                                   keyboardType: TextInputType.number,
-                                  readOnly: true,
                                   onChanged: (val) => _onFieldChanged('totalded', val),
                                 ),
                                 AnimatedInputField(
@@ -816,7 +814,6 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   controller: netsalaryController,
                                   icon: Icons.account_balance_wallet_rounded,
                                   keyboardType: TextInputType.number,
-                                  readOnly: true,
                                   onChanged: (val) => _onFieldChanged('netsalary', val),
                                 ),
                               ],

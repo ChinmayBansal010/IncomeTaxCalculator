@@ -297,16 +297,10 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start, // Forces elements to align to the left
                   children: [
-                     // Used height instead of width for vertical spacing
                     _buildHeaderChip(
                         Icons.calendar_month_rounded,
                         sharedData.ccurrentYear,
                         const Color(0xFFF59E0B)),
-                    const SizedBox(height: 10), // Used height instead of width for vertical spacing
-                    _buildHeaderChip(
-                        Icons.visibility_rounded,
-                        'Display Only',
-                        const Color(0xFF8B5CF6)),
                   ],
                 ),
               ],
@@ -594,31 +588,31 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
 
   Widget _buildTaxSnapshotCard(_EcrPreviewData preview) {
     final metrics = [
-      _InfoItem(
-          'Taxable Gross', _formatCurrency(_toInt(preview.itaxNew['tg']))),
-      _InfoItem('Conv + Drive',
-          _formatCurrency(_toInt(preview.itaxNew['convdrive']))),
-      _InfoItem('Uniform Exemption',
-          _formatCurrency(_toInt(preview.itaxNew['uniform']))),
-      _InfoItem('Gross Taxable Income',
-          _formatCurrency(_toInt(preview.itaxNew['gti']))),
-      _InfoItem('Employer NPS 80CCD(2)',
-          _formatCurrency(_toInt(preview.itaxNew['atccd2']))),
-      _InfoItem('Total Income', _formatCurrency(_toInt(preview.itaxNew['ti']))),
-      _InfoItem(
-          'Standard Deduction', _formatCurrency(_toInt(preview.itaxNew['sd']))),
-      _InfoItem(
-          'Other Deduction', _formatCurrency(_toInt(preview.itaxNew['other']))),
-      _InfoItem('Taxable Total Income',
-          _formatCurrency(_toInt(preview.itaxNew['tti']))),
-      _InfoItem(
-          'Education Cess', _formatCurrency(_toInt(preview.itaxNew['ec']))),
-      _InfoItem('Tax Payable', _formatCurrency(_toInt(preview.itaxNew['ttp']))),
-      _InfoItem('Already Deducted',
-          _formatCurrency(_toInt(preview.itaxNew['deduct']))),
-      _InfoItem('Balance Before Relief',
-          _formatCurrency(_toInt(preview.itaxNew['nitp']))),
-      _InfoItem('Relief', _formatCurrency(_toInt(preview.itaxNew['relief']))),
+      // _InfoItem(
+      //     'Taxable Gross', _formatCurrency(_toInt(preview.itaxNew['tg']))),
+      // _InfoItem('Conv + Drive',
+      //     _formatCurrency(_toInt(preview.itaxNew['convdrive']))),
+      // _InfoItem('Uniform Exemption',
+      //     _formatCurrency(_toInt(preview.itaxNew['uniform']))),
+      // _InfoItem('Gross Taxable Income',
+      //     _formatCurrency(_toInt(preview.itaxNew['gti']))),
+      // _InfoItem('Employer NPS 80CCD(2)',
+      //     _formatCurrency(_toInt(preview.itaxNew['atccd2']))),
+      // _InfoItem('Total Income', _formatCurrency(_toInt(preview.itaxNew['ti']))),
+      // _InfoItem(
+      //     'Standard Deduction', _formatCurrency(_toInt(preview.itaxNew['sd']))),
+      // _InfoItem(
+      //     'Other Deduction', _formatCurrency(_toInt(preview.itaxNew['other']))),
+      // _InfoItem('Taxable Total Income',
+      //     _formatCurrency(_toInt(preview.itaxNew['tti']))),
+      // _InfoItem(
+      //     'Education Cess', _formatCurrency(_toInt(preview.itaxNew['ec']))),
+      // _InfoItem('Tax Payable', _formatCurrency(_toInt(preview.itaxNew['ttp']))),
+      // _InfoItem('Already Deducted',
+      //     _formatCurrency(_toInt(preview.itaxNew['deduct']))),
+      // _InfoItem('Balance Before Relief',
+      //     _formatCurrency(_toInt(preview.itaxNew['nitp']))),
+      // _InfoItem('Relief', _formatCurrency(_toInt(preview.itaxNew['relief']))),
       _InfoItem('Final New Regime Balance',
           _formatCurrency(_toInt(preview.itaxNew['nitpi']))),
       _InfoItem('New Regime Excess Paid',
