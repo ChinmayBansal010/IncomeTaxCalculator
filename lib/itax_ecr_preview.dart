@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:incometax/arrear/arrear_save.dart';
+import 'package:incometax/monthpages/month_update.dart';
 import 'package:incometax/shared.dart';
 
 class EcrPreviewPage extends StatefulWidget {
@@ -198,8 +200,8 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                   const SizedBox(height: 24),
                   _buildEmployeeCard(preview),
                   const SizedBox(height: 24),
-                  _buildTaxSnapshotCard(preview),
-                  const SizedBox(height: 24),
+                  // _buildTaxSnapshotCard(preview),
+                  // const SizedBox(height: 24),
                   _buildTaxSheetDetailSection(preview),
                   const SizedBox(height: 24),
                   _buildCombinedMatrixCard(preview),
@@ -360,62 +362,78 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
   Widget _buildSummaryStrip(_EcrPreviewData preview) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth > 900;
         final children = [
           _buildSummaryCard(
-            title: 'Gross Total',
-            value: _formatCurrency(preview.grossTotal),
+            title: 'New Regime Payable',
+            value:  _formatCurrency(_toInt(preview.itaxNew['ttp'])),
             icon: Icons.payments_rounded,
             accent: const Color(0xFF2563EB),
             bgColor: const Color(0xFFEFF6FF),
           ),
           _buildSummaryCard(
-            title: 'Total Deductions',
-            value: _formatCurrency(preview.totalDeduction),
+            title: 'New Regime Balance',
+            value:  _formatCurrency(_toInt(preview.itaxNew['nitpi'])),
+            icon: Icons.payments_rounded,
+            accent: const Color(0xFF2563EB),
+            bgColor: const Color(0xFFEFF6FF),
+          ),
+          _buildSummaryCard(
+            title: 'New Regime Excess Paid',
+            value: _formatCurrency(_toInt(preview.itaxNew['ep'])),
             icon: Icons.remove_circle_outline_rounded,
             accent: const Color(0xFFDC2626),
             bgColor: const Color(0xFFFEF2F2),
           ),
           _buildSummaryCard(
-            title: 'Net Salary',
-            value: _formatCurrency(preview.netSalary),
+            title: 'Old Regime Payable',
+            value:  _formatCurrency(_toInt(preview.itaxOld['ttp'])),
+            icon: Icons.payments_rounded,
+            accent: const Color(0xFF2563EB),
+            bgColor: const Color(0xFFEFF6FF),
+          ),
+          _buildSummaryCard(
+            title: 'Old Regime Balance',
+            value: _formatCurrency(_toInt(preview.itaxOld['nitpi'])),
             icon: Icons.account_balance_wallet_rounded,
             accent: const Color(0xFF059669),
             bgColor: const Color(0xFFECFDF5),
           ),
           _buildSummaryCard(
-            title: 'February ECR Tax',
-            value: _formatCurrency(preview.februaryEcrTax),
+            title: 'Old Regime Excess Paid',
+            value: _formatCurrency(_toInt(preview.itaxOld['ep'])),
             icon: Icons.receipt_rounded,
             accent: const Color(0xFF7C3AED),
             bgColor: const Color(0xFFF5F3FF),
           ),
+          _buildSummaryCard(
+            title: 'Tax Already Paid',
+            value:  _formatCurrency(_toInt(preview.itaxNew['deduct'])),
+            icon: Icons.payments_rounded,
+            accent: const Color(0xFF2563EB),
+            bgColor: const Color(0xFFEFF6FF),
+          ),
         ];
 
-        if (isWide) {
-          return Row(
-            children: children
-                .map(
-                  (child) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: child,
-                ),
-              ),
-            )
-                .toList(),
-          );
-        }
+        final width = constraints.maxWidth;
+        final crossAxisCount = width >= 1200
+            ? 4
+            : width >= 840
+                ? 3
+                : width >= 560
+                    ? 2
+                    : 1;
 
-        return Column(
-          children: children
-              .map(
-                (child) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: child,
-            ),
-          )
-              .toList(),
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: children.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: 126,
+          ),
+          itemBuilder: (context, index) => children[index],
         );
       },
     );
@@ -429,6 +447,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     required Color bgColor,
   }) {
     return Container(
+      height: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: bgColor,
@@ -461,15 +480,18 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
               children: [
                 Text(
                   title.toUpperCase(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: accent.withValues(alpha: 0.8),
-                    letterSpacing: 0.5,
+                    letterSpacing: 0,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Container(
+                  constraints: const BoxConstraints(maxWidth: double.infinity),
                   padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
@@ -478,12 +500,17 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                     border: Border.all(
                         color: accent.withValues(alpha: 0.3), width: 1.5),
                   ),
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: accent,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      value,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: accent,
+                      ),
                     ),
                   ),
                 ),
@@ -522,14 +549,25 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
         builder: (context, constraints) {
           final cardWidth =
           constraints.maxWidth > 600 ? 280.0 : constraints.maxWidth;
+          const itemSpacing = 16.0;
+          final columnCount = constraints.maxWidth > 600
+              ? ((constraints.maxWidth + itemSpacing) /
+                      (cardWidth + itemSpacing))
+                  .floor()
+                  .clamp(1, items.length)
+              : 1;
+          final rowWidth =
+              (columnCount * cardWidth) + ((columnCount - 1) * itemSpacing);
 
           return Wrap(
-            spacing: 16,
-            runSpacing: 16,
+            spacing: itemSpacing,
+            runSpacing: itemSpacing,
             children: items
                 .map(
                   (item) => SizedBox(
-                width: cardWidth,
+                width: item.label == 'Address'
+                    ? rowWidth
+                    : cardWidth,
                 child: Container(
                   clipBehavior: Clip.antiAlias, // Ensures inner border trims correctly
                   decoration: BoxDecoration(
@@ -571,7 +609,11 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                           ),
-                          softWrap: true,
+                          maxLines: item.label == 'Address' ? 1 : null,
+                          overflow: item.label == 'Address'
+                              ? TextOverflow.ellipsis
+                              : TextOverflow.visible,
+                          softWrap: item.label != 'Address',
                         ),
                       ],
                     ),
@@ -586,33 +628,34 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildTaxSnapshotCard(_EcrPreviewData preview) {
     final metrics = [
-      // _InfoItem(
-      //     'Taxable Gross', _formatCurrency(_toInt(preview.itaxNew['tg']))),
-      // _InfoItem('Conv + Drive',
-      //     _formatCurrency(_toInt(preview.itaxNew['convdrive']))),
-      // _InfoItem('Uniform Exemption',
-      //     _formatCurrency(_toInt(preview.itaxNew['uniform']))),
-      // _InfoItem('Gross Taxable Income',
-      //     _formatCurrency(_toInt(preview.itaxNew['gti']))),
-      // _InfoItem('Employer NPS 80CCD(2)',
-      //     _formatCurrency(_toInt(preview.itaxNew['atccd2']))),
-      // _InfoItem('Total Income', _formatCurrency(_toInt(preview.itaxNew['ti']))),
-      // _InfoItem(
-      //     'Standard Deduction', _formatCurrency(_toInt(preview.itaxNew['sd']))),
-      // _InfoItem(
-      //     'Other Deduction', _formatCurrency(_toInt(preview.itaxNew['other']))),
-      // _InfoItem('Taxable Total Income',
-      //     _formatCurrency(_toInt(preview.itaxNew['tti']))),
-      // _InfoItem(
-      //     'Education Cess', _formatCurrency(_toInt(preview.itaxNew['ec']))),
-      // _InfoItem('Tax Payable', _formatCurrency(_toInt(preview.itaxNew['ttp']))),
-      // _InfoItem('Already Deducted',
-      //     _formatCurrency(_toInt(preview.itaxNew['deduct']))),
-      // _InfoItem('Balance Before Relief',
-      //     _formatCurrency(_toInt(preview.itaxNew['nitp']))),
-      // _InfoItem('Relief', _formatCurrency(_toInt(preview.itaxNew['relief']))),
+      _InfoItem(
+          'Taxable Gross', _formatCurrency(_toInt(preview.itaxNew['tg']))),
+      _InfoItem('Conv + Drive',
+          _formatCurrency(_toInt(preview.itaxNew['convdrive']))),
+      _InfoItem('Uniform Exemption',
+          _formatCurrency(_toInt(preview.itaxNew['uniform']))),
+      _InfoItem('Gross Taxable Income',
+          _formatCurrency(_toInt(preview.itaxNew['gti']))),
+      _InfoItem('Employer NPS 80CCD(2)',
+          _formatCurrency(_toInt(preview.itaxNew['atccd2']))),
+      _InfoItem('Total Income', _formatCurrency(_toInt(preview.itaxNew['ti']))),
+      _InfoItem(
+          'Standard Deduction', _formatCurrency(_toInt(preview.itaxNew['sd']))),
+      _InfoItem(
+          'Other Deduction', _formatCurrency(_toInt(preview.itaxNew['other']))),
+      _InfoItem('Taxable Total Income',
+          _formatCurrency(_toInt(preview.itaxNew['tti']))),
+      _InfoItem(
+          'Education Cess', _formatCurrency(_toInt(preview.itaxNew['ec']))),
+      _InfoItem('Tax Payable', _formatCurrency(_toInt(preview.itaxNew['ttp']))),
+      _InfoItem('Already Deducted',
+          _formatCurrency(_toInt(preview.itaxNew['deduct']))),
+      _InfoItem('Balance Before Relief',
+          _formatCurrency(_toInt(preview.itaxNew['nitp']))),
+      _InfoItem('Relief', _formatCurrency(_toInt(preview.itaxNew['relief']))),
       _InfoItem('Final New Regime Balance',
           _formatCurrency(_toInt(preview.itaxNew['nitpi']))),
       _InfoItem('New Regime Excess Paid',
@@ -1209,6 +1252,10 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                         final row = entry.value;
                         final isTotalRow = row.label.contains('QTR') ||
                             row.label == 'GROSS TOTAL';
+                        final monthRoute = _monthRouteForPeriod(row.label);
+                        final isArrearPeriod = _isArrearPeriod(row.label);
+                        final canOpenPeriod =
+                            monthRoute != null || isArrearPeriod;
 
                         return DataRow(
                           color: WidgetStatePropertyAll(
@@ -1220,27 +1267,55 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                           ),
                           cells: [
                             DataCell(
-                              Container(
-                                width: 120,
-                                height: double.infinity, // Forces edge-to-edge fill in cell
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: isTotalRow
-                                      ? const Color(0xFF4F46E5) // Vibrant Indigo for Total period
-                                      : const Color(0xFF1E293B), // Deep Slate for normal period
-                                ),
-                                child: Text(
-                                  row.label,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: isTotalRow ? 16 : 14, // Larger, distinct size
-                                    fontWeight: isTotalRow
-                                        ? FontWeight.w900
-                                        : FontWeight.w700,
-                                    letterSpacing: 0.8,
+                              MouseRegion(
+                                cursor: canOpenPeriod
+                                    ? SystemMouseCursors.click
+                                    : MouseCursor.defer,
+                                child: Tooltip(
+                                  message: monthRoute != null
+                                      ? 'Open ${monthRoute['long']} page'
+                                      : isArrearPeriod
+                                      ? 'Open arrear page'
+                                      : '',
+                                  child: Container(
+                                    width: 120,
+                                    height: double.infinity, // Forces edge-to-edge fill in cell
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: isTotalRow
+                                          ? const Color(0xFF4F46E5) // Vibrant Indigo for Total period
+                                          : const Color(0xFF1E293B), // Deep Slate for normal period
+                                    ),
+                                    child: Text(
+                                      row.label,
+                                      style: TextStyle(
+                                        color: canOpenPeriod
+                                            ? const Color(0xFFBAE6FD)
+                                            : Colors.white,
+                                        fontSize: isTotalRow ? 16 : 14, // Larger, distinct size
+                                        fontWeight: canOpenPeriod || isTotalRow
+                                            ? FontWeight.w900
+                                            : FontWeight.w700,
+                                        letterSpacing: 0.8,
+                                        decoration: canOpenPeriod
+                                            ? TextDecoration.underline
+                                            : TextDecoration.none,
+                                        decorationColor:
+                                        const Color(0xFFBAE6FD),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
+                              onTap: canOpenPeriod
+                                  ? () {
+                                if (monthRoute != null) {
+                                  _openMonthPage(monthRoute);
+                                } else {
+                                  _openArrearPage(preview);
+                                }
+                              }
+                                  : null,
                             ),
                             ...visibleColumns.map(
                                   (column) {
@@ -1477,6 +1552,107 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
       return rows.any((row) => (row.values[column.key] ?? 0) != 0);
     }).toList();
   }
+
+  Map<String, String>? _monthRouteForPeriod(String period) {
+    const monthRoutes = {
+      'MAR': {'short': 'mar', 'long': 'MARCH'},
+      'APR': {'short': 'apr', 'long': 'APRIL'},
+      'MAY': {'short': 'may', 'long': 'MAY'},
+      'JUN': {'short': 'jun', 'long': 'JUNE'},
+      'JUL': {'short': 'jul', 'long': 'JULY'},
+      'AUG': {'short': 'aug', 'long': 'AUGUST'},
+      'SEPT': {'short': 'sept', 'long': 'SEPTEMBER'},
+      'OCT': {'short': 'oct', 'long': 'OCTOBER'},
+      'NOV': {'short': 'nov', 'long': 'NOVEMBER'},
+      'DEC': {'short': 'dec', 'long': 'DECEMBER'},
+      'JAN': {'short': 'jan', 'long': 'JANUARY'},
+      'FEB': {'short': 'feb', 'long': 'FEBRUARY'},
+    };
+
+    return monthRoutes[period.toUpperCase()];
+  }
+
+  bool _isArrearPeriod(String period) {
+    return const {
+      'ARREAR Q1',
+      'ARREAR Q2',
+      'ARREAR Q3',
+      'ARREAR Q4',
+    }.contains(period.toUpperCase());
+  }
+
+  void _openMonthPage(Map<String, String> monthRoute) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MonthDataPage(
+          biometricId: widget.biometricId,
+          shortMonth: monthRoute['short']!,
+          longMonth: monthRoute['long']!,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openArrearPage(_EcrPreviewData preview) async {
+    final arrearData = preview.arrearData;
+    String value(String key) => arrearData[key]?.toString() ?? '0';
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ArrearUpdatePage(
+          biometricId: widget.biometricId,
+          name: preview.mainData['name']?.toString() ?? '',
+          mmda: value('mmda'),
+          mmhra: value('mmhra'),
+          mmdaonta: value('mmdaonta'),
+          mmpca: value('mmpca'),
+          mmnpa: value('mmnpa'),
+          mmtution: value('mmtution'),
+          mmother: value('mmother'),
+          mmext1: value('mmext1'),
+          mmext2: value('mmext2'),
+          mmext3: value('mmext3'),
+          jada: value('jada'),
+          jahra: value('jahra'),
+          jadaonta: value('jadaonta'),
+          japca: value('japca'),
+          janpa: value('janpa'),
+          jatution: value('jatution'),
+          jaother: value('jaother'),
+          jaext1: value('jaext1'),
+          jaext2: value('jaext2'),
+          jaext3: value('jaext3'),
+          snda: value('snda'),
+          snhra: value('snhra'),
+          sndaonta: value('sndaonta'),
+          snpca: value('snpca'),
+          snnpa: value('snnpa'),
+          sntution: value('sntution'),
+          snother: value('snother'),
+          snext1: value('snext1'),
+          snext2: value('snext2'),
+          snext3: value('snext3'),
+          dfda: value('dfda'),
+          dfhra: value('dfhra'),
+          dfdaonta: value('dfdaonta'),
+          dfpca: value('dfpca'),
+          dfnpa: value('dfnpa'),
+          dftution: value('dftution'),
+          dfother: value('dfother'),
+          dfext1: value('dfext1'),
+          dfext2: value('dfext2'),
+          dfext3: value('dfext3'),
+          bonus: value('bonus'),
+        ),
+      ),
+    );
+
+    if (result == true && mounted) {
+      await _loadPreview();
+    }
+  }
 }
 
 _EcrPreviewData _buildPreviewData({
@@ -1537,6 +1713,7 @@ _EcrPreviewData _buildPreviewData({
 
   return _EcrPreviewData(
     mainData: mainData,
+    arrearData: arrearData,
     dedData: dedData,
     itfData: itfData,
     itaxNew: itaxNew,
@@ -2315,6 +2492,7 @@ class _TaxSheetEntry {
 
 class _EcrPreviewData {
   final Map<String, dynamic> mainData;
+  final Map<String, dynamic> arrearData;
   final Map<String, dynamic> dedData;
   final Map<String, dynamic> itfData;
   final Map<String, dynamic> itaxNew;
@@ -2329,6 +2507,7 @@ class _EcrPreviewData {
 
   const _EcrPreviewData({
     required this.mainData,
+    required this.arrearData,
     required this.dedData,
     required this.itfData,
     required this.itaxNew,
