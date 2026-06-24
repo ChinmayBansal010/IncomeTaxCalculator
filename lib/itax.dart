@@ -7787,7 +7787,6 @@ class _ItaxPageState extends State<ItaxPage>
       if (const {'2024-25', '2025-26'}.contains(sharedData.ccurrentYear)) {
         varTti = (varTti / 10).round() * 10;
       }
-
       int varT1 = 0;
       int varT2 = 0;
       int varT3 = 0;
