@@ -7785,8 +7785,9 @@ class _ItaxPageState extends State<ItaxPage>
       }
       sheet.getRangeByName("G11").setValue(varTti);
 
-      varTti =
-          (varTti % 10 >= 5) ? ((varTti + 5) ~/ 10) * 10 : (varTti ~/ 10) * 10;
+      if(sharedData.ccurrentYear == '2024-25'){
+        varTti = (varTti % 10 >= 5) ? ((varTti + 5) ~/ 10) * 10 : (varTti ~/ 10) * 10;
+      }
 
       int varT1 = 0;
       int varT2 = 0;
