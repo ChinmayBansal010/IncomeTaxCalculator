@@ -135,6 +135,7 @@ class DeductionAllPage {
         if (nps > 0) {
           atccd22 += ((bp + da + npa)*0.14).round();
         }
+        atccd2 = atccd22.toString();
 
         gis2 += gisValue;
         gpf2 += gpfValue;

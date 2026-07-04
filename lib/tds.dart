@@ -22,10 +22,10 @@ Future<void> exportExcel(bool isZero) async {
   if (rawArrear is! Map) return;
   final arrearData = Map<String, dynamic>.from(rawArrear);
 
-  final dataDedSnapshot = await db.child(sharedData.userPlace).child("deddata").once();
-  final rawDed = dataDedSnapshot.snapshot.value;
-  if (rawDed is! Map) return;
-  final dedData = Map<String, dynamic>.from(rawDed);
+  // final dataDedSnapshot = await db.child(sharedData.userPlace).child("deddata").once();
+  // final rawDed = dataDedSnapshot.snapshot.value;
+  // if (rawDed is! Map) return;
+  // final dedData = Map<String, dynamic>.from(rawDed);
 
   final oldTaxSnap = await db.child(sharedData.userPlace).child("itaxold").once();
   final newTaxSnap = await db.child(sharedData.userPlace).child("itaxnew").once();
@@ -51,7 +51,7 @@ Future<void> exportExcel(bool isZero) async {
     final rawMonth = allMonthsData[monthKey];
     final monthData = rawMonth is Map ? Map<String, dynamic>.from(rawMonth) : <String, dynamic>{};
 
-    final data = getOptimizedData(monthKey, dataMain, monthData, dedData, oldTaxData, newTaxData, isZero);
+    final data = getOptimizedData(monthKey, dataMain, monthData, oldTaxData, newTaxData, isZero);
 
     sheet.getRangeByIndex(1, 1, 1, 9).merge();
     sheet.getRangeByIndex(1, 1).setText(sharedData.zone.toUpperCase());
@@ -195,7 +195,7 @@ List<List<dynamic>> getOptimizedData(
     String month,
     Map<String, dynamic> dataMain,
     Map<String, dynamic> monthData,
-    Map<String, dynamic> dedData,
+    // Map<String, dynamic> dedData,
     Map<String, dynamic> oldTaxData,
     Map<String, dynamic> newTaxData,
     bool isZero) {
@@ -206,13 +206,15 @@ List<List<dynamic>> getOptimizedData(
   for (int i = 0; i < keys.length; i++) {
     final mainEntry = dataMain[keys[i]] is Map ? Map<String, dynamic>.from(dataMain[keys[i]]) : <String, dynamic>{};
     final monthEntry = monthData[keys[i]] is Map ? Map<String, dynamic>.from(monthData[keys[i]]) : <String, dynamic>{};
-    final dedEntry = dedData[keys[i]] is Map ? Map<String, dynamic>.from(dedData[keys[i]]) : <String, dynamic>{};
+    // final dedEntry = dedData[keys[i]] is Map ? Map<String, dynamic>.from(dedData[keys[i]]) : <String, dynamic>{};
 
+    int npsemp = parseValue(monthEntry['nps']) > 0 ? ((parseValue(monthEntry['bp'])+parseValue(monthEntry['da'])+parseValue(monthEntry['npa']))*0.14).round() : 0;
+    debugPrint(npsemp.toString());
     int gross = parseValue(monthEntry["gross"]) -
         parseValue(monthEntry["conv"]) -
         parseValue(monthEntry["drive"]) -
         parseValue(monthEntry["uniform"]) +
-        parseValue(dedEntry["80ccd2"]);
+        npsemp;
 
     int tax = parseValue(monthEntry["incometax"]);
 
