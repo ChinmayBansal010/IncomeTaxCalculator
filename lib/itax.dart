@@ -431,6 +431,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivegross,
       int varCyclegross,
       int varPcagross,
+      int varOtgross,
       int varNpsempgross,
       int varOthergross,
       int varDaext1gross,
@@ -498,6 +499,7 @@ class _ItaxPageState extends State<ItaxPage>
         'tdrive': varDrivegross,
         'tcycle': varCyclegross,
         'tpca': varPcagross,
+        'tot': varOtgross,
         'tnpsemp': varNpsempgross,
         'tother': varOthergross,
         'tgross': varSalarygross,
@@ -1623,6 +1625,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivemar = int.tryParse(marData['drive']?.toString() ?? '0') ?? 0;
       int varCyclemar = int.tryParse(marData['cycle']?.toString() ?? '0') ?? 0;
       int varPcamar = int.tryParse(marData['pca']?.toString() ?? '0') ?? 0;
+      int varOtmar = int.tryParse(marData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempmar = 0;
 
       if ((marData['nps'] is int
@@ -1668,6 +1671,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivemar,
         varCyclemar,
         varPcamar,
+        varOtmar,
         varNpsempmar,
         varOthermar,
         varDaext1mar,
@@ -1732,6 +1736,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDriveapr = int.tryParse(aprData['drive']?.toString() ?? '0') ?? 0;
       int varCycleapr = int.tryParse(aprData['cycle']?.toString() ?? '0') ?? 0;
       int varPcaapr = int.tryParse(aprData['pca']?.toString() ?? '0') ?? 0;
+      int varOtapr = int.tryParse(aprData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempapr = 0;
 
       if ((aprData['nps'] is int
@@ -1777,6 +1782,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDriveapr,
         varCycleapr,
         varPcaapr,
+        varOtapr,
         varNpsempapr,
         varOtherapr,
         varDaext1apr,
@@ -1841,6 +1847,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivemay = int.tryParse(mayData['drive']?.toString() ?? '0') ?? 0;
       int varCyclemay = int.tryParse(mayData['cycle']?.toString() ?? '0') ?? 0;
       int varPcamay = int.tryParse(mayData['pca']?.toString() ?? '0') ?? 0;
+      int varOtmay = int.tryParse(mayData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempmay = 0;
 
       if ((mayData['nps'] is int
@@ -1886,6 +1893,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivemay,
         varCyclemay,
         varPcamay,
+        varOtmay,
         varNpsempmay,
         varOthermay,
         varDaext1may,
@@ -1948,6 +1956,8 @@ class _ItaxPageState extends State<ItaxPage>
       int varCyclearrearqtr1 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr1 =
           int.tryParse(arrearData['mmpca']?.toString() ?? '0') ?? 0;
+      int varOtarrearqtr1 =
+          int.tryParse(arrearData['mmot']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr1 = int.tryParse('0') ?? 0;
       int varOtherarrearqtr1 =
           int.tryParse(arrearData['mmother']?.toString() ?? '0') ?? 0;
@@ -1976,6 +1986,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivearrearqtr1,
         varCyclearrearqtr1,
         varPcaarrearqtr1,
+        varOtarrearqtr1,
         varNpsemparrearqtr1,
         varOtherarrearqtr1,
         varDaext1arrearqtr1,
@@ -2103,6 +2114,8 @@ class _ItaxPageState extends State<ItaxPage>
       ].fold(0, (sum, value) => sum + value);
       int varPcaqtr1 = [varPcamar, varPcaapr, varPcamay, varPcaarrearqtr1]
           .fold(0, (sum, value) => sum + value);
+      int varOtqtr1 = [varOtmar, varOtapr, varOtmay, varOtarrearqtr1]
+          .fold(0, (sum, value) => sum + value);
       int varNpsempqtr1 = [
         varNpsempmar,
         varNpsempapr,
@@ -2160,6 +2173,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDriveqtr1,
         varCycleqtr1,
         varPcaqtr1,
+        varOtqtr1,
         varNpsempqtr1,
         varOtherqtr1,
         varDaext1qtr1,
@@ -2278,6 +2292,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivejun = int.tryParse(junData['drive']?.toString() ?? '0') ?? 0;
       int varCyclejun = int.tryParse(junData['cycle']?.toString() ?? '0') ?? 0;
       int varPcajun = int.tryParse(junData['pca']?.toString() ?? '0') ?? 0;
+      int varOtjun = int.tryParse(junData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempjun = 0;
 
       if ((junData['nps'] is int
@@ -2323,6 +2338,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivejun,
         varCyclejun,
         varPcajun,
+        varOtjun,
         varNpsempjun,
         varOtherjun,
         varDaext1jun,
@@ -2387,6 +2403,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivejul = int.tryParse(julData['drive']?.toString() ?? '0') ?? 0;
       int varCyclejul = int.tryParse(julData['cycle']?.toString() ?? '0') ?? 0;
       int varPcajul = int.tryParse(julData['pca']?.toString() ?? '0') ?? 0;
+      int varOtjul = int.tryParse(julData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempjul = 0;
 
       if ((julData['nps'] is int
@@ -2432,6 +2449,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivejul,
         varCyclejul,
         varPcajul,
+        varOtjul,
         varNpsempjul,
         varOtherjul,
         varDaext1jul,
@@ -2496,6 +2514,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDriveaug = int.tryParse(augData['drive']?.toString() ?? '0') ?? 0;
       int varCycleaug = int.tryParse(augData['cycle']?.toString() ?? '0') ?? 0;
       int varPcaaug = int.tryParse(augData['pca']?.toString() ?? '0') ?? 0;
+      int varOtaug = int.tryParse(augData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempaug = 0;
 
       if ((augData['nps'] is int
@@ -2541,6 +2560,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDriveaug,
         varCycleaug,
         varPcaaug,
+        varOtaug,
         varNpsempaug,
         varOtheraug,
         varDaext1aug,
@@ -2603,6 +2623,8 @@ class _ItaxPageState extends State<ItaxPage>
       int varCyclearrearqtr2 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr2 =
           int.tryParse(arrearData['japca']?.toString() ?? '0') ?? 0;
+      int varOtarrearqtr2 =
+          int.tryParse(arrearData['jaot']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr2 = int.tryParse('0') ?? 0;
       int varOtherarrearqtr2 =
           int.tryParse(arrearData['jaother']?.toString() ?? '0') ?? 0;
@@ -2631,6 +2653,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivearrearqtr2,
         varCyclearrearqtr2,
         varPcaarrearqtr2,
+        varOtarrearqtr2,
         varNpsemparrearqtr2,
         varOtherarrearqtr2,
         varDaext1arrearqtr2,
@@ -2757,6 +2780,8 @@ class _ItaxPageState extends State<ItaxPage>
         varCyclearrearqtr2
       ].fold(0, (sum, value) => sum + value);
       int varPcaqtr2 = [varPcajun, varPcajul, varPcaaug, varPcaarrearqtr2]
+          .fold(0, (sum, value) => sum + value);
+      int varOtqtr2 = [varOtjun, varOtjul, varOtaug, varOtarrearqtr2]
           .fold(0, (sum, value) => sum + value);
       int varNpsempqtr2 = [
         varNpsempjun,
@@ -2936,6 +2961,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varCyclesept =
           int.tryParse(septData['cycle']?.toString() ?? '0') ?? 0;
       int varPcasept = int.tryParse(septData['pca']?.toString() ?? '0') ?? 0;
+      int varOtsept = int.tryParse(septData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempsept = 0;
 
       if ((septData['nps'] is int
@@ -2981,6 +3007,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivesept,
         varCyclesept,
         varPcasept,
+        varOtsept,
         varNpsempsept,
         varOthersept,
         varDaext1sept,
@@ -3047,6 +3074,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDriveoct = int.tryParse(octData['drive']?.toString() ?? '0') ?? 0;
       int varCycleoct = int.tryParse(octData['cycle']?.toString() ?? '0') ?? 0;
       int varPcaoct = int.tryParse(octData['pca']?.toString() ?? '0') ?? 0;
+      int varOtoct = int.tryParse(octData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempoct = 0;
 
       if ((octData['nps'] is int
@@ -3092,6 +3120,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDriveoct,
         varCycleoct,
         varPcaoct,
+        varOtoct,
         varNpsempoct,
         varOtheroct,
         varDaext1oct,
@@ -3156,6 +3185,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivenov = int.tryParse(novData['drive']?.toString() ?? '0') ?? 0;
       int varCyclenov = int.tryParse(novData['cycle']?.toString() ?? '0') ?? 0;
       int varPcanov = int.tryParse(novData['pca']?.toString() ?? '0') ?? 0;
+      int varOtnov = int.tryParse(novData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempnov = 0;
 
       if ((novData['nps'] is int
@@ -3201,6 +3231,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivenov,
         varCyclenov,
         varPcanov,
+        varOtnov,
         varNpsempnov,
         varOthernov,
         varDaext1nov,
@@ -3263,6 +3294,8 @@ class _ItaxPageState extends State<ItaxPage>
       int varCyclearrearqtr3 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr3 =
           int.tryParse(arrearData['snpca']?.toString() ?? '0') ?? 0;
+      int varOtarrearqtr3 =
+          int.tryParse(arrearData['snot']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr3 = int.tryParse('0') ?? 0;
       int varOtherarrearqtr3 =
           int.tryParse(arrearData['snother']?.toString() ?? '0') ?? 0;
@@ -3291,6 +3324,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivearrearqtr3,
         varCyclearrearqtr3,
         varPcaarrearqtr3,
+        varOtarrearqtr3,
         varNpsemparrearqtr3,
         varOtherarrearqtr3,
         varDaext1arrearqtr3,
@@ -3418,6 +3452,8 @@ class _ItaxPageState extends State<ItaxPage>
       ].fold(0, (sum, value) => sum + value);
       int varPcaqtr3 = [varPcasept, varPcaoct, varPcanov, varPcaarrearqtr3]
           .fold(0, (sum, value) => sum + value);
+      int varOtqtr3 = [varOtsept, varOtoct, varOtnov, varOtarrearqtr3]
+          .fold(0, (sum, value) => sum + value);
       int varNpsempqtr3 = [
         varNpsempsept,
         varNpsempoct,
@@ -3475,6 +3511,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDriveqtr3,
         varCycleqtr3,
         varPcaqtr3,
+        varOtqtr3,
         varNpsempqtr3,
         varOtherqtr3,
         varDaext1qtr3,
@@ -3593,6 +3630,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivedec = int.tryParse(decData['drive']?.toString() ?? '0') ?? 0;
       int varCycledec = int.tryParse(decData['cycle']?.toString() ?? '0') ?? 0;
       int varPcadec = int.tryParse(decData['pca']?.toString() ?? '0') ?? 0;
+      int varOtdec = int.tryParse(decData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempdec = 0;
       if ((decData['nps'] is int
                   ? decData['nps']
@@ -3637,6 +3675,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivedec,
         varCycledec,
         varPcadec,
+        varOtdec,
         varNpsempdec,
         varOtherdec,
         varDaext1dec,
@@ -3701,6 +3740,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivejan = int.tryParse(janData['drive']?.toString() ?? '0') ?? 0;
       int varCyclejan = int.tryParse(janData['cycle']?.toString() ?? '0') ?? 0;
       int varPcajan = int.tryParse(janData['pca']?.toString() ?? '0') ?? 0;
+      int varOtjan = int.tryParse(janData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempjan = 0;
 
       if ((janData['nps'] is int
@@ -3746,6 +3786,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivejan,
         varCyclejan,
         varPcajan,
+        varOtjan,
         varNpsempjan,
         varOtherjan,
         varDaext1jan,
@@ -3810,6 +3851,7 @@ class _ItaxPageState extends State<ItaxPage>
       int varDrivefeb = int.tryParse(febData['drive']?.toString() ?? '0') ?? 0;
       int varCyclefeb = int.tryParse(febData['cycle']?.toString() ?? '0') ?? 0;
       int varPcafeb = int.tryParse(febData['pca']?.toString() ?? '0') ?? 0;
+      int varOtfeb = int.tryParse(febData['ot']?.toString() ?? '0') ?? 0;
       int varNpsempfeb = 0;
       if ((febData['nps'] is int
                   ? febData['nps']
@@ -3854,6 +3896,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivefeb,
         varCyclefeb,
         varPcafeb,
+        varOtfeb,
         varNpsempfeb,
         varOtherfeb,
         varDaext1feb,
@@ -3921,6 +3964,8 @@ class _ItaxPageState extends State<ItaxPage>
       int varCyclearrearqtr4 = int.tryParse('0') ?? 0;
       int varPcaarrearqtr4 =
           int.tryParse(arrearData['dfpca']?.toString() ?? '0') ?? 0;
+      int varOtarrearqtr4 =
+          int.tryParse(arrearData['dfpca']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr4 = int.tryParse('0') ?? 0;
       int varOtherarrearqtr4 =
           int.tryParse(arrearData['dfother']?.toString() ?? '0') ?? 0;
@@ -3949,6 +3994,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivearrearqtr4,
         varCyclearrearqtr4,
         varPcaarrearqtr4,
+        varOtarrearqtr4,
         varNpsemparrearqtr4,
         varOtherarrearqtr4,
         varDaext1arrearqtr4,
@@ -4092,6 +4138,8 @@ class _ItaxPageState extends State<ItaxPage>
       ].fold(0, (sum, value) => sum + value);
       int varPcaqtr4 = [varPcadec, varPcajan, varPcafeb, varPcaarrearqtr4]
           .fold(0, (sum, value) => sum + value);
+      int varOtqtr4 = [varOtdec, varOtjan, varOtfeb, varOtarrearqtr4]
+          .fold(0, (sum, value) => sum + value);
       int varNpsempqtr4 = [
         varNpsempdec,
         varNpsempjan,
@@ -4151,6 +4199,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDriveqtr4,
         varCycleqtr4,
         varPcaqtr4,
+        varOtqtr4,
         varNpsempqtr4,
         varOtherqtr4,
         varDaext1qtr4,
@@ -4322,6 +4371,8 @@ class _ItaxPageState extends State<ItaxPage>
       ].fold(0, (sum, value) => sum + value);
       int varPcagross = [varPcaqtr1, varPcaqtr2, varPcaqtr3, varPcaqtr4]
           .fold(0, (sum, value) => sum + value);
+      int varOtgross = [varOtqtr1, varOtqtr2, varOtqtr3, varOtqtr4]
+          .fold(0, (sum, value) => sum + value);
       int varNpsempgross = [
         varNpsempqtr1,
         varNpsempqtr2,
@@ -4379,6 +4430,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDrivegross,
         varCyclegross,
         varPcagross,
+        varOtgross,
         varNpsempgross,
         varOthergross,
         varDaext1gross,
@@ -4497,6 +4549,7 @@ class _ItaxPageState extends State<ItaxPage>
             varDrivegross,
             varCyclegross,
             varPcagross,
+            varOtgross,
             varNpsempgross,
             varOthergross,
             varDaext1gross,
@@ -5529,67 +5582,112 @@ class _ItaxPageState extends State<ItaxPage>
         end += 1;
       }
 
-      if (!isECR) {
-        if (varNpsempgross > 0) {
-          sheet.getRangeByName("${columns[end]}10").setValue("NPS 14%");
-          sheet.getRangeByName("${columns[end]}10").cellStyle =
-              tableheadingStyle;
+      if (varOtgross > 0) {
+        sheet.getRangeByName("${columns[end]}10").setValue("OT");
+        sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
 
-          sheet.getRangeByName("${columns[end]}11").setValue(varNpsempmar);
-          sheet.getRangeByName("${columns[end]}12").setValue(varNpsempapr);
-          sheet.getRangeByName("${columns[end]}13").setValue(varNpsempmay);
-          sheet
-              .getRangeByName("${columns[end]}14")
-              .setValue(varNpsemparrearqtr1);
-          sheet.getRangeByName("${columns[end]}15").setValue(varNpsempqtr1);
-          sheet.getRangeByName("${columns[end]}16").setValue(varNpsempjun);
-          sheet.getRangeByName("${columns[end]}17").setValue(varNpsempjul);
-          sheet.getRangeByName("${columns[end]}18").setValue(varNpsempaug);
-          sheet
-              .getRangeByName("${columns[end]}19")
-              .setValue(varNpsemparrearqtr2);
-          sheet.getRangeByName("${columns[end]}20").setValue(varNpsempqtr2);
-          sheet.getRangeByName("${columns[end]}21").setValue(varNpsempsept);
-          sheet.getRangeByName("${columns[end]}22").setValue(varNpsempoct);
-          sheet.getRangeByName("${columns[end]}23").setValue(varNpsempnov);
-          sheet
-              .getRangeByName("${columns[end]}24")
-              .setValue(varNpsemparrearqtr3);
-          sheet.getRangeByName("${columns[end]}25").setValue(varNpsempqtr3);
-          sheet.getRangeByName("${columns[end]}26").setValue(varNpsempdec);
-          sheet.getRangeByName("${columns[end]}27").setValue(varNpsempjan);
-          sheet.getRangeByName("${columns[end]}28").setValue(varNpsempfeb);
-          sheet
-              .getRangeByName("${columns[end]}29")
-              .setValue(varNpsemparrearqtr4);
-          sheet.getRangeByName("${columns[end]}30").setValue('0');
-          sheet.getRangeByName("${columns[end]}31").setValue('0');
-          sheet.getRangeByName("${columns[end]}32").setValue(varNpsempqtr4);
-          sheet.getRangeByName("${columns[end]}33").setValue(varNpsempgross);
+        sheet.getRangeByName("${columns[end]}11").setValue(varOtmar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varOtapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varOtmay);
+        sheet.getRangeByName("${columns[end]}14").setValue(varOtarrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varOtqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varOtjun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varOtjul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varOtaug);
+        sheet.getRangeByName("${columns[end]}19").setValue(varOtarrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varOtqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varOtsept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varOtoct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varOtnov);
+        sheet.getRangeByName("${columns[end]}24").setValue(varOtarrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varOtqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varOtdec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varOtjan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varOtfeb);
+        sheet.getRangeByName("${columns[end]}29").setValue(varOtarrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varOtqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varOtgross);
 
-          sheet
-              .getRangeByName("${columns[end]}11:${columns[end]}14")
-              .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}16:${columns[end]}19")
-              .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}21:${columns[end]}24")
-              .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}26:${columns[end]}31")
-              .cellStyle = commontextStyle;
+        sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
+            commontextStyle;
+        sheet.getRangeByName("${columns[end]}16:${columns[end]}19").cellStyle =
+            commontextStyle;
+        sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
+            commontextStyle;
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+            commontextStyle;
 
-          List<String> qtrcolumns = ['15', '20', '25', '32'];
-          for (String cols in qtrcolumns) {
-            sheet.getRangeByName("${columns[end]}$cols").cellStyle =
-                totalrowStyle!;
-          }
-          sheet.getRangeByName("${columns[end]}33").cellStyle =
-              formlastrowStyle;
-
-          end += 1;
+        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        for (String cols in qtrcolumns) {
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle =
+              totalrowStyle!;
         }
+        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+
+        end += 1;
+      }
+
+      if (varNpsempgross > 0) {
+        sheet.getRangeByName("${columns[end]}10").setValue("NPS 14%");
+        sheet.getRangeByName("${columns[end]}10").cellStyle =
+            tableheadingStyle;
+
+        sheet.getRangeByName("${columns[end]}11").setValue(varNpsempmar);
+        sheet.getRangeByName("${columns[end]}12").setValue(varNpsempapr);
+        sheet.getRangeByName("${columns[end]}13").setValue(varNpsempmay);
+        sheet
+            .getRangeByName("${columns[end]}14")
+            .setValue(varNpsemparrearqtr1);
+        sheet.getRangeByName("${columns[end]}15").setValue(varNpsempqtr1);
+        sheet.getRangeByName("${columns[end]}16").setValue(varNpsempjun);
+        sheet.getRangeByName("${columns[end]}17").setValue(varNpsempjul);
+        sheet.getRangeByName("${columns[end]}18").setValue(varNpsempaug);
+        sheet
+            .getRangeByName("${columns[end]}19")
+            .setValue(varNpsemparrearqtr2);
+        sheet.getRangeByName("${columns[end]}20").setValue(varNpsempqtr2);
+        sheet.getRangeByName("${columns[end]}21").setValue(varNpsempsept);
+        sheet.getRangeByName("${columns[end]}22").setValue(varNpsempoct);
+        sheet.getRangeByName("${columns[end]}23").setValue(varNpsempnov);
+        sheet
+            .getRangeByName("${columns[end]}24")
+            .setValue(varNpsemparrearqtr3);
+        sheet.getRangeByName("${columns[end]}25").setValue(varNpsempqtr3);
+        sheet.getRangeByName("${columns[end]}26").setValue(varNpsempdec);
+        sheet.getRangeByName("${columns[end]}27").setValue(varNpsempjan);
+        sheet.getRangeByName("${columns[end]}28").setValue(varNpsempfeb);
+        sheet
+            .getRangeByName("${columns[end]}29")
+            .setValue(varNpsemparrearqtr4);
+        sheet.getRangeByName("${columns[end]}30").setValue('0');
+        sheet.getRangeByName("${columns[end]}31").setValue('0');
+        sheet.getRangeByName("${columns[end]}32").setValue(varNpsempqtr4);
+        sheet.getRangeByName("${columns[end]}33").setValue(varNpsempgross);
+
+        sheet
+            .getRangeByName("${columns[end]}11:${columns[end]}14")
+            .cellStyle = commontextStyle;
+        sheet
+            .getRangeByName("${columns[end]}16:${columns[end]}19")
+            .cellStyle = commontextStyle;
+        sheet
+            .getRangeByName("${columns[end]}21:${columns[end]}24")
+            .cellStyle = commontextStyle;
+        sheet
+            .getRangeByName("${columns[end]}26:${columns[end]}31")
+            .cellStyle = commontextStyle;
+
+        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        for (String cols in qtrcolumns) {
+          sheet.getRangeByName("${columns[end]}$cols").cellStyle =
+              totalrowStyle!;
+        }
+        sheet.getRangeByName("${columns[end]}33").cellStyle =
+            formlastrowStyle;
+
+        end += 1;
       }
 
       if ((varOthergross + varTution + varBonus) > 0) {

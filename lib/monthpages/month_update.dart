@@ -43,6 +43,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   final TextEditingController driveController = TextEditingController();
   final TextEditingController cycleController = TextEditingController();
   final TextEditingController pcaController = TextEditingController();
+  final TextEditingController otController = TextEditingController();
   final TextEditingController daext1Controller = TextEditingController();
   final TextEditingController daext2Controller = TextEditingController();
   final TextEditingController daext3Controller = TextEditingController();
@@ -126,6 +127,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     driveController.text = monthData['drive']?.toString() ?? '';
     cycleController.text = monthData['cycle']?.toString() ?? '';
     pcaController.text = monthData['pca']?.toString() ?? '';
+    otController.text = monthData['ot']?.toString() ?? '';
     daext1Controller.text = monthData['daext1']?.toString() ?? '';
     daext2Controller.text = monthData['daext2']?.toString() ?? '';
     daext3Controller.text = monthData['daext3']?.toString() ?? '';
@@ -192,6 +194,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     driveController.dispose();
     cycleController.dispose();
     pcaController.dispose();
+    otController.dispose();
     daext1Controller.dispose();
     daext2Controller.dispose();
     daext3Controller.dispose();
@@ -696,6 +699,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                 AnimatedInputField(label: "CONTINGENCY", controller: driveController, icon: Icons.warning_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('drive', val)),
                                 AnimatedInputField(label: "CYCLE", controller: cycleController, icon: Icons.pedal_bike_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('cycle', val)),
                                 AnimatedInputField(label: "PCA", controller: pcaController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pca', val)),
+                                AnimatedInputField(label: "OT", controller: otController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ot', val)),
                               ],
                             ),
                           ),
@@ -964,7 +968,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
         bpController, daController, hraController, npaController, splpayController, convController,
         pgController, annualController, uniformController, nursingController, taController, daontaController,
         medicalController, dirtController, washingController, tbController, nightController, driveController,
-        cycleController, pcaController, daext1Controller, daext2Controller, daext3Controller, daext4Controller,
+        cycleController, pcaController, otController, daext1Controller, daext2Controller, daext3Controller, daext4Controller,
       ];
 
       double grossTotal = controllers.map((controller) => double.tryParse(controller.text) ?? 0).reduce((sum, value) => sum + value);
