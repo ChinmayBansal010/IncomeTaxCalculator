@@ -1413,7 +1413,6 @@ class _UserFreezeModalState extends State<_UserFreezeModal> {
             const SizedBox(height: 20),
             Material(
               color: const Color(0xFFFEF2F2),
-              borderRadius: BorderRadius.circular(16),
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
