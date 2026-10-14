@@ -36,7 +36,12 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        fontFamily: 'Roboto',
+        fontFamily: 'NotoSans',
+        fontFamilyFallback: const ['NotoHindi', 'NotoEmoji', 'Roboto', 'sans-serif'],
+        textTheme: Typography.material2021().black.apply(
+          fontFamily: 'NotoSans',
+          fontFamilyFallback: const ['NotoHindi', 'NotoEmoji', 'Roboto', 'sans-serif'],
+        ),
         useMaterial3: true,
       ),
       home: const SplashScreen(),

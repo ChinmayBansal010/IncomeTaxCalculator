@@ -95,7 +95,7 @@
 
       - family: NotoEmoji
         fonts:
-          - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+          - asset: assets/fonts/NotoEmoji-Regular.ttf
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
 
