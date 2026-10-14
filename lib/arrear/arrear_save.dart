@@ -253,6 +253,7 @@ class ArrearUpdatePageState extends State<ArrearUpdatePage> with SingleTickerPro
   }
 
   Future<void> _saveData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricIdController.text.isEmpty) {
       showDialog(
         context: context,

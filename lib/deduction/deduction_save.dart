@@ -362,6 +362,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
   }
 
   Future<void> _saveData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricIdController.text.isEmpty) {
       _showDialog("Error", "Biometric ID cannot be blank.");
       return;

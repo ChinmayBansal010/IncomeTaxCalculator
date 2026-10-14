@@ -1,0 +1,16 @@
+{
+  "rules": {
+    ".read": true,
+    "_admin": {
+      ".read": true,
+      ".write": true
+    },
+    "$year": {
+      ".read": true,
+      "$username": {
+        ".read": true,
+        ".write": "root.child('_admin/frozen_years/' + $year).val() != true && root.child('_admin/frozen_users/' + $username + '/all_years').val() != true && root.child('_admin/frozen_users/' + $username + '/years/' + $year).val() != true"
+      }
+    }
+  }
+}

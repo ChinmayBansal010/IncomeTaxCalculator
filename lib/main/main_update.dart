@@ -219,6 +219,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
   }
 
   void updateData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricIdController.text.isEmpty) {
       showDialog(
         context: context,
@@ -400,6 +401,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
   }
 
   void deleteData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricIdController.text.isEmpty) {
       showDialog(
         context: context,

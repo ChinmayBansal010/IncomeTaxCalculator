@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'firebase_options.dart';
 import 'home.dart';
 import 'shared.dart';
+import 'admin_dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -256,6 +257,39 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
     try {
       final databaseRef = FirebaseDatabase.instance.ref();
+
+      // Check Admin Login (username: admin)
+      if (username == 'admin') {
+        final adminPassSnap = await databaseRef.child('_admin/credentials/password').get();
+        String activeAdminPassword = 'admin';
+        if (adminPassSnap.exists && adminPassSnap.value != null && adminPassSnap.value.toString().isNotEmpty) {
+          activeAdminPassword = adminPassSnap.value.toString();
+        }
+
+        if (password == activeAdminPassword) {
+          sharedData.isAdmin = true;
+          sharedData.adminUsername = 'admin';
+          sharedData.ccurrentYear = selectedYear;
+          sharedData.isYearFrozen = false;
+
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const AdminDashboardPage(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
+          }
+          return;
+        } else {
+          _showCustomDialog('Access Denied', 'The admin password you entered is incorrect.', Icons.lock_outline_rounded, const Color(0xFFEF4444));
+          return;
+        }
+      }
+
       final userRef = databaseRef.child('$selectedYear/$username').child(username);
       final dataSnapshot = await userRef.get();
 
@@ -268,6 +302,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           sharedData.userPlace = '$selectedYear/$username';
           sharedData.ccurrentYear = selectedYear;
           sharedData.zone = storedZone;
+          sharedData.isAdmin = false;
+
+          sharedData.isYearFrozen = await checkDatabaseFreezeStatus(
+            username: username,
+            year: selectedYear,
+          );
 
           if (mounted) {
             Navigator.pushReplacement(

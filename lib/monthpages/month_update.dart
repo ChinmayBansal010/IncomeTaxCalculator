@@ -1033,6 +1033,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   }
 
   Future<void> _saveData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     try {
       DatabaseReference userMonthDataRef = _dbRef.child(sharedData.userPlace).child('monthdata');
 
@@ -1087,6 +1088,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   }
 
   Future<void> _saveAll() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     showDialog(
       context: context,
       barrierDismissible: false,

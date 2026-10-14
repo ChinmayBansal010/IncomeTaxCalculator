@@ -170,6 +170,7 @@ class DeductionAllPage {
   }
 
   Future<void> saveData() async {
+    if (sharedData.isYearFrozen && !sharedData.isAdmin) return;
     await _validateValue();
     await _calculateData();
 

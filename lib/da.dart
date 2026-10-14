@@ -86,6 +86,7 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
   }
 
   void saveData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     bool isValid = true;
     _controllers.forEach((key, controller) {
       int? value = int.tryParse(controller.text);

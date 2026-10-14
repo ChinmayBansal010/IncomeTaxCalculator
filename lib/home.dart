@@ -12,6 +12,7 @@ import 'deduction_data.dart';
 import 'tax.dart';
 import 'arrear_calc.dart';
 import 'exportall.dart';
+import 'admin_dashboard.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -63,6 +64,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         children: [
           Column(
             children: [
+              if (sharedData.isAdmin) _buildAdminBanner(),
+              if (sharedData.isYearFrozen) _buildFrozenBanner(),
               _buildTopNavigation(),
               Expanded(
                 child: Center(
@@ -76,6 +79,81 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           if (_isLoading) _buildLoadingOverlay(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAdminBanner() {
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFF1E3A8A),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.admin_panel_settings_rounded, color: Colors.white, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Admin Mode: Viewing Dashboard for "${sharedData.viewingAsUsername ?? sharedData.userPlace.split('/').last}" (Center: ${sharedData.zone})',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
+                  );
+                },
+                icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                label: const Text('Back to Admin'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFrozenBanner() {
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFFFEF2F2),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Row(
+            children: [
+              const Icon(Icons.lock_rounded, color: Color(0xFFDC2626), size: 18),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Financial Year ${sharedData.ccurrentYear} is FROZEN by Administrator. All data is read-only.',
+                  style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -97,10 +175,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ],
       ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 24,
-        bottom: 24,
-        left: 32,
-        right: 32,
+        top: MediaQuery.of(context).padding.top + 16,
+        bottom: 16,
+        left: 20,
+        right: 20,
       ),
       child: Center(
         child: ConstrainedBox(
@@ -108,66 +186,74 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    height: 48,
-                    width: 48,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2563EB),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF1D4ED8), width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      height: 44,
+                      width: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2563EB),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFF1D4ED8), width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 22),
                     ),
-                    child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Income Tax Portal',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F172A),
-                          letterSpacing: -0.5,
-                        ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'Income Tax Portal',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF0F172A),
+                              letterSpacing: -0.5,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Select a module to manage your entries',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF64748B),
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Select a module to manage your entries',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF64748B),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF475569)),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.calendar_month_rounded, size: 16, color: Color(0xFF475569)),
+                    const SizedBox(width: 6),
                     Text(
                       'FY: ${sharedData.ccurrentYear}',
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF334155),
                       ),
@@ -346,6 +432,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         _executeExport(() => exportExcel(true));
         break;
       case "LOGOUT":
+        final nav = Navigator.of(context);
         final confirmLogout = await _showConfirmDialog(
           "Confirm Logout",
           "Are you sure you want to end your current session?",
@@ -353,7 +440,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           isDestructive: true,
         );
         if (confirmLogout == true && mounted) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+          if (sharedData.isAdmin) {
+            nav.pushReplacement(MaterialPageRoute(builder: (context) => const AdminDashboardPage()));
+          } else {
+            nav.pushReplacement(MaterialPageRoute(builder: (context) => const LoginPage()));
+          }
         }
         break;
     }

@@ -105,6 +105,7 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
   }
 
   void addData() async {
+    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricIdController.text.isEmpty) {
       showDialog(
         context: context,
