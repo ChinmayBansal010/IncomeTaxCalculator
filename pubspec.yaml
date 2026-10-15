@@ -85,6 +85,10 @@
       - assets/fonts/
 
     fonts:
+      - family: MaterialIcons
+        fonts:
+          - asset: assets/fonts/MaterialIcons-Regular.otf
+
       - family: NotoSans
         fonts:
           - asset: assets/fonts/NotoSans-Regular.ttf

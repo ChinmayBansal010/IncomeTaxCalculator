@@ -26,6 +26,7 @@ const List<String> kAppFontFallback = [
   'NotoSans',
   'NotoHindi',
   'NotoEmoji',
+  'MaterialIcons',
   'Roboto',
   'Arial',
   'sans-serif',
