@@ -22,6 +22,15 @@ void main() async {
   runApp(const MyApp());
 }
 
+const List<String> kAppFontFallback = [
+  'NotoSans',
+  'NotoHindi',
+  'NotoEmoji',
+  'Roboto',
+  'Arial',
+  'sans-serif',
+];
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -37,10 +46,14 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFFF8FAFC),
         fontFamily: 'NotoSans',
-        fontFamilyFallback: const ['NotoHindi', 'NotoEmoji', 'Roboto', 'sans-serif'],
+        fontFamilyFallback: kAppFontFallback,
         textTheme: Typography.material2021().black.apply(
           fontFamily: 'NotoSans',
-          fontFamilyFallback: const ['NotoHindi', 'NotoEmoji', 'Roboto', 'sans-serif'],
+          fontFamilyFallback: kAppFontFallback,
+        ),
+        primaryTextTheme: Typography.material2021().black.apply(
+          fontFamily: 'NotoSans',
+          fontFamilyFallback: kAppFontFallback,
         ),
         useMaterial3: true,
       ),
