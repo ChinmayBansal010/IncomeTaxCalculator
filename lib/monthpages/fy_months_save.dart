@@ -111,24 +111,45 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     return {};
   }
 
+  Future<Map<String, Map<String, Map<String, dynamic>>>> _fetchAllMonthData() async {
+    final monthRef = _dbRef.child('${sharedData.userPlace}/monthdata');
+    final snapshot = await monthRef.get();
+    Map<String, Map<String, Map<String, dynamic>>> allData = {};
+
+    if (snapshot.exists && snapshot.value is Map) {
+      Map rawMap = snapshot.value as Map;
+      rawMap.forEach((mKey, mVal) {
+        if (mKey is String && mVal is Map) {
+          Map<String, Map<String, dynamic>> empMonthMap = {};
+          mVal.forEach((bioKey, bioVal) {
+            if (bioKey is String && bioVal is Map) {
+              empMonthMap[bioKey] = Map<String, dynamic>.from(bioVal);
+            }
+          });
+          allData[mKey] = empMonthMap;
+        }
+      });
+    }
+    return allData;
+  }
+
   Map<String, String> _calculateEmployeeSalary({
     required String monthKey,
     required Map<String, dynamic> empDetails,
+    required Map<String, dynamic> runningState,
     required Map<String, dynamic> percData,
-    Map<String, dynamic>? existingMonthData,
   }) {
     Map<String, String> mData = {};
-    if (existingMonthData != null) {
-      existingMonthData.forEach((k, v) {
-        mData[k] = v?.toString() ?? '0';
-      });
-    }
+
+    runningState.forEach((k, v) {
+      mData[k] = v?.toString() ?? '0';
+    });
 
     String biometricId = empDetails['biometricid']?.toString() ?? empDetails['biometricId']?.toString() ?? '';
-    String name = empDetails['name']?.toString() ?? '';
-    String designation = empDetails['designation']?.toString() ?? '';
-    String mincrement = empDetails['mincrement']?.toString() ?? '';
-    String dort = empDetails['dort']?.toString() ?? '';
+    String name = empDetails['name']?.toString() ?? mData['name'] ?? '';
+    String designation = empDetails['designation']?.toString() ?? mData['designation'] ?? '';
+    String mincrement = empDetails['mincrement']?.toString() ?? mData['mincrement'] ?? '';
+    String dort = empDetails['dort']?.toString() ?? mData['dort'] ?? '';
 
     mData['biometricid'] = biometricId;
     mData['name'] = name;
@@ -157,12 +178,15 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
           DateTime monthDate = DateTime(targetY, targetM, 1);
 
           if (monthDate.isAfter(DateTime(retirementDate.year, retirementDate.month, 1))) {
+            Map<String, String> retiredMap = {};
             mData.forEach((key, value) {
-              if (key != 'biometricid' && key != 'name' && key != 'designation') {
-                mData[key] = "0";
+              if (key == 'biometricid' || key == 'name' || key == 'designation') {
+                retiredMap[key] = value;
+              } else {
+                retiredMap[key] = "0";
               }
             });
-            return mData;
+            return retiredMap;
           }
         }
       } catch (e) {
@@ -170,7 +194,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
       }
     }
 
-    int bp = int.tryParse(mData['bp'] ?? empDetails['bp']?.toString() ?? '0') ?? 0;
+    int bp = int.tryParse(mData['bp'] ?? '0') ?? 0;
     if (bp == 0 && empDetails.containsKey('bp')) {
       bp = int.tryParse(empDetails['bp'].toString()) ?? 0;
     }
@@ -186,15 +210,28 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     }
 
     mData['bp'] = bp.toString();
+    runningState['bp'] = bp.toString(); // Update running BP for subsequent months!
 
-    bool dachk = mData['dachk'] == 'true' || empDetails['dachk'] == true || empDetails['dachk'] == 'true';
-    bool hrachk = mData['hrachk'] == 'true' || empDetails['hrachk'] == true || empDetails['hrachk'] == 'true';
-    bool tachk = mData['tachk'] == 'true' || empDetails['tachk'] == true || empDetails['tachk'] == 'true';
-    bool npachk = mData['npachk'] == 'true' || empDetails['npachk'] == true || empDetails['npachk'] == 'true';
-    bool npschk = mData['npschk'] == 'true' || empDetails['npschk'] == true || empDetails['npschk'] == 'true';
-    bool gpfchk = mData['gpfchk'] == 'true' || empDetails['gpfchk'] == true || empDetails['gpfchk'] == 'true';
-    bool esichk = mData['esichk'] == 'true' || empDetails['esichk'] == true || empDetails['esichk'] == 'true';
-    bool epfchk = mData['epfchk'] == 'true' || empDetails['epfchk'] == true || empDetails['epfchk'] == 'true';
+    // Check Flags in alignment with month_update.dart ('dap' == '1', 'hrap' == '1', 'tap' == '1', 'npap' == '1')
+    bool dachk = mData['dap']?.toString() == '1' || mData['dachk']?.toString() == 'true' || empDetails['dachk'] == true || empDetails['dachk'] == 'true' || mData['dap'] == null;
+    bool hrachk = mData['hrap']?.toString() == '1' || mData['hrachk']?.toString() == 'true' || empDetails['hrachk'] == true || empDetails['hrachk'] == 'true' || mData['hrap'] == null;
+    bool tachk = mData['tap']?.toString() == '1' || mData['tachk']?.toString() == 'true' || empDetails['tachk'] == true || empDetails['tachk'] == 'true' || mData['tap'] == null;
+    bool npachk = mData['npap']?.toString() == '1' || mData['npachk']?.toString() == 'true' || empDetails['npachk'] == true || empDetails['npachk'] == 'true';
+
+    bool gpfchk = mData['gpfchk']?.toString() == '1' || mData['gpfchk']?.toString() == 'true' || empDetails['gpfchk'] == true || empDetails['gpfchk'] == 'true';
+    bool npschk = mData['npschk']?.toString() == '1' || mData['npschk']?.toString() == 'true' || empDetails['npschk'] == true || empDetails['npschk'] == 'true';
+    bool epfchk = mData['epfchk']?.toString() == '1' || mData['epfchk']?.toString() == 'true' || empDetails['epfchk'] == true || empDetails['epfchk'] == 'true';
+    bool esichk = mData['esichk']?.toString() == '1' || mData['esichk']?.toString() == 'true' || empDetails['esichk'] == true || empDetails['esichk'] == 'true';
+
+    // Preserve check flags in saved month map
+    mData['dap'] = dachk ? '1' : '0';
+    mData['hrap'] = hrachk ? '1' : '0';
+    mData['tap'] = tachk ? '1' : '0';
+    mData['npap'] = npachk ? '1' : '0';
+    mData['gpfchk'] = gpfchk ? '1' : '0';
+    mData['npschk'] = npschk ? '1' : '0';
+    mData['epfchk'] = epfchk ? '1' : '0';
+    mData['esichk'] = esichk ? '1' : '0';
 
     int dap = int.tryParse(percData['${monthKey}d']?.toString() ?? '0') ?? 0;
     int hrap = int.tryParse(percData['${monthKey}h']?.toString() ?? '0') ?? 0;
@@ -240,7 +277,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
 
     double grossTotal = 0;
     for (String field in grossFields) {
-      double val = double.tryParse(mData[field] ?? empDetails[field]?.toString() ?? '0') ?? 0;
+      double val = double.tryParse(mData[field] ?? '0') ?? 0;
       grossTotal += val;
     }
     mData['gross'] = grossTotal.round().toString();
@@ -286,7 +323,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
 
     double dedTotal = 0;
     for (String field in dedFields) {
-      double val = double.tryParse(mData[field] ?? empDetails[field]?.toString() ?? '0') ?? 0;
+      double val = double.tryParse(mData[field] ?? '0') ?? 0;
       dedTotal += val;
     }
     mData['totalded'] = dedTotal.round().toString();
@@ -361,6 +398,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     try {
       final employees = await _fetchMainData();
       final percData = await _fetchPercentageData();
+      final allMonthData = await _fetchAllMonthData();
 
       if (employees.isEmpty) {
         if (mounted) nav.pop();
@@ -375,18 +413,20 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
         String bioId = entry.key;
         Map<String, dynamic> empDetails = entry.value;
 
-        // Fetch existing month data if present
-        final existingSnap = await monthRef.child(bioId).get();
-        Map<String, dynamic>? existingMap;
-        if (existingSnap.exists && existingSnap.value is Map) {
-          existingMap = Map<String, dynamic>.from(existingSnap.value as Map);
+        // Build running state from previous months up to current
+        Map<String, dynamic> runningState = {};
+        for (var m in fyMonths) {
+          if (allMonthData.containsKey(m.shortKey) && allMonthData[m.shortKey]!.containsKey(bioId)) {
+            runningState.addAll(allMonthData[m.shortKey]![bioId]!);
+          }
+          if (m.shortKey == monthInfo.shortKey) break;
         }
 
         Map<String, String> calculatedMonthData = _calculateEmployeeSalary(
           monthKey: monthInfo.shortKey,
           empDetails: empDetails,
+          runningState: runningState,
           percData: percData,
-          existingMonthData: existingMap,
         );
 
         await monthRef.child(bioId).update(calculatedMonthData);
@@ -480,11 +520,18 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     try {
       final employees = await _fetchMainData();
       final percData = await _fetchPercentageData();
+      final allMonthData = await _fetchAllMonthData();
 
       if (employees.isEmpty) {
         if (mounted) nav.pop();
         _showDialog('No Employee Records', 'No employee records found in maindata to save.');
         return;
+      }
+
+      // Map employee running state across sequential months
+      Map<String, Map<String, dynamic>> employeeRunningStates = {};
+      for (var bioId in employees.keys) {
+        employeeRunningStates[bioId] = {};
       }
 
       for (int i = 0; i < fyMonths.length; i++) {
@@ -496,19 +543,22 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
         for (var entry in employees.entries) {
           String bioId = entry.key;
           Map<String, dynamic> empDetails = entry.value;
+          Map<String, dynamic> runningState = employeeRunningStates[bioId]!;
 
-          final existingSnap = await monthRef.child(bioId).get();
-          Map<String, dynamic>? existingMap;
-          if (existingSnap.exists && existingSnap.value is Map) {
-            existingMap = Map<String, dynamic>.from(existingSnap.value as Map);
+          // Load any pre-existing saved month data for this month
+          if (allMonthData.containsKey(mInfo.shortKey) && allMonthData[mInfo.shortKey]!.containsKey(bioId)) {
+            runningState.addAll(allMonthData[mInfo.shortKey]![bioId]!);
           }
 
           Map<String, String> calculatedMonthData = _calculateEmployeeSalary(
             monthKey: mInfo.shortKey,
             empDetails: empDetails,
+            runningState: runningState,
             percData: percData,
-            existingMonthData: existingMap,
           );
+
+          // Update running state with calculated values
+          runningState.addAll(calculatedMonthData);
 
           await monthRef.child(bioId).update(calculatedMonthData);
         }
