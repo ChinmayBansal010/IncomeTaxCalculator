@@ -1459,10 +1459,20 @@ class _UserFreezeModalState extends State<_UserFreezeModal> {
                   String statusSubtitle;
                   Color statusColor;
                   if (isGlobalFrozen) {
-                    statusSubtitle = 'GLOBAL FROZEN (Frozen across all users)';
+                    if (isSpecFrozen) {
+                      statusSubtitle = 'GLOBAL FROZEN (Overlaps with User FY $yr Switch)';
+                    } else if (isAllYearsFrozen) {
+                      statusSubtitle = 'GLOBAL FROZEN (Overlaps with User All-Years)';
+                    } else {
+                      statusSubtitle = 'GLOBAL FROZEN (Global FY Settings)';
+                    }
                     statusColor = const Color(0xFFDC2626);
                   } else if (isAllYearsFrozen) {
-                    statusSubtitle = 'FROZEN (User All-Years Switch)';
+                    if (isSpecFrozen) {
+                      statusSubtitle = 'USER FROZEN (All-Years + Specific FY $yr)';
+                    } else {
+                      statusSubtitle = 'USER FROZEN (User All-Years Switch)';
+                    }
                     statusColor = const Color(0xFFDC2626);
                   } else if (isSpecFrozen) {
                     statusSubtitle = 'USER FROZEN (User FY $yr Switch)';
