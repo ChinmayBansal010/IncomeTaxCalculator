@@ -458,7 +458,6 @@ class _ItaxPageState extends State<ItaxPage>
       int varDdext4gross,
       int varTotaldedgross,
       int varNetsalarygross) async {
-    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricId == null) {
       if (mounted) {
         showDialog(
@@ -567,7 +566,6 @@ class _ItaxPageState extends State<ItaxPage>
       int varRelief,
       int varNitpi,
       int varEp) async {
-    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricId == null) {
       if (mounted) {
         showDialog(
@@ -680,7 +678,6 @@ class _ItaxPageState extends State<ItaxPage>
       int varRelief,
       int varNitpi,
       int varEp) async {
-    if (checkYearFrozenAndShowDialog(context)) return;
     if (biometricId == null) {
       if (mounted) {
         showDialog(
