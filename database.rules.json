@@ -1,25 +1,6 @@
 {
   "rules": {
     ".read": true,
-    "_admin": {
-      ".read": true,
-      ".write": true
-    },
-    "$year": {
-      ".read": true,
-      "$username": {
-        ".read": true,
-        "itfdata": {
-          ".write": true
-        },
-        "itaxnew": {
-          ".write": true
-        },
-        "itaxold": {
-          ".write": true
-        },
-        ".write": "root.child('_admin/frozen_years/' + $year).val() != true && root.child('_admin/frozen_users/' + $username + '/all_years').val() != true && root.child('_admin/frozen_users/' + $username + '/years/' + $year).val() != true"
-      }
-    }
+    ".write": true
   }
 }
