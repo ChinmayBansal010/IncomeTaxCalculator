@@ -414,6 +414,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         availableYears: _availableYears,
         isAllYearsFrozen: _userAllYearsFrozenMap[user.username] ?? false,
         specificYearsMap: _userSpecificYearsFrozenMap[user.username] ?? {},
+        globalFrozenYearsMap: _globalFrozenYearsMap,
         onToggleAllYears: (freeze) => _toggleUserAllYearsFreeze(user.username, freeze),
         onToggleSpecificYear: (year, freeze) => _toggleUserSpecificYearFreeze(user.username, year, freeze),
       ),
@@ -1354,6 +1355,7 @@ class _UserFreezeModal extends StatefulWidget {
   final List<String> availableYears;
   final bool isAllYearsFrozen;
   final Map<String, bool> specificYearsMap;
+  final Map<String, bool> globalFrozenYearsMap;
   final Function(bool freeze) onToggleAllYears;
   final Function(String year, bool freeze) onToggleSpecificYear;
 
@@ -1362,6 +1364,7 @@ class _UserFreezeModal extends StatefulWidget {
     required this.availableYears,
     required this.isAllYearsFrozen,
     required this.specificYearsMap,
+    required this.globalFrozenYearsMap,
     required this.onToggleAllYears,
     required this.onToggleSpecificYear,
   });
@@ -1448,21 +1451,41 @@ class _UserFreezeModalState extends State<_UserFreezeModal> {
                 separatorBuilder: (context, index) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   String yr = widget.availableYears[index];
-                  bool isYrFrozen = _allYears || (_specYears[yr] == true);
+                  bool isGlobalFrozen = widget.globalFrozenYearsMap[yr] == true;
+                  bool isAllYearsFrozen = _allYears;
+                  bool isSpecFrozen = _specYears[yr] == true;
+                  bool isEffectiveFrozen = isGlobalFrozen || isAllYearsFrozen || isSpecFrozen;
+
+                  String statusSubtitle;
+                  Color statusColor;
+                  if (isGlobalFrozen) {
+                    statusSubtitle = 'GLOBAL FROZEN (Frozen across all users)';
+                    statusColor = const Color(0xFFDC2626);
+                  } else if (isAllYearsFrozen) {
+                    statusSubtitle = 'FROZEN (User All-Years Switch)';
+                    statusColor = const Color(0xFFDC2626);
+                  } else if (isSpecFrozen) {
+                    statusSubtitle = 'USER FROZEN (User FY $yr Switch)';
+                    statusColor = const Color(0xFFDC2626);
+                  } else {
+                    statusSubtitle = 'ACTIVE (Editable)';
+                    statusColor = const Color(0xFF059669);
+                  }
+
                   return SwitchListTile(
                     title: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.w700)),
                     subtitle: Text(
-                      isYrFrozen ? 'FROZEN' : 'ACTIVE',
+                      statusSubtitle,
                       style: TextStyle(
-                        color: isYrFrozen ? const Color(0xFFDC2626) : const Color(0xFF059669),
+                        color: statusColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     ),
-                    value: isYrFrozen,
+                    value: isEffectiveFrozen,
                     activeThumbColor: const Color(0xFFDC2626),
-                    onChanged: _allYears
-                        ? null // Locked if all years frozen
+                    onChanged: (isGlobalFrozen || isAllYearsFrozen)
+                        ? null // Locked if globally frozen or all years frozen
                         : (val) {
                       setState(() {
                         _specYears[yr] = val;
