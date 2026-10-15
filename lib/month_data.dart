@@ -246,47 +246,24 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
               ],
             ),
           ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FyMonthsSavePage()),
-              );
-            },
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(
-                    Icons.calendar_month_rounded,
-                    color: Color(0xFF2563EB),
-                    size: 22,
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    'FY Months',
-                    style: TextStyle(
-                      color: Color(0xFF2563EB),
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
+          Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.date_range_rounded,
+              color: Color(0xFF2563EB),
+              size: 26,
             ),
           ),
         ],
