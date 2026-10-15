@@ -133,6 +133,45 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     return allData;
   }
 
+  Map<String, dynamic> _getEmployeeInitialBaseState({
+    required String bioId,
+    required Map<String, dynamic> empDetails,
+    required Map<String, Map<String, Map<String, dynamic>>> allMonthData,
+  }) {
+    Map<String, dynamic> baseState = {};
+
+    // 1. Copy maindata details
+    empDetails.forEach((k, v) {
+      baseState[k] = v;
+    });
+
+    // 2. Find earliest month in FY order (mar, apr, may, ...) with saved non-zero values
+    for (var mInfo in fyMonths) {
+      String mKey = mInfo.shortKey;
+      if (allMonthData.containsKey(mKey) && allMonthData[mKey]!.containsKey(bioId)) {
+        Map<String, dynamic> mData = allMonthData[mKey]![bioId]!;
+
+        mData.forEach((k, v) {
+          if (v != null && v.toString().isNotEmpty && v.toString() != '0') {
+            baseState[k] = v;
+          } else if (!baseState.containsKey(k)) {
+            baseState[k] = v;
+          }
+        });
+
+        int monthBp = int.tryParse(mData['bp']?.toString() ?? '0') ?? 0;
+        int monthGross = int.tryParse(mData['gross']?.toString() ?? '0') ?? 0;
+
+        if (monthBp > 0 || monthGross > 0) {
+          baseState['bp'] = mData['bp']?.toString() ?? baseState['bp']?.toString() ?? '0';
+          break; // Found base month with non-zero BP
+        }
+      }
+    }
+
+    return baseState;
+  }
+
   Map<String, String> _calculateEmployeeSalary({
     required String monthKey,
     required Map<String, dynamic> empDetails,
@@ -413,8 +452,13 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
         String bioId = entry.key;
         Map<String, dynamic> empDetails = entry.value;
 
-        // Build running state from previous months up to current
-        Map<String, dynamic> runningState = {};
+        // Build initial base state
+        Map<String, dynamic> runningState = _getEmployeeInitialBaseState(
+          bioId: bioId,
+          empDetails: empDetails,
+          allMonthData: allMonthData,
+        );
+
         for (var m in fyMonths) {
           if (allMonthData.containsKey(m.shortKey) && allMonthData[m.shortKey]!.containsKey(bioId)) {
             runningState.addAll(allMonthData[m.shortKey]![bioId]!);
@@ -531,7 +575,11 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
       // Map employee running state across sequential months
       Map<String, Map<String, dynamic>> employeeRunningStates = {};
       for (var bioId in employees.keys) {
-        employeeRunningStates[bioId] = {};
+        employeeRunningStates[bioId] = _getEmployeeInitialBaseState(
+          bioId: bioId,
+          empDetails: employees[bioId]!,
+          allMonthData: allMonthData,
+        );
       }
 
       for (int i = 0; i < fyMonths.length; i++) {
