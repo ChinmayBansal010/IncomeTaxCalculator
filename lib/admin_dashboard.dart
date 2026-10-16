@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'shared.dart';
@@ -64,6 +65,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
+  StreamSubscription<DatabaseEvent>? _frozenYearsSub;
+  StreamSubscription<DatabaseEvent>? _frozenUsersSub;
+
   @override
   void initState() {
     super.initState();
@@ -79,10 +83,61 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       }
     }
     _loadDashboardData();
+    _listenToFreezeData();
+  }
+
+  void _listenToFreezeData() {
+    _frozenYearsSub = _dbRef.child('_admin/frozen_years').onValue.listen((event) {
+      Map<String, bool> globalFrozen = {};
+      if (event.snapshot.exists && event.snapshot.value is Map) {
+        Map map = event.snapshot.value as Map;
+        map.forEach((key, value) {
+          globalFrozen[key.toString()] = value == true;
+        });
+      }
+      if (mounted) {
+        setState(() {
+          _globalFrozenYearsMap = globalFrozen;
+        });
+      }
+    });
+
+    _frozenUsersSub = _dbRef.child('_admin/frozen_users').onValue.listen((event) {
+      Map<String, bool> userAllYears = {};
+      Map<String, Map<String, bool>> userSpecificYears = {};
+
+      if (event.snapshot.exists && event.snapshot.value is Map) {
+        Map userMap = event.snapshot.value as Map;
+        userMap.forEach((userKey, userVal) {
+          String uname = userKey.toString();
+          if (userVal is Map) {
+            if (userVal['all_years'] == true) {
+              userAllYears[uname] = true;
+            }
+            if (userVal['years'] is Map) {
+              Map yrMap = userVal['years'] as Map;
+              Map<String, bool> specYr = {};
+              yrMap.forEach((yk, yv) {
+                specYr[yk.toString()] = yv == true;
+              });
+              userSpecificYears[uname] = specYr;
+            }
+          }
+        });
+      }
+      if (mounted) {
+        setState(() {
+          _userAllYearsFrozenMap = userAllYears;
+          _userSpecificYearsFrozenMap = userSpecificYears;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
+    _frozenYearsSub?.cancel();
+    _frozenUsersSub?.cancel();
     _searchController.dispose();
     super.dispose();
   }
