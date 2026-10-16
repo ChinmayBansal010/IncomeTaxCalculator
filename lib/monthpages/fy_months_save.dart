@@ -316,7 +316,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     required String bioId,
     required Map<String, dynamic> empMainDetails,
     required Map<String, dynamic> percentageData,
-    required Map<String, Map<String, dynamic>> allExistingMonthDataForBioId,
+    required Map<String, Map<String, Map<String, dynamic>>> allExistingMonthData,
     String startMonth = 'mar',
   }) async {
     final List<String> monthKeys = ['mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sept', 'oct', 'nov', 'dec', 'jan', 'feb'];
@@ -327,8 +327,8 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     Map<String, dynamic> monthData = {};
 
     for (String m in monthKeys) {
-      if (allExistingMonthDataForBioId.containsKey(m) && allExistingMonthDataForBioId[m]!.isNotEmpty) {
-        monthData = Map<String, dynamic>.from(allExistingMonthDataForBioId[m]!);
+      if (allExistingMonthData.containsKey(m) && allExistingMonthData[m]!.containsKey(bioId)) {
+        monthData = Map<String, dynamic>.from(allExistingMonthData[m]![bioId]!);
         break;
       }
     }
@@ -377,8 +377,8 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     for (int i = targetIndex; i < monthKeys.length; i++) {
       final currentMonth = monthKeys[i];
 
-      if (allExistingMonthDataForBioId.containsKey(currentMonth) && allExistingMonthDataForBioId[currentMonth]!.isNotEmpty) {
-        allExistingMonthDataForBioId[currentMonth]!.forEach((k, v) {
+      if (allExistingMonthData.containsKey(currentMonth) && allExistingMonthData[currentMonth]!.containsKey(bioId)) {
+        allExistingMonthData[currentMonth]![bioId]!.forEach((k, v) {
           if (v != null && v.toString().isNotEmpty && v.toString() != '0') {
             monthData[k] = v.toString();
           }
@@ -652,7 +652,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
           bioId: bioId,
           empMainDetails: empDetails,
           percentageData: percData,
-          allExistingMonthDataForBioId: allMonthData,
+          allExistingMonthData: allMonthData,
           startMonth: monthInfo.shortKey,
         );
       }
