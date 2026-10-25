@@ -2835,7 +2835,10 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Row(
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -2845,10 +2848,7 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
                                   ),
                                   child: Text('Source FY ($_sourceYear) Feb Salary', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A))),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 6),
-                                  child: Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF2563EB)),
-                                ),
+                                const Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF2563EB)),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
