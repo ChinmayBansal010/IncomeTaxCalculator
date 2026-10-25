@@ -2644,6 +2644,15 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
                   yearSet.add(_sourceYear);
                   yearSet.add(_destYear);
                   yearSet.add(_getNextFy(_sourceYear));
+
+                  DateTime now = DateTime.now();
+                  int curYr = now.year;
+                  for (int i = -3; i <= 6; i++) {
+                    int sY = curYr + i;
+                    String fy = '$sY-${(sY + 1).toString().substring(2)}';
+                    yearSet.add(fy);
+                  }
+
                   List<String> allDropdownYears = yearSet.toList()..sort();
 
                   return Row(
