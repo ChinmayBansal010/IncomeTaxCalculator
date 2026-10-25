@@ -2052,6 +2052,24 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
   bool _shouldTransferMainData = true;
   DataSnapshot? _sourceSnapshot;
 
+  String _getNextFy(String sourceFy) {
+    try {
+      List<String> parts = sourceFy.split('-');
+      if (parts.length == 2) {
+        int startYr = int.parse(parts[0]);
+        int nextStartYr = startYr + 1;
+        String nextYrStr = (nextStartYr + 1).toString();
+        if (nextYrStr.length >= 4) {
+          nextYrStr = nextYrStr.substring(nextYrStr.length - 2);
+        }
+        return '$nextStartYr-$nextYrStr';
+      }
+    } catch (e) {
+      debugPrint('Error parsing FY for next year: $e');
+    }
+    return sourceFy;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -2061,16 +2079,17 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
       _selectedUser = widget.allUsers.first;
     }
 
-    _sourceYear = widget.currentSelectedYear;
-
-    int sourceIndex = widget.availableYears.indexOf(_sourceYear);
-    if (sourceIndex != -1 && sourceIndex < widget.availableYears.length - 1) {
-      _destYear = widget.availableYears[sourceIndex + 1];
-    } else if (widget.availableYears.length > 1) {
-      _destYear = widget.availableYears.firstWhere((y) => y != _sourceYear, orElse: () => _sourceYear);
+    if (sharedData.ccurrentYear.isNotEmpty) {
+      _sourceYear = sharedData.ccurrentYear;
+    } else if (widget.currentSelectedYear.isNotEmpty) {
+      _sourceYear = widget.currentSelectedYear;
     } else {
-      _destYear = _sourceYear;
+      DateTime now = DateTime.now();
+      int startYr = now.month >= 3 ? now.year : now.year - 1;
+      _sourceYear = '$startYr-${(startYr + 1).toString().substring(2)}';
     }
+
+    _destYear = _getNextFy(_sourceYear);
 
     _fetchPreviewData();
   }
@@ -2619,89 +2638,100 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
                 style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF334155), fontSize: 14),
               ),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  // Source FY
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Source FY (From)', style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _sourceYear,
-                              isExpanded: true,
-                              items: widget.availableYears.map((yr) {
-                                return DropdownMenuItem<String>(
-                                  value: yr,
-                                  child: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                );
-                              }).toList(),
-                              onChanged: (yr) {
-                                if (yr != null) {
-                                  setState(() {
-                                    _sourceYear = yr;
-                                  });
-                                  _fetchPreviewData();
-                                }
-                              },
+              Builder(
+                builder: (context) {
+                  Set<String> yearSet = Set.from(widget.availableYears);
+                  yearSet.add(_sourceYear);
+                  yearSet.add(_destYear);
+                  yearSet.add(_getNextFy(_sourceYear));
+                  List<String> allDropdownYears = yearSet.toList()..sort();
+
+                  return Row(
+                    children: [
+                      // Source FY
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Source FY (From)', style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _sourceYear,
+                                  isExpanded: true,
+                                  items: allDropdownYears.map((yr) {
+                                    return DropdownMenuItem<String>(
+                                      value: yr,
+                                      child: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (yr) {
+                                    if (yr != null) {
+                                      setState(() {
+                                        _sourceYear = yr;
+                                        _destYear = _getNextFy(yr);
+                                      });
+                                      _fetchPreviewData();
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Icon(Icons.arrow_forward_rounded, color: Color(0xFF2563EB), size: 22),
-                  ),
-                  // Destination FY
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Destination FY (To)', style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _destYear,
-                              isExpanded: true,
-                              items: widget.availableYears.map((yr) {
-                                return DropdownMenuItem<String>(
-                                  value: yr,
-                                  child: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                );
-                              }).toList(),
-                              onChanged: (yr) {
-                                if (yr != null) {
-                                  setState(() {
-                                    _destYear = yr;
-                                  });
-                                  _fetchPreviewData();
-                                }
-                              },
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Icon(Icons.arrow_forward_rounded, color: Color(0xFF2563EB), size: 22),
+                      ),
+                      // Destination FY
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Destination FY (To)', style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _destYear,
+                                  isExpanded: true,
+                                  items: allDropdownYears.map((yr) {
+                                    return DropdownMenuItem<String>(
+                                      value: yr,
+                                      child: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (yr) {
+                                    if (yr != null) {
+                                      setState(() {
+                                        _destYear = yr;
+                                      });
+                                      _fetchPreviewData();
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 20),
 
