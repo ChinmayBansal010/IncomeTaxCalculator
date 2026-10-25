@@ -2286,6 +2286,19 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
     return entry;
   }
 
+  Map<String, dynamic> _resetArrearOrDeductionEntry(Map<String, dynamic> rawEntry) {
+    Map<String, dynamic> res = {};
+    rawEntry.forEach((k, v) {
+      String keyStr = k.toString().toLowerCase();
+      if (keyStr == 'biometricid' || keyStr == 'biometric_id' || keyStr == 'name' || keyStr == 'designation') {
+        res[k.toString()] = v;
+      } else {
+        res[k.toString()] = '0';
+      }
+    });
+    return res;
+  }
+
   Future<void> _confirmAndTransferData() async {
     if (_validationError != null || _selectedUser == null || _sourceSnapshot == null) return;
 
@@ -2333,7 +2346,7 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
                   Text('• 12 Months Structure: All 12 Months (Mar - Feb) created'),
                   Text('• February Salary -> March Salary: ${_febSalaryExists ? "$_febSalaryCount record(s)" : "Zero-valued entry"}'),
                   const SizedBox(height: 6),
-                  const Text('• Excluded: Arrears, DA, and Deductions set to 0', style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.bold, fontSize: 12)),
+                  const Text('• Arrears & Deductions: Name and Biometric copied, amounts set to 0', style: TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.bold, fontSize: 12)),
                 ],
               ),
             ),
@@ -2451,11 +2464,39 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
         updates['$destPath/maindata'] = srcMap['maindata'];
       }
 
-      // 3. Preserve other permitted sections (EXCLUDING arrdata & deddata!)
+      // 3. Preserve other permitted sections
       for (String sec in ['itfdata', 'itaxnew', 'itaxold', 'percentage']) {
         if (srcMap.containsKey(sec) && srcMap[sec] != null) {
           updates['$destPath/$sec'] = srcMap[sec];
         }
+      }
+
+      // 4. Arrear Data (arrdata): Copy Name, Biometric ID, Designation, set all other amounts to 0
+      if (srcMap.containsKey('arrdata') && srcMap['arrdata'] is Map) {
+        Map<String, dynamic> destArrMap = {};
+        Map srcArr = srcMap['arrdata'] as Map;
+        srcArr.forEach((bioId, val) {
+          if (val is Map) {
+            destArrMap[bioId.toString()] = _resetArrearOrDeductionEntry(
+              Map<String, dynamic>.from(val),
+            );
+          }
+        });
+        updates['$destPath/arrdata'] = destArrMap;
+      }
+
+      // 5. Deduction Data (deddata): Copy Name, Biometric ID, Designation, set all other amounts to 0
+      if (srcMap.containsKey('deddata') && srcMap['deddata'] is Map) {
+        Map<String, dynamic> destDedMap = {};
+        Map srcDed = srcMap['deddata'] as Map;
+        srcDed.forEach((bioId, val) {
+          if (val is Map) {
+            destDedMap[bioId.toString()] = _resetArrearOrDeductionEntry(
+              Map<String, dynamic>.from(val),
+            );
+          }
+        });
+        updates['$destPath/deddata'] = destDedMap;
       }
 
       // Atomic Update in Firebase Realtime Database
