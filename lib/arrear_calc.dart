@@ -1242,14 +1242,17 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                               itemBuilder: (context, index) {
                                 final emp = visibleEmployees[index];
                                 final id = emp['id']!;
-                                return CheckboxListTile(
-                                  title: Text(emp['name']!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
-                                  subtitle: Text('ID: $id', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
-                                  value: selectedEmployees[id] ?? false,
-                                  onChanged: (val) => setState(() => selectedEmployees[id] = val ?? false),
-                                  activeColor: const Color(0xFF2563EB),
-                                  controlAffinity: ListTileControlAffinity.leading,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                return Material(
+                                  color: Colors.transparent,
+                                  child: CheckboxListTile(
+                                    title: Text(emp['name']!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                                    subtitle: Text('ID: $id', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+                                    value: selectedEmployees[id] ?? false,
+                                    onChanged: (val) => setState(() => selectedEmployees[id] = val ?? false),
+                                    activeColor: const Color(0xFF2563EB),
+                                    controlAffinity: ListTileControlAffinity.leading,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                  ),
                                 );
                               },
                             );
@@ -1521,14 +1524,17 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   }
 
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
-    return SwitchListTile(
-      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
-      value: value,
-      onChanged: onChanged,
-      activeThumbColor: const Color(0xFF2563EB),
-      activeTrackColor: const Color(0xFFBFDBFE),
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+    return Material(
+      color: Colors.transparent,
+      child: SwitchListTile(
+        title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
+        value: value,
+        onChanged: onChanged,
+        activeThumbColor: const Color(0xFF2563EB),
+        activeTrackColor: const Color(0xFFBFDBFE),
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      ),
     );
   }
 

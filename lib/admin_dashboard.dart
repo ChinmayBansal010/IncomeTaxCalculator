@@ -1594,26 +1594,29 @@ class _UserFreezeModalState extends State<_UserFreezeModal> {
                     statusColor = const Color(0xFF059669);
                   }
 
-                  return SwitchListTile(
-                    title: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text(
-                      statusSubtitle,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                  return Material(
+                    color: Colors.transparent,
+                    child: SwitchListTile(
+                      title: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.w700)),
+                      subtitle: Text(
+                        statusSubtitle,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
+                      value: isEffectiveFrozen,
+                      activeThumbColor: const Color(0xFFDC2626),
+                      onChanged: (isGlobalFrozen || isAllYearsFrozen)
+                          ? null // Locked if globally frozen or all years frozen
+                          : (val) {
+                        setState(() {
+                          _specYears[yr] = val;
+                        });
+                        widget.onToggleSpecificYear(yr, val);
+                      },
                     ),
-                    value: isEffectiveFrozen,
-                    activeThumbColor: const Color(0xFFDC2626),
-                    onChanged: (isGlobalFrozen || isAllYearsFrozen)
-                        ? null // Locked if globally frozen or all years frozen
-                        : (val) {
-                      setState(() {
-                        _specYears[yr] = val;
-                      });
-                      widget.onToggleSpecificYear(yr, val);
-                    },
                   );
                 },
               ),
@@ -1706,27 +1709,30 @@ class _ManageYearsDialogState extends State<_ManageYearsDialog> {
                 itemBuilder: (context, index) {
                   String yr = widget.availableYears[index];
                   bool isFrozen = widget.frozenYearsMap[yr] ?? false;
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    title: Text(
-                      'FY $yr',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                    ),
-                    subtitle: Text(
-                      isFrozen ? 'GLOBAL FROZEN (Read-only for all users)' : 'ACTIVE (Editable)',
-                      style: TextStyle(
-                        color: isFrozen ? const Color(0xFFDC2626) : const Color(0xFF059669),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                  return Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                      title: Text(
+                        'FY $yr',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                       ),
-                    ),
-                    trailing: Switch(
-                      value: isFrozen,
-                      activeThumbColor: const Color(0xFFDC2626),
-                      onChanged: (bool val) {
-                        widget.onToggleFreeze(yr, val);
-                        setState(() {});
-                      },
+                      subtitle: Text(
+                        isFrozen ? 'GLOBAL FROZEN (Read-only for all users)' : 'ACTIVE (Editable)',
+                        style: TextStyle(
+                          color: isFrozen ? const Color(0xFFDC2626) : const Color(0xFF059669),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                      trailing: Switch(
+                        value: isFrozen,
+                        activeThumbColor: const Color(0xFFDC2626),
+                        onChanged: (bool val) {
+                          widget.onToggleFreeze(yr, val);
+                          setState(() {});
+                        },
+                      ),
                     ),
                   );
                 },
