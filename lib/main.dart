@@ -11,7 +11,7 @@ import 'admin_dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GoogleFonts.config.allowRuntimeFetching = true;
+  GoogleFonts.config.allowRuntimeFetching = false;
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -444,7 +444,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   void _showForgetPasswordDialog() {
     _showCustomDialog(
       'Password Recovery',
-      'Please send an email to itaxcalculator8@gmail.com to reset your password.\n\n• Include your registered username.\n• Processing takes 24-48 hours.\n• Unauthorized requests will be rejected.',
+      'Please contact administrator.',
       Icons.mark_email_read_rounded,
       const Color(0xFF2563EB),
     );
