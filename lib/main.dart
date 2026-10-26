@@ -226,18 +226,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     int startYear = now.month >= 3 ? currentYearNum : currentYearNum - 1;
     String currentFy = '$startYear-${(startYear + 1).toString().substring(2)}';
 
-    Set<String> optionsSet = {};
-    for (int i = -3; i <= 5; i++) {
-      int sY = startYear + i;
-      String fy = '$sY-${(sY + 1).toString().substring(2)}';
-      optionsSet.add(fy);
-    }
-
-    optionsSet.add(currentFy);
-    List<String> sortedList = optionsSet.toList()..sort();
-    sortedList.add(customYearOptionKey);
-
-    yearOptions = sortedList;
+    yearOptions = [currentFy, customYearOptionKey];
     selectedYear = currentFy;
   }
 
