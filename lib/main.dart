@@ -213,25 +213,39 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   bool _isLoading = false;
 
   late String selectedYear;
-  final List<String> yearOptions = [
-    '2024-25',
-    '2025-26',
-    '2026-27',
-    '2027-28',
-  ];
+  late List<String> yearOptions;
+  static const String customYearOptionKey = '+ Custom Year...';
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  void _initYearOptions() {
+    DateTime now = DateTime.now();
+    int currentYearNum = now.year;
+    int startYear = now.month >= 3 ? currentYearNum : currentYearNum - 1;
+    String currentFy = '$startYear-${(startYear + 1).toString().substring(2)}';
+
+    Set<String> optionsSet = {};
+    for (int i = -3; i <= 5; i++) {
+      int sY = startYear + i;
+      String fy = '$sY-${(sY + 1).toString().substring(2)}';
+      optionsSet.add(fy);
+    }
+
+    optionsSet.add(currentFy);
+    List<String> sortedList = optionsSet.toList()..sort();
+    sortedList.add(customYearOptionKey);
+
+    yearOptions = sortedList;
+    selectedYear = currentFy;
+  }
+
   @override
   void initState() {
     super.initState();
 
-    DateTime now = DateTime.now();
-    int currentYear = now.year;
-    int startYear = now.month >= 3 ? currentYear : currentYear - 1;
-    selectedYear = '$startYear-${(startYear + 1).toString().substring(2)}';
+    _initYearOptions();
 
     _controller = AnimationController(
       vsync: this,
@@ -444,6 +458,97 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       'Please send an email to itaxcalculator8@gmail.com to reset your password.\n\n• Include your registered username.\n• Processing takes 24-48 hours.\n• Unauthorized requests will be rejected.',
       Icons.mark_email_read_rounded,
       const Color(0xFF2563EB),
+    );
+  }
+
+  void _showCustomYearDialog() {
+    final TextEditingController customYearController = TextEditingController();
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Row(
+                children: [
+                  Icon(Icons.edit_calendar_rounded, color: Color(0xFF2563EB)),
+                  SizedBox(width: 10),
+                  Text('Custom Financial Year'),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Enter a custom financial year (Format: YYYY-YY):',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: customYearController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'e.g. 2021-22 or 2028-29',
+                      errorText: dialogError,
+                      filled: true,
+                      fillColor: const Color(0xFFF1F5F9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF64748B))),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    String input = customYearController.text.trim();
+                    if (input.isEmpty) {
+                      setDialogState(() {
+                        dialogError = 'Please enter a financial year.';
+                      });
+                      return;
+                    }
+                    if (!RegExp(r'^\d{4}-\d{2}$').hasMatch(input)) {
+                      setDialogState(() {
+                        dialogError = 'Invalid format. Example: 2023-24';
+                      });
+                      return;
+                    }
+
+                    setState(() {
+                      if (!yearOptions.contains(input)) {
+                        yearOptions.insert(yearOptions.length - 1, input);
+                      }
+                      selectedYear = input;
+                    });
+                    Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('Apply Year'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -762,16 +867,33 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             fontWeight: FontWeight.w600,
           ),
           onChanged: (String? newValue) {
-            if (newValue != null) {
+            if (newValue == customYearOptionKey) {
+              _showCustomYearDialog();
+            } else if (newValue != null) {
               setState(() {
                 selectedYear = newValue;
               });
             }
           },
           items: yearOptions.map<DropdownMenuItem<String>>((String year) {
+            bool isCustomItem = year == customYearOptionKey;
             return DropdownMenuItem<String>(
               value: year,
-              child: Text(year),
+              child: Row(
+                children: [
+                  if (isCustomItem) ...[
+                    const Icon(Icons.add_rounded, size: 18, color: Color(0xFF2563EB)),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    year,
+                    style: TextStyle(
+                      color: isCustomItem ? const Color(0xFF2563EB) : const Color(0xFF0F172A),
+                      fontWeight: isCustomItem ? FontWeight.bold : FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             );
           }).toList(),
         ),
