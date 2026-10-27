@@ -1595,7 +1595,7 @@ class _UserFreezeModalState extends State<_UserFreezeModal> {
                   }
 
                   return Material(
-                    color: Colors.transparent,
+                    color: Colors.white,
                     child: SwitchListTile(
                       title: Text('FY $yr', style: const TextStyle(fontWeight: FontWeight.w700)),
                       subtitle: Text(
@@ -1710,7 +1710,7 @@ class _ManageYearsDialogState extends State<_ManageYearsDialog> {
                   String yr = widget.availableYears[index];
                   bool isFrozen = widget.frozenYearsMap[yr] ?? false;
                   return Material(
-                    color: Colors.transparent,
+                    color: Colors.white,
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                       title: Text(

@@ -1243,7 +1243,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                                 final emp = visibleEmployees[index];
                                 final id = emp['id']!;
                                 return Material(
-                                  color: Colors.transparent,
+                                  color: Colors.white,
                                   child: CheckboxListTile(
                                     title: Text(emp['name']!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
                                     subtitle: Text('ID: $id', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
@@ -1329,7 +1329,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: Material(
-            color: Colors.transparent,
+            color: Colors.white,
             child: ExpansionTile(
               tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             title: Text(person['name'], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A))),
@@ -1528,7 +1528,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
 
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return Material(
-      color: Colors.transparent,
+      color: Colors.white,
       child: SwitchListTile(
         title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
         value: value,
