@@ -428,7 +428,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       elevation: 0,
                     ),
                     child: const Text(
-                      'Acknowledge',
+                      'Ok',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                     ),
                   ),
@@ -810,7 +810,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 ),
               )
                   : const Text(
-                'Sign In',
+                'Login',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
