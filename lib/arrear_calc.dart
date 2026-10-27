@@ -621,7 +621,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     if (kIsWeb) {
       final content = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(content);
-      final anchor = html.AnchorElement(href: url)
+      html.AnchorElement(href: url)
         ..setAttribute("download", fileName)
         ..click();
       html.Url.revokeObjectUrl(url);
@@ -858,7 +858,6 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               physics: const BouncingScrollPhysics(),
               itemCount: filteredResults.length,
-              cacheExtent: 1500,
               itemBuilder: (context, index) => _buildResultCard(filteredResults[index]),
             ),
           ),
@@ -1374,7 +1373,8 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                   physics: const BouncingScrollPhysics(),
                   child: DataTable(
                     headingRowHeight: 50,
-                    dataRowHeight: 56,
+                    dataRowMinHeight: 56,
+                    dataRowMaxHeight: 56,
                     columnSpacing: 24,
                     horizontalMargin: 24,
                     headingTextStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF475569)),
