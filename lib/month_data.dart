@@ -228,6 +228,29 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          const Icon(Icons.people_alt_rounded, color: Colors.white, size: 14),
+                          const SizedBox(width: 6),
+                          Text(
+                            isLoading ? "Loading..." : "Total Records: ${biometricData.length}",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           const Icon(Icons.calendar_month_rounded, color: Colors.white, size: 14),
                           const SizedBox(width: 6),
                           Text(
