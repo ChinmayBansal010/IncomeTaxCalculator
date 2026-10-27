@@ -443,8 +443,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   void _showForgetPasswordDialog() {
     _showCustomDialog(
-      'Password Recovery',
-      'Please contact administrator.',
+      'Forgot Password',
+      'Please contact administrator',
       Icons.mark_email_read_rounded,
       const Color(0xFF2563EB),
     );
@@ -740,7 +740,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           controller: _usernameController,
           obscureText: false,
           icon: Icons.person_outline_rounded,
-          hintText: 'Enter your username',
+          hintText: 'Login ID',
         ),
         const SizedBox(height: 24),
         _buildLabel('Password'),
@@ -749,7 +749,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           controller: _passwordController,
           obscureText: _obscurePassword,
           icon: Icons.lock_outline_rounded,
-          hintText: 'Enter your password',
+          hintText: 'Password',
           toggleVisibility: _togglePasswordVisibility,
         ),
         const SizedBox(height: 16),
@@ -763,7 +763,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text(
-              'Forgot Password?',
+              'Forgot Password',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
