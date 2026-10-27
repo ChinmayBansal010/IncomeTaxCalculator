@@ -1328,8 +1328,10 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
         borderRadius: BorderRadius.circular(20),
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: Material(
+            color: Colors.transparent,
+            child: ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             title: Text(person['name'], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A))),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 8.0),
@@ -1486,14 +1488,14 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                                 style: TextStyle(fontWeight: FontWeight.w900, color: totals['diff_${allow['key']!}'] < 0 ? const Color(0xFFEF4444) : const Color(0xFF10B981)))),
                           ],
                           DataCell(
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: person['totalArrear'] < 0 ? const Color(0xFFDC2626) : const Color(0xFF059669),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(person['totalArrear'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 14)),
-                              )
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: person['totalArrear'] < 0 ? const Color(0xFFDC2626) : const Color(0xFF059669),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(person['totalArrear'].toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 14)),
+                            ),
                           ),
                         ],
                       ),
@@ -1505,8 +1507,9 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildBadge(String label, Color bgColor, Color textColor, IconData icon) {
     return Container(
