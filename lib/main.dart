@@ -282,15 +282,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     try {
       final databaseRef = FirebaseDatabase.instance.ref();
 
-      // Check Admin Login (username: admin)
-      if (username == 'admin') {
+      // Check Admin Login (case-insensitive username & password)
+      if (username.trim().toLowerCase() == 'admin') {
         final adminPassSnap = await databaseRef.child('_admin/credentials/password').get();
         String activeAdminPassword = 'admin';
         if (adminPassSnap.exists && adminPassSnap.value != null && adminPassSnap.value.toString().isNotEmpty) {
           activeAdminPassword = adminPassSnap.value.toString();
         }
 
-        if (password == activeAdminPassword) {
+        if (password.trim().toLowerCase() == activeAdminPassword.trim().toLowerCase()) {
           sharedData.isAdmin = true;
           sharedData.adminUsername = 'admin';
           sharedData.ccurrentYear = selectedYear;
@@ -314,41 +314,80 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         }
       }
 
-      final userRef = databaseRef.child('$selectedYear/$username').child(username);
-      final dataSnapshot = await userRef.get();
+      // Normal User Login (Case-insensitive Login ID search & password comparison)
+      final yearSnap = await databaseRef.child(selectedYear).get();
+      if (yearSnap.exists && yearSnap.value is Map) {
+        Map yearMap = yearSnap.value as Map;
+        String enteredUnameLower = username.trim().toLowerCase();
 
-      if (dataSnapshot.exists) {
-        Map<String, dynamic> userMap = Map<String, dynamic>.from(dataSnapshot.value as Map);
-        String? storedPassword = userMap['password'];
-        String storedZone = userMap['zone'] ?? '';
+        String? matchedUserKey;
+        Map<String, dynamic>? matchedUserMap;
 
-        if (storedPassword == password) {
-          sharedData.userPlace = '$selectedYear/$username';
-          sharedData.ccurrentYear = selectedYear;
-          sharedData.zone = storedZone;
-          sharedData.isAdmin = false;
+        yearMap.forEach((userKey, userVal) {
+          String keyStr = userKey.toString();
+          if (keyStr == '_admin' || keyStr == '_metadata' || keyStr == 'frozen_years' || keyStr == 'frozen_users') return;
 
-          sharedData.isYearFrozen = await checkDatabaseFreezeStatus(
-            username: username,
-            year: selectedYear,
-          );
+          if (userVal is Map) {
+            Map userNodeMap = userVal;
+            Map? profileMap;
 
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const HomePage(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-              ),
+            if (userNodeMap.containsKey(keyStr) && userNodeMap[keyStr] is Map) {
+              profileMap = userNodeMap[keyStr] as Map;
+            } else {
+              userNodeMap.forEach((k, v) {
+                if (v is Map && (v.containsKey('password') || v.containsKey('zone') || v.containsKey('username'))) {
+                  profileMap = v;
+                }
+              });
+            }
+
+            String storedUsername = profileMap?['username']?.toString() ?? keyStr;
+            if (storedUsername.trim().toLowerCase() == enteredUnameLower || keyStr.trim().toLowerCase() == enteredUnameLower) {
+              matchedUserKey = keyStr;
+              if (profileMap != null) {
+                matchedUserMap = Map<String, dynamic>.from(profileMap!);
+              } else if (userNodeMap.containsKey(keyStr) && userNodeMap[keyStr] is Map) {
+                matchedUserMap = Map<String, dynamic>.from(userNodeMap[keyStr] as Map);
+              }
+            }
+          }
+        });
+
+        if (matchedUserKey != null && matchedUserMap != null) {
+          String storedPassword = matchedUserMap!['password']?.toString() ?? '';
+          String storedZone = matchedUserMap!['zone']?.toString() ?? '';
+          String actualUsername = matchedUserMap!['username']?.toString() ?? matchedUserKey!;
+
+          if (password.trim().toLowerCase() == storedPassword.trim().toLowerCase()) {
+            sharedData.userPlace = '$selectedYear/$actualUsername';
+            sharedData.ccurrentYear = selectedYear;
+            sharedData.zone = storedZone;
+            sharedData.isAdmin = false;
+
+            sharedData.isYearFrozen = await checkDatabaseFreezeStatus(
+              username: actualUsername,
+              year: selectedYear,
             );
+
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const HomePage(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              );
+            }
+          } else {
+            _showCustomDialog('Access Denied', 'The password you entered is incorrect.', Icons.lock_outline_rounded, const Color(0xFFEF4444));
           }
         } else {
-          _showCustomDialog('Access Denied', 'The password you entered is incorrect.', Icons.lock_outline_rounded, const Color(0xFFEF4444));
+          _showCustomDialog('Account Not Found', 'We could not find an account with that username for the selected year.', Icons.person_off_rounded, const Color(0xFFEF4444));
         }
       } else {
-        _showCustomDialog('Account Not Found', 'We could not find an account with that username for the selected year.', Icons.person_off_rounded, const Color(0xFFEF4444));
+        _showCustomDialog('Account Not Found', 'We could not find any accounts for the selected year.', Icons.person_off_rounded, const Color(0xFFEF4444));
       }
     } catch (e) {
       _showCustomDialog('Connection Error', 'Something went wrong. Please check your connection and try again.', Icons.wifi_off_rounded, const Color(0xFFEF4444));
