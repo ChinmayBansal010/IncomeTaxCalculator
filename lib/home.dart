@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/shared.dart';
 import 'package:incometax/tds.dart';
 import 'main.dart';
@@ -25,15 +26,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   bool _isLoading = false;
   late AnimationController _animationController;
 
+  int _totalEmployeeRecords = 0;
+  bool _isFetchingRecords = true;
+
   final List<Map<String, dynamic>> _menuItems = [
     {"label": "MAIN", "subtitle": "Core tax entries", "icon": Icons.dashboard_customize_rounded, "color": const Color(0xFF2563EB)},
     {"label": "DA%", "subtitle": "Dearness allowance", "icon": Icons.percent_rounded, "color": const Color(0xFF059669)},
-    {"label": "MONTH", "subtitle": "Monthly statements", "icon": Icons.calendar_month_rounded, "color": const Color(0xFFD97706)},
+    {"label": "MONTH", "subtitle": "Monthly salary", "icon": Icons.calendar_month_rounded, "color": const Color(0xFFD97706)},
     {"label": "ARREAR", "subtitle": "Pending clearings", "icon": Icons.account_balance_wallet_rounded, "color": const Color(0xFF7C3AED)},
     {"label": "DEDUCTION", "subtitle": "Tax deductions", "icon": Icons.remove_circle_outline_rounded, "color": const Color(0xFFDC2626)},
     {"label": "ITAX FORM", "subtitle": "Official generation", "icon": Icons.description_rounded, "color": const Color(0xFF2563EB)},
     {"label": "TAX EXPORT", "subtitle": "Download current", "icon": Icons.file_download_rounded, "color": const Color(0xFF0891B2)},
-    {"label": "ARREAR - CALC", "subtitle": "Arrear processing", "icon": Icons.calculate_rounded, "color": const Color(0xFF4F46E5)},
+    {"label": "ARREAR - CALC", "subtitle": "Arrear calculation", "icon": Icons.calculate_rounded, "color": const Color(0xFF4F46E5)},
     {"label": "EXPORT ALL", "subtitle": "Complete backup", "icon": Icons.archive_rounded, "color": const Color(0xFF0D9488)},
     {"label": "TDS", "subtitle": "Standard deduction", "icon": Icons.receipt_long_rounded, "color": const Color(0xFFEA580C)},
     {"label": "TDS - 0", "subtitle": "Zero rate standard", "icon": Icons.receipt_rounded, "color": const Color(0xFFCA8A04)},
@@ -48,6 +52,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       duration: const Duration(milliseconds: 900),
     );
     _animationController.forward();
+    _fetchTotalRecords();
+  }
+
+  Future<void> _fetchTotalRecords() async {
+    try {
+      final dbRef = FirebaseDatabase.instance.ref();
+      final mainDataSnap = await dbRef.child('${sharedData.userPlace}/maindata').get();
+      int count = 0;
+      if (mainDataSnap.exists && mainDataSnap.value is Map) {
+        count = (mainDataSnap.value as Map).length;
+      }
+      if (mounted) {
+        setState(() {
+          _totalEmployeeRecords = count;
+          _isFetchingRecords = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching total records on home page: $e');
+      if (mounted) {
+        setState(() {
+          _isFetchingRecords = false;
+        });
+      }
+    }
   }
 
   @override
@@ -238,28 +267,60 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ),
               const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.calendar_month_rounded, size: 16, color: Color(0xFF475569)),
-                    const SizedBox(width: 6),
-                    Text(
-                      'FY: ${sharedData.ccurrentYear}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF334155),
-                      ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEFF6FF),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFBFDBFE), width: 1.5),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.people_alt_rounded, size: 16, color: Color(0xFF2563EB)),
+                        const SizedBox(width: 6),
+                        Text(
+                          _isFetchingRecords
+                              ? 'Loading...'
+                              : 'Total Records: $_totalEmployeeRecords',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF1E40AF),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.calendar_month_rounded, size: 16, color: Color(0xFF475569)),
+                        const SizedBox(width: 6),
+                        Text(
+                          'FY: ${sharedData.ccurrentYear}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF334155),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -373,24 +434,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _handleMenuAction(String label, BuildContext context) async {
+    final nav = Navigator.of(context);
+    Widget? page;
     switch (label) {
       case "MAIN":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const MainDataPage()));
+        page = const MainDataPage();
         break;
       case "DA%":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const DaPage()));
+        page = const DaPage();
         break;
       case "MONTH":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const MonthDataPage()));
+        page = const MonthDataPage();
         break;
       case "ARREAR":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ArrearPage()));
+        page = const ArrearPage();
         break;
       case "DEDUCTION":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const DeductionPage()));
+        page = const DeductionPage();
         break;
       case "ITAX FORM":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ItaxPage()));
+        page = const ItaxPage();
         break;
       case "TAX EXPORT":
         final confirm = await _showConfirmDialog(
@@ -398,11 +461,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           "Are you sure you want to generate and export the tax data?",
           Icons.file_download_rounded,
         );
-        if (confirm != true) break;
-        _executeExport(createExcel);
-        break;
+        if (confirm == true) {
+          _executeExport(createExcel);
+        }
+        return;
       case "ARREAR - CALC":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const CalcArrearPage()));
+        page = const CalcArrearPage();
         break;
       case "EXPORT ALL":
         final confirmAll = await _showConfirmDialog(
@@ -410,27 +474,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           "Are you sure you want to export the entire database?",
           Icons.archive_rounded,
         );
-        if (confirmAll != true) break;
-        _executeExport(exportAll);
-        break;
+        if (confirmAll == true) {
+          _executeExport(exportAll);
+        }
+        return;
       case "TDS":
         final confirmTDS = await _showConfirmDialog(
           "Export TDS",
           "Are you sure you want to export the standard TDS data?",
           Icons.receipt_long_rounded,
         );
-        if (confirmTDS != true) break;
-        _executeExport(() => exportExcel(false));
-        break;
+        if (confirmTDS == true) {
+          _executeExport(() => exportExcel(false));
+        }
+        return;
       case "TDS - 0":
         final confirmTDSZero = await _showConfirmDialog(
           "Export TDS (0%)",
           "Are you sure you want to export TDS data with a 0% rate?",
           Icons.receipt_rounded,
         );
-        if (confirmTDSZero != true) break;
-        _executeExport(() => exportExcel(true));
-        break;
+        if (confirmTDSZero == true) {
+          _executeExport(() => exportExcel(true));
+        }
+        return;
       case "LOGOUT":
         final nav = Navigator.of(context);
         final confirmLogout = await _showConfirmDialog(
@@ -446,7 +513,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             nav.pushReplacement(MaterialPageRoute(builder: (context) => const LoginPage()));
           }
         }
-        break;
+        return;
+    }
+
+    if (page != null) {
+      nav.push(MaterialPageRoute(builder: (context) => page!)).then((_) {
+        _fetchTotalRecords();
+      });
     }
   }
 
