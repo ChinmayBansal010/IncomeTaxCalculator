@@ -26,7 +26,9 @@ void main() async {
 
 const List<String> kAppFontFallback = [
   'NotoSans',
+  'NotoSansDevanagari',
   'NotoHindi',
+  'NotoColorEmoji',
   'NotoEmoji',
   'MaterialIcons',
   'Roboto',
