@@ -982,21 +982,23 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF64748B).withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF64748B).withValues(alpha: 0.06),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -1290,8 +1292,9 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildResultCard(Map<String, dynamic> person) {
     List monthlyData = person['monthlyData'];
