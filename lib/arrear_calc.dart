@@ -999,20 +999,26 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF8FAFC),
-                  border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF8FAFC),
+                    border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                  ),
+                  child: const Text(
+                    "Parameters Configuration",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                  ),
                 ),
-                child: const Text(
-                  "Parameters Configuration",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                ),
-              ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
               Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
@@ -1263,6 +1269,10 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                   ],
                 ),
               ),
+                      ],
+                    ),
+                  ),
+                ),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
