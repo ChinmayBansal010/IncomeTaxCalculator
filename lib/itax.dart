@@ -85,22 +85,22 @@ class _ItaxPageState extends State<ItaxPage>
       DatabaseEvent event = await bioRef.child('maindata').once();
       DataSnapshot snapshot = event.snapshot;
 
-      if (snapshot.exists) {
-        Map<Object?, Object?> rawData = snapshot.value as Map<Object?, Object?>;
-        Map<String, Map<String, dynamic>> data = {};
-
-        rawData.forEach((key, value) {
-          if (key is String && value is Map) {
-            data[key] = Map<String, dynamic>.from(value);
-          }
-        });
+      if (snapshot.exists && snapshot.value != null) {
+        Map<String, Map<String, dynamic>> data = parseFirebaseSnapshotToMap(snapshot.value);
 
         if (mounted) {
           setState(() {
             biometricData = data;
             filteredData = data; // Initially, no filter applied
             sortedKeys = filteredData.keys.toList()
-              ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+              ..sort((a, b) {
+                int? numA = int.tryParse(a);
+                int? numB = int.tryParse(b);
+                if (numA != null && numB != null) {
+                  return numA.compareTo(numB);
+                }
+                return a.compareTo(b);
+              });
             isLoading = false;
             shouldRefetch = false;
           });

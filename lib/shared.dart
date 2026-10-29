@@ -81,3 +81,28 @@ bool checkYearFrozenAndShowDialog(BuildContext context) {
   }
   return false;
 }
+
+Map<String, Map<String, dynamic>> parseFirebaseSnapshotToMap(dynamic snapshotValue) {
+  Map<String, Map<String, dynamic>> result = {};
+  if (snapshotValue == null) return result;
+
+  if (snapshotValue is Map) {
+    snapshotValue.forEach((key, value) {
+      if (value is Map) {
+        result[key.toString()] = Map<String, dynamic>.from(value);
+      }
+    });
+  } else if (snapshotValue is List) {
+    for (int i = 0; i < snapshotValue.length; i++) {
+      final value = snapshotValue[i];
+      if (value is Map) {
+        final mapVal = Map<String, dynamic>.from(value);
+        final bioId = mapVal['biometricid']?.toString() ??
+            mapVal['biometricId']?.toString() ??
+            i.toString();
+        result[bioId] = mapVal;
+      }
+    }
+  }
+  return result;
+}

@@ -60,8 +60,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       final dbRef = FirebaseDatabase.instance.ref();
       final mainDataSnap = await dbRef.child('${sharedData.userPlace}/maindata').get();
       int count = 0;
-      if (mainDataSnap.exists && mainDataSnap.value is Map) {
-        count = (mainDataSnap.value as Map).length;
+      if (mainDataSnap.exists && mainDataSnap.value != null) {
+        final recordsMap = parseFirebaseSnapshotToMap(mainDataSnap.value);
+        count = recordsMap.length;
       }
       if (mounted) {
         setState(() {

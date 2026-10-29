@@ -52,6 +52,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
   }
 
   Future<void> _loadMonthCounts() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -61,13 +62,40 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
       final snapshot = await monthDataRef.get();
 
       Map<String, int> counts = {};
-      if (snapshot.exists && snapshot.value is Map) {
-        Map monthMap = snapshot.value as Map;
-        monthMap.forEach((mKey, mVal) {
-          if (mVal is Map) {
-            counts[mKey.toString()] = mVal.length;
+      if (snapshot.exists && snapshot.value != null) {
+        final rawVal = snapshot.value;
+        if (rawVal is Map) {
+          rawVal.forEach((mKey, mVal) {
+            int count = 0;
+            if (mVal is Map) {
+              mVal.forEach((bioKey, bioVal) {
+                if (bioVal is Map) count++;
+              });
+            } else if (mVal is List) {
+              for (var item in mVal) {
+                if (item is Map) count++;
+              }
+            }
+            counts[mKey.toString().toLowerCase()] = count;
+          });
+        } else if (rawVal is List) {
+          for (int i = 0; i < rawVal.length; i++) {
+            final mVal = rawVal[i];
+            if (mVal != null) {
+              int count = 0;
+              if (mVal is Map) {
+                mVal.forEach((bioKey, bioVal) {
+                  if (bioVal is Map) count++;
+                });
+              } else if (mVal is List) {
+                for (var item in mVal) {
+                  if (item is Map) count++;
+                }
+              }
+              counts[i.toString().toLowerCase()] = count;
+            }
           }
-        });
+        }
       }
 
       if (mounted) {
@@ -89,17 +117,7 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
   Future<Map<String, Map<String, dynamic>>> _fetchMainData() async {
     final mainRef = _dbRef.child('${sharedData.userPlace}/maindata');
     final snapshot = await mainRef.get();
-    Map<String, Map<String, dynamic>> employees = {};
-
-    if (snapshot.exists && snapshot.value is Map) {
-      Map rawMap = snapshot.value as Map;
-      rawMap.forEach((key, val) {
-        if (key is String && val is Map) {
-          employees[key] = Map<String, dynamic>.from(val);
-        }
-      });
-    }
-    return employees;
+    return parseFirebaseSnapshotToMap(snapshot.value);
   }
 
   Future<Map<String, dynamic>> _fetchPercentageData() async {
@@ -116,19 +134,22 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
     final snapshot = await monthRef.get();
     Map<String, Map<String, Map<String, dynamic>>> allData = {};
 
-    if (snapshot.exists && snapshot.value is Map) {
-      Map rawMap = snapshot.value as Map;
-      rawMap.forEach((mKey, mVal) {
-        if (mKey is String && mVal is Map) {
-          Map<String, Map<String, dynamic>> empMonthMap = {};
-          mVal.forEach((bioKey, bioVal) {
-            if (bioKey is String && bioVal is Map) {
-              empMonthMap[bioKey] = Map<String, dynamic>.from(bioVal);
-            }
-          });
-          allData[mKey] = empMonthMap;
+    if (snapshot.exists && snapshot.value != null) {
+      final rawVal = snapshot.value;
+      if (rawVal is Map) {
+        rawVal.forEach((mKey, mVal) {
+          final monthMap = parseFirebaseSnapshotToMap(mVal);
+          allData[mKey.toString().toLowerCase()] = monthMap;
+        });
+      } else if (rawVal is List) {
+        for (int i = 0; i < rawVal.length; i++) {
+          final mVal = rawVal[i];
+          if (mVal != null) {
+            final monthMap = parseFirebaseSnapshotToMap(mVal);
+            allData[i.toString().toLowerCase()] = monthMap;
+          }
         }
-      });
+      }
     }
     return allData;
   }

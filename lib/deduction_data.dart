@@ -40,15 +40,8 @@ class _DeductionPageState extends State<DeductionPage> with SingleTickerProvider
       DatabaseEvent event = await bioRef.once();
       DataSnapshot snapshot = event.snapshot;
 
-      if (snapshot.exists) {
-        Map<Object?, Object?> rawData = snapshot.value as Map<Object?, Object?>;
-        Map<String, Map<String, dynamic>> data = {};
-
-        rawData.forEach((key, value) {
-          if (key is String && value is Map) {
-            data[key] = Map<String, dynamic>.from(value);
-          }
-        });
+      if (snapshot.exists && snapshot.value != null) {
+        Map<String, Map<String, dynamic>> data = parseFirebaseSnapshotToMap(snapshot.value);
 
         if (mounted) {
           setState(() {
@@ -91,7 +84,15 @@ class _DeductionPageState extends State<DeductionPage> with SingleTickerProvider
   }
 
   void _updateSortedKeys() {
-    sortedKeys = filteredData.keys.toList()..sort();
+    sortedKeys = filteredData.keys.toList()
+      ..sort((a, b) {
+        int? numA = int.tryParse(a);
+        int? numB = int.tryParse(b);
+        if (numA != null && numB != null) {
+          return numA.compareTo(numB);
+        }
+        return a.compareTo(b);
+      });
   }
 
   Future<void> _refreshData() async {
