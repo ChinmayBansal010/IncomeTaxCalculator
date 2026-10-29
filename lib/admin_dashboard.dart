@@ -2906,13 +2906,13 @@ class _TransferFyDataModalState extends State<_TransferFyDataModal> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '✓ All 12 Months (Mar - Feb) will be created in Destination FY ($_destYear).',
+                              '• All 12 Months (Mar - Feb) will be created in Destination FY ($_destYear).',
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               _febSalaryExists
-                                  ? '✓ $_febSalaryCount February salary record(s) mapped to March in FY $_destYear.'
+                                  ? '• $_febSalaryCount February salary record(s) mapped to March in FY $_destYear.'
                                   : '• No February salary record in Source FY. March initialized with zero baseline.',
                               style: TextStyle(
                                 fontSize: 12,

@@ -97,6 +97,10 @@
         fonts:
           - asset: assets/fonts/NotoSans-Regular.ttf
 
+      - family: Noto Sans
+        fonts:
+          - asset: assets/fonts/NotoSans-Regular.ttf
+
       - family: NotoHindi
         fonts:
           - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
@@ -105,11 +109,23 @@
         fonts:
           - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
 
+      - family: Noto Sans Devanagari
+        fonts:
+          - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+
       - family: NotoEmoji
         fonts:
           - asset: assets/fonts/NotoEmoji-Regular.ttf
 
+      - family: Noto Emoji
+        fonts:
+          - asset: assets/fonts/NotoEmoji-Regular.ttf
+
       - family: NotoColorEmoji
+        fonts:
+          - asset: assets/fonts/NotoEmoji-Regular.ttf
+
+      - family: Noto Color Emoji
         fonts:
           - asset: assets/fonts/NotoEmoji-Regular.ttf
     # An image asset can refer to one or more resolution-specific "variants", see

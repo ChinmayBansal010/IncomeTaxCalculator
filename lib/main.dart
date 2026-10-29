@@ -26,14 +26,16 @@ void main() async {
 
 const List<String> kAppFontFallback = [
   'NotoSans',
+  'Noto Sans',
   'NotoSansDevanagari',
+  'Noto Sans Devanagari',
   'NotoHindi',
   'NotoColorEmoji',
+  'Noto Color Emoji',
   'NotoEmoji',
+  'Noto Emoji',
   'MaterialIcons',
   'Roboto',
-  'Arial',
-  'sans-serif',
 ];
 
 class MyApp extends StatelessWidget {
