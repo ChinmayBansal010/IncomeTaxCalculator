@@ -91,6 +91,21 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   bool isEpfChecked = false;
   bool isEsiChecked = false;
 
+  Set<String> manualOverrides = {};
+  Set<String> dirtyManualFields = {};
+  bool isBpChanged = false;
+  bool isTaChanged = false;
+
+  static const Map<String, String> _autoCalculatedFieldLabels = {
+    'npa': 'NPA',
+    'da': 'DA',
+    'hra': 'HRA',
+    'daonta': 'DA ON TA',
+    'nps': 'NPS',
+    'esi': 'ESI',
+    'epf': 'EPF',
+  };
+
   late AnimationController _entranceController;
 
   @override
@@ -104,6 +119,28 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   }
 
   void _setInitialValue() {
+    isBpChanged = false;
+    isTaChanged = false;
+    dirtyManualFields.clear();
+    manualOverrides.clear();
+    if (monthData['manual_overrides'] != null) {
+      if (monthData['manual_overrides'] is Map) {
+        (monthData['manual_overrides'] as Map).forEach((k, v) {
+          if (v == true || v == '1' || v == 1 || v == 'true') {
+            manualOverrides.add(k.toString());
+          }
+        });
+      } else if (monthData['manual_overrides'] is List) {
+        for (var item in (monthData['manual_overrides'] as List)) {
+          manualOverrides.add(item.toString());
+        }
+      } else if (monthData['manual_overrides'] is String) {
+        manualOverrides = (monthData['manual_overrides'] as String)
+            .split(',')
+            .where((s) => s.isNotEmpty)
+            .toSet();
+      }
+    }
     biometricidController.text = monthData['biometricid']?.toString() ?? '';
     nameController.text = monthData['name']?.toString() ?? '';
     designationController.text = monthData['designation']?.toString() ?? '';
@@ -501,6 +538,13 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     });
   }
 
+  void _onAutoCalculatedFieldChanged(String key, String value) {
+    setState(() {
+      monthData[key] = value;
+      dirtyManualFields.add(key);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -648,24 +692,28 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   setState(() {
                                     dachk = val;
                                     monthData['dap'] = val ? '1' : '0';
+                                    if (!val) manualOverrides.remove('da');
                                   });
                                 }),
                                 _buildToggleCard("HRA", hrachk, (val) {
                                   setState(() {
                                     hrachk = val;
                                     monthData['hrap'] = val ? '1' : '0';
+                                    if (!val) manualOverrides.remove('hra');
                                   });
                                 }),
                                 _buildToggleCard("TA", tachk, (val) {
                                   setState(() {
                                     tachk = val;
                                     monthData['tap'] = val ? '1' : '0';
+                                    if (!val) manualOverrides.remove('daonta');
                                   });
                                 }),
                                 _buildToggleCard("NPA", npachk, (val) {
                                   setState(() {
                                     npachk = val;
                                     monthData['npap'] = val ? '1' : '0';
+                                    if (!val) manualOverrides.remove('npa');
                                   });
                                 }),
                               ],
@@ -679,18 +727,18 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                               "Details of Allowance",
                               Icons.account_balance_wallet_rounded,
                               [
-                                AnimatedInputField(label: "BP", controller: bpController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('bp', val)),
-                                AnimatedInputField(label: "DA", controller: daController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('da', val)),
-                                AnimatedInputField(label: "HRA", controller: hraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('hra', val)),
-                                AnimatedInputField(label: "NPA", controller: npaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('npa', val)),
+                                AnimatedInputField(label: "BP", controller: bpController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('bp', val); isBpChanged = true; }),
+                                AnimatedInputField(label: "DA", controller: daController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('da', val)),
+                                AnimatedInputField(label: "HRA", controller: hraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('hra', val)),
+                                AnimatedInputField(label: "NPA", controller: npaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('npa', val)),
                                 AnimatedInputField(label: "SPECIAL PAY", controller: splpayController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('splpay', val)),
                                 AnimatedInputField(label: "CONVEYANCE", controller: convController, icon: Icons.directions_car_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('conv', val)),
                                 AnimatedInputField(label: "PG", controller: pgController, icon: Icons.school_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pg', val)),
                                 AnimatedInputField(label: "ANNUAL", controller: annualController, icon: Icons.event_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('annual', val)),
                                 AnimatedInputField(label: "UNIFORM", controller: uniformController, icon: Icons.checkroom_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('uniform', val)),
                                 AnimatedInputField(label: "NURSING", controller: nursingController, icon: Icons.local_hospital_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('nursing', val)),
-                                AnimatedInputField(label: "TA", controller: taController, icon: Icons.flight_takeoff_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ta', val)),
-                                AnimatedInputField(label: "DA ON TA", controller: daontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daonta', val)),
+                                AnimatedInputField(label: "TA", controller: taController, icon: Icons.flight_takeoff_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('ta', val); isTaChanged = true; }),
+                                AnimatedInputField(label: "DA ON TA", controller: daontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('daonta', val)),
                                 AnimatedInputField(label: "MEDICAL", controller: medicalController, icon: Icons.medical_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('medical', val)),
                                 AnimatedInputField(label: "DIRT", controller: dirtController, icon: Icons.cleaning_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('dirt', val)),
                                 AnimatedInputField(label: "WASHING", controller: washingController, icon: Icons.local_laundry_service_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('washing', val)),
@@ -715,7 +763,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   controller: grossController,
                                   icon: Icons.account_balance_rounded,
                                   keyboardType: TextInputType.number,
-                                  onChanged: (val) => _onFieldChanged('gross', val),
+                                  readOnly: true,
                                 ),
                               ],
                             ),
@@ -762,9 +810,13 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                       isNpsChecked = val;
                                       npsController.text = val ? monthData['nps'] ?? '0' : '0';
                                       monthData['npschk'] = val ? '1' : '0';
+                                      if (!val) {
+                                        manualOverrides.remove('nps');
+                                        dirtyManualFields.remove('nps');
+                                      }
                                     });
                                   },
-                                  onFieldChanged: (val) => _onFieldChanged('nps', val),
+                                  onFieldChanged: (val) => _onAutoCalculatedFieldChanged('nps', val),
                                 ),
                                 _buildCheckboxInputField(
                                   label: "EPF",
@@ -777,9 +829,13 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                       isEpfChecked = val;
                                       epfController.text = val ? monthData['epf'] ?? '0' : '0';
                                       monthData['epfchk'] = val ? '1' : '0';
+                                      if (!val) {
+                                        manualOverrides.remove('epf');
+                                        dirtyManualFields.remove('epf');
+                                      }
                                     });
                                   },
-                                  onFieldChanged: (val) => _onFieldChanged('epf', val),
+                                  onFieldChanged: (val) => _onAutoCalculatedFieldChanged('epf', val),
                                 ),
                                 _buildCheckboxInputField(
                                   label: "ESI",
@@ -792,9 +848,13 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                       isEsiChecked = val;
                                       esiController.text = val ? monthData['esi'] ?? '0' : '0';
                                       monthData['esichk'] = val ? '1' : '0';
+                                      if (!val) {
+                                        manualOverrides.remove('esi');
+                                        dirtyManualFields.remove('esi');
+                                      }
                                     });
                                   },
-                                  onFieldChanged: (val) => _onFieldChanged('esi', val),
+                                  onFieldChanged: (val) => _onAutoCalculatedFieldChanged('esi', val),
                                 ),
                               ],
                             ),
@@ -811,14 +871,14 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   controller: totaldedController,
                                   icon: Icons.remove_circle_outline_rounded,
                                   keyboardType: TextInputType.number,
-                                  onChanged: (val) => _onFieldChanged('totalded', val),
+                                  readOnly: true,
                                 ),
                                 AnimatedInputField(
                                   label: "NET SALARY",
                                   controller: netsalaryController,
                                   icon: Icons.account_balance_wallet_rounded,
                                   keyboardType: TextInputType.number,
-                                  onChanged: (val) => _onFieldChanged('netsalary', val),
+                                  readOnly: true,
                                 ),
                               ],
                             ),
@@ -868,9 +928,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                             label: "CALCULATE",
                             icon: Icons.calculate_rounded,
                             gradientColors: const [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
-                            onPressed: () async {
-                              await _calculateData(widget.shortMonth);
-                            },
+                            onPressed: _handleCalculate,
                           ),
                           const SizedBox(width: 16),
                           _AnimatedActionButton(
@@ -899,7 +957,84 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     );
   }
 
-  Future<Map<String, String>> _calculateData(String month, {bool isIncrement = false}) async {
+  Future<void> _handleCalculate() async {
+    if (isBpChanged) {
+      const bpDependents = {'npa', 'da', 'hra', 'nps', 'esi', 'epf'};
+      manualOverrides.removeAll(bpDependents);
+      dirtyManualFields.removeAll(bpDependents);
+      isBpChanged = false;
+    }
+
+    if (isTaChanged) {
+      const taDependents = {'daonta', 'esi', 'epf'};
+      manualOverrides.removeAll(taDependents);
+      dirtyManualFields.removeAll(taDependents);
+      isTaChanged = false;
+    }
+
+    // Only check fields that the user actually modified manually in this session
+    // and that are not yet confirmed in manualOverrides.
+    List<String> unconfirmedManualFields = dirtyManualFields
+        .where((field) => !manualOverrides.contains(field))
+        .toList();
+
+    if (unconfirmedManualFields.isNotEmpty) {
+      if (!mounted) return;
+      List<String> modifiedLabels = unconfirmedManualFields
+          .map((f) => _autoCalculatedFieldLabels[f] ?? f.toUpperCase())
+          .toList();
+
+      bool? confirmOverride = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text("Confirm Manual Override"),
+          content: Text(
+            "You have manually modified auto-calculated field(s):\n"
+            "${modifiedLabels.join(', ')}\n\n"
+            "Do you want to override the calculated data with manually entered values?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, null),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text("Use Auto Values"),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text("Override"),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmOverride == null) {
+        return; // User cancelled
+      } else if (confirmOverride == true) {
+        setState(() {
+          manualOverrides.addAll(unconfirmedManualFields);
+          dirtyManualFields.removeAll(unconfirmedManualFields);
+        });
+      } else {
+        setState(() {
+          manualOverrides.removeAll(unconfirmedManualFields);
+          dirtyManualFields.removeAll(unconfirmedManualFields);
+        });
+      }
+    }
+
+    await _calculateData(widget.shortMonth);
+  }
+
+  Future<Map<String, dynamic>> _calculateData(String month, {bool isIncrement = false, Set<String>? overridesToUse}) async {
+    Set<String> activeOverrides = overridesToUse ?? manualOverrides;
+
     try {
       DatabaseReference percentageRef = _dbRef.child(sharedData.userPlace).child('percentage');
       DatabaseEvent event = await percentageRef.once();
@@ -923,54 +1058,79 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
 
     try {
       int dap = 0, hrap = 0, tap = 0, npap = 0;
-      int? bp = int.tryParse(bpController.text);
-      int? npa = int.tryParse(npaController.text);
+      int bpVal = int.tryParse(bpController.text) ?? 0;
+      int npaVal = int.tryParse(npaController.text) ?? 0;
       if (isIncrement) {
-        double incrementAmount = (bp ?? 0) * 0.03;
+        double incrementAmount = bpVal * 0.03;
         incrementAmount = ((incrementAmount + 50) ~/ 100) * 100;
-        bp = (bp ?? 0) + incrementAmount.toInt();
-        if (bp > 218200) {
-          bp = 218200;
+        bpVal = bpVal + incrementAmount.toInt();
+        if (bpVal > 218200) {
+          bpVal = 218200;
         }
-        bpController.text = bp.toString();
+        bpController.text = bpVal.toString();
       }
-      monthData['bp'] = bp.toString();
-      if (npachk) {
-        npap = int.tryParse(percentageData['${month}n']?.toString() ?? '0') ?? 0;
-        npa = ((bp ?? 0) * (npap / 100)).round();
-        if (npa + (bp ?? 0) > 237500) {
-          npa = npa - ((bp ?? 0) + npa - 237500);
+      monthData['bp'] = bpVal.toString();
+
+      if (activeOverrides.contains('npa')) {
+        npaVal = int.tryParse(npaController.text) ?? 0;
+        monthData['npa'] = npaController.text = npaVal.toString();
+      } else {
+        if (npachk) {
+          npap = int.tryParse(percentageData['${month}n']?.toString() ?? '0') ?? 0;
+          npaVal = (bpVal * (npap / 100)).round();
+          if (npaVal + bpVal > 237500) {
+            npaVal = npaVal - (bpVal + npaVal - 237500);
+          }
+          monthData['npa'] = npaController.text = npaVal.toString();
+        } else {
+          monthData['npa'] = npaController.text = '0';
+          npaVal = 0;
         }
-        monthData['npa'] = npaController.text = npa.toString();
-      } else {
-        monthData['npa'] = npaController.text = '0';
-      }
-      if (dachk) {
-        dap = int.tryParse(percentageData['${month}d']?.toString() ?? '0') ?? 0;
-        monthData['da'] = daController.text = (((bp ?? 0) + (npa ?? 0)) * (dap / 100)).round().toString();
-      } else {
-        monthData['da'] = daController.text = '0';
-      }
-      if (hrachk) {
-        hrap = int.tryParse(percentageData['${month}h']?.toString() ?? '0') ?? 0;
-        monthData['hra'] = hraController.text = ((bp ?? 0) * (hrap / 100)).round().toString();
-      } else {
-        monthData['hra'] = hraController.text = '0';
-      }
-      if (tachk) {
-        tap = int.tryParse(percentageData['${month}d']?.toString() ?? '0') ?? 0;
-        monthData['daonta'] = daontaController.text = ((int.tryParse(taController.text) ?? 0) * (tap / 100)).round().toString();
-      } else {
-        monthData['daonta'] = daontaController.text = '0';
       }
 
+      if (activeOverrides.contains('da')) {
+        int daVal = int.tryParse(daController.text) ?? 0;
+        monthData['da'] = daController.text = daVal.toString();
+      } else {
+        if (dachk) {
+          dap = int.tryParse(percentageData['${month}d']?.toString() ?? '0') ?? 0;
+          monthData['da'] = daController.text = ((bpVal + npaVal) * (dap / 100)).round().toString();
+        } else {
+          monthData['da'] = daController.text = '0';
+        }
+      }
+
+      if (activeOverrides.contains('hra')) {
+        int hraVal = int.tryParse(hraController.text) ?? 0;
+        monthData['hra'] = hraController.text = hraVal.toString();
+      } else {
+        if (hrachk) {
+          hrap = int.tryParse(percentageData['${month}h']?.toString() ?? '0') ?? 0;
+          monthData['hra'] = hraController.text = (bpVal * (hrap / 100)).round().toString();
+        } else {
+          monthData['hra'] = hraController.text = '0';
+        }
+      }
+
+      if (activeOverrides.contains('daonta')) {
+        int daontaVal = int.tryParse(daontaController.text) ?? 0;
+        monthData['daonta'] = daontaController.text = daontaVal.toString();
+      } else {
+        if (tachk) {
+          tap = int.tryParse(percentageData['${month}d']?.toString() ?? '0') ?? 0;
+          monthData['daonta'] = daontaController.text = ((int.tryParse(taController.text) ?? 0) * (tap / 100)).round().toString();
+        } else {
+          monthData['daonta'] = daontaController.text = '0';
+        }
+      }
+
+      // Gross Salary: Automatically calculated from all allowance components (reflecting manual overrides)
       var controllers = [
         bpController, daController, hraController, npaController, splpayController, convController,
         pgController, annualController, uniformController, nursingController, taController, daontaController,
         medicalController, dirtController, washingController, tbController, nightController, driveController,
         cycleController, pcaController, otController, daext1Controller, daext2Controller, daext3Controller, daext4Controller,
       ];
-
       double grossTotal = controllers.map((controller) => double.tryParse(controller.text) ?? 0).reduce((sum, value) => sum + value);
       monthData['gross'] = grossController.text = grossTotal.round().toString();
 
@@ -991,38 +1151,62 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
           );
         }
         return {};
+      }
+
+      if (activeOverrides.contains('nps')) {
+        int npsVal = int.tryParse(npsController.text) ?? 0;
+        monthData['nps'] = npsController.text = npsVal.toString();
       } else if (npschk && !gpfchk) {
         var npsControllersList = [bpController, npaController, daController];
         double npsTotal = npsControllersList.map((controller) => double.tryParse(controller.text) ?? 0).reduce((sum, value) => sum + value);
         monthData['nps'] = npsController.text = (npsTotal * 0.10).round().toString();
+      } else {
+        monthData['nps'] = npsController.text = '0';
       }
+
       monthData['epf'] = monthData['esi'] = '0';
 
-      if (esichk) {
+      if (activeOverrides.contains('esi')) {
+        int esiVal = int.tryParse(esiController.text) ?? 0;
+        monthData['esi'] = esiController.text = esiVal.toString();
+      } else if (esichk) {
         if ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) <= 21000) {
           monthData['esi'] = esiController.text = ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) * 0.0075).ceil().toString();
         }
       }
 
-      if (epfchk) {
+      if (activeOverrides.contains('epf')) {
+        int epfVal = int.tryParse(epfController.text) ?? 0;
+        monthData['epf'] = epfController.text = epfVal.toString();
+      } else if (epfchk) {
         if ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) >= 15000) {
           monthData['epf'] = epfController.text = '1800';
         } else {
           monthData['epf'] = epfController.text = ((int.tryParse(monthData['gross']?.toString() ?? '0') ?? 0) * 0.12).round().toString();
         }
       }
+
       if (month == 'feb') incometaxController.text = '0';
+
+      // Total Deductions: Automatically calculated as sum of all 17 deduction components
       var dedControllers = [
         incometaxController, gisController, gpfController, npsController, epfController, esiController,
         slfController, societyController, recoveryController, wfController, medController, waterController,
         otherController, ddext1Controller, ddext2Controller, ddext3Controller, ddext4Controller,
       ];
-
       double dedTotal = dedControllers.map((controller) => double.tryParse(controller.text) ?? 0).reduce((sum, value) => sum + value);
       monthData['totalded'] = totaldedController.text = dedTotal.round().toString();
+
+      // Net Salary: Automatically calculated as Gross Salary - Total Deductions
       monthData['netsalary'] = netsalaryController.text = ((int.tryParse(grossController.text) ?? 0) - (int.tryParse(totaldedController.text) ?? 0)).toString();
 
-      return Map<String, String>.from(monthData);
+      if (activeOverrides.isNotEmpty) {
+        monthData['manual_overrides'] = activeOverrides.join(',');
+      } else {
+        monthData.remove('manual_overrides');
+      }
+
+      return Map<String, dynamic>.from(monthData);
     } catch (error) {
       final String message = "Error: $error";
       if (mounted) {
@@ -1048,7 +1232,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
 
       if (needsJulyIncrement || needsJanuaryIncrement) {
         String nextIncrementMonth = needsJulyIncrement ? 'jul' : 'jan';
-        final incrementedData = await _calculateData(nextIncrementMonth, isIncrement: true);
+        final incrementedData = await _calculateData(nextIncrementMonth, isIncrement: true, overridesToUse: {});
         DatabaseReference nextMonthNodeRef = userMonthDataRef.child(nextIncrementMonth).child(widget.biometricId);
         await nextMonthNodeRef.update(incrementedData);
       }
@@ -1156,11 +1340,14 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
             updatedmonths.add(currentMonth);
             if ((widget.shortMonth != 'jul' && currentMonth == 'jul' && mIncrement == 'JULY') ||
                 (widget.shortMonth != 'jan' && currentMonth == 'jan' && mIncrement == 'JANUARY')) {
-              final incData = await _calculateData(currentMonth, isIncrement: true);
+              final incData = await _calculateData(currentMonth, isIncrement: true, overridesToUse: {});
               await monthRef.child(currentMonth).child(widget.biometricId).update(incData);
               continue;
             }
-            final monthDataForCurrent = await _calculateData(currentMonth);
+            final monthDataForCurrent = await _calculateData(
+              currentMonth,
+              overridesToUse: currentMonth == widget.shortMonth ? manualOverrides : {},
+            );
 
             if (currentMonth == 'feb') {
               monthDataForCurrent['incometax'] = '0';

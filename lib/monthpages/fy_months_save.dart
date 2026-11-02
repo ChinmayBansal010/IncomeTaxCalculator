@@ -219,6 +219,26 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
       result[k] = v?.toString() ?? '0';
     });
 
+    Set<String> manualOverrides = {};
+    if (monthData['manual_overrides'] != null) {
+      if (monthData['manual_overrides'] is Map) {
+        (monthData['manual_overrides'] as Map).forEach((k, v) {
+          if (v == true || v == '1' || v == 1 || v == 'true') {
+            manualOverrides.add(k.toString());
+          }
+        });
+      } else if (monthData['manual_overrides'] is List) {
+        for (var item in (monthData['manual_overrides'] as List)) {
+          manualOverrides.add(item.toString());
+        }
+      } else if (monthData['manual_overrides'] is String) {
+        manualOverrides = (monthData['manual_overrides'] as String)
+            .split(',')
+            .where((s) => s.isNotEmpty)
+            .toSet();
+      }
+    }
+
     bool dachk = result['dap']?.toString() == '1' || result['dachk']?.toString() == 'true' || result['dap'] == null;
     bool hrachk = result['hrap']?.toString() == '1' || result['hrachk']?.toString() == 'true' || result['hrap'] == null;
     bool tachk = result['tap']?.toString() == '1' || result['tachk']?.toString() == 'true' || result['tap'] == null;
@@ -235,64 +255,91 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
 
     result['bp'] = bp.toString();
 
-    if (npachk) {
-      npap = int.tryParse(percentageData['${currentMonth}n']?.toString() ?? '0') ?? 0;
-      npa = (bp * (npap / 100)).round();
-      if (npa + bp > 237500) {
-        npa = max(0, 237500 - bp);
+    if (manualOverrides.contains('npa')) {
+      result['npa'] = monthData['npa']?.toString() ?? '0';
+      npa = int.tryParse(result['npa']!) ?? 0;
+    } else {
+      if (npachk) {
+        npap = int.tryParse(percentageData['${currentMonth}n']?.toString() ?? '0') ?? 0;
+        npa = (bp * (npap / 100)).round();
+        if (npa + bp > 237500) {
+          npa = max(0, 237500 - bp);
+        }
+        result['npa'] = npa.toString();
+      } else {
+        result['npa'] = '0';
+        npa = 0;
       }
-      result['npa'] = npa.toString();
-    } else {
-      result['npa'] = '0';
-      npa = 0;
     }
 
-    if (dachk) {
-      dap = int.tryParse(percentageData['${currentMonth}d']?.toString() ?? '0') ?? 0;
-      result['da'] = ((bp + npa) * (dap / 100)).round().toString();
+    if (manualOverrides.contains('da')) {
+      result['da'] = monthData['da']?.toString() ?? '0';
     } else {
-      result['da'] = '0';
+      if (dachk) {
+        dap = int.tryParse(percentageData['${currentMonth}d']?.toString() ?? '0') ?? 0;
+        result['da'] = ((bp + npa) * (dap / 100)).round().toString();
+      } else {
+        result['da'] = '0';
+      }
     }
 
-    if (hrachk) {
-      hrap = int.tryParse(percentageData['${currentMonth}h']?.toString() ?? '0') ?? 0;
-      result['hra'] = (bp * (hrap / 100)).round().toString();
+    if (manualOverrides.contains('hra')) {
+      result['hra'] = monthData['hra']?.toString() ?? '0';
     } else {
-      result['hra'] = '0';
+      if (hrachk) {
+        hrap = int.tryParse(percentageData['${currentMonth}h']?.toString() ?? '0') ?? 0;
+        result['hra'] = (bp * (hrap / 100)).round().toString();
+      } else {
+        result['hra'] = '0';
+      }
     }
 
     int taVal = int.tryParse(result['ta'] ?? '0') ?? 0;
-    if (tachk) {
-      tap = int.tryParse(percentageData['${currentMonth}d']?.toString() ?? '0') ?? 0;
-      result['daonta'] = (taVal * (tap / 100)).round().toString();
+    if (manualOverrides.contains('daonta')) {
+      result['daonta'] = monthData['daonta']?.toString() ?? '0';
     } else {
-      result['daonta'] = '0';
+      if (tachk) {
+        tap = int.tryParse(percentageData['${currentMonth}d']?.toString() ?? '0') ?? 0;
+        result['daonta'] = (taVal * (tap / 100)).round().toString();
+      } else {
+        result['daonta'] = '0';
+      }
     }
 
     // Gross Total
-    List<String> grossFields = [
-      'bp', 'da', 'hra', 'npa', 'splpay', 'conv', 'pg', 'annual',
-      'uniform', 'nursing', 'ta', 'daonta', 'medical', 'dirt',
-      'washing', 'tb', 'night', 'drive', 'cycle', 'pca', 'ot',
-      'daext1', 'daext2', 'daext3', 'daext4',
-    ];
+    if (manualOverrides.contains('gross')) {
+      result['gross'] = monthData['gross']?.toString() ?? '0';
+    } else {
+      List<String> grossFields = [
+        'bp', 'da', 'hra', 'npa', 'splpay', 'conv', 'pg', 'annual',
+        'uniform', 'nursing', 'ta', 'daonta', 'medical', 'dirt',
+        'washing', 'tb', 'night', 'drive', 'cycle', 'pca', 'ot',
+        'daext1', 'daext2', 'daext3', 'daext4',
+      ];
 
-    double grossTotal = 0;
-    for (String field in grossFields) {
-      double val = double.tryParse(result[field] ?? '0') ?? 0;
-      grossTotal += val;
+      double grossTotal = 0;
+      for (String field in grossFields) {
+        double val = double.tryParse(result[field] ?? '0') ?? 0;
+        grossTotal += val;
+      }
+      result['gross'] = grossTotal.round().toString();
     }
-    result['gross'] = grossTotal.round().toString();
 
     // Deductions
-    if (npschk && !gpfchk) {
+    if (manualOverrides.contains('nps')) {
+      result['nps'] = monthData['nps']?.toString() ?? '0';
+    } else if (npschk && !gpfchk) {
       int daVal = int.tryParse(result['da'] ?? '0') ?? 0;
       double npsTotal = (bp + npa + daVal).toDouble();
       result['nps'] = (npsTotal * 0.10).round().toString();
+    } else {
+      result['nps'] = '0';
     }
 
-    int grossInt = grossTotal.round();
-    if (esichk) {
+    int grossInt = int.tryParse(result['gross'] ?? '0') ?? 0;
+    if (manualOverrides.contains('esi')) {
+      result['esi'] = monthData['esi']?.toString() ?? '0';
+    } else if (esichk) {
       if (grossInt <= 21000) {
         result['esi'] = (grossInt * 0.0075).ceil().toString();
       } else {
@@ -302,7 +349,9 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
       result['esi'] = '0';
     }
 
-    if (epfchk) {
+    if (manualOverrides.contains('epf')) {
+      result['epf'] = monthData['epf']?.toString() ?? '0';
+    } else if (epfchk) {
       if (grossInt >= 15000) {
         result['epf'] = '1800';
       } else {
@@ -316,19 +365,35 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
       result['incometax'] = '0';
     }
 
-    List<String> dedFields = [
-      'incometax', 'gis', 'gpf', 'nps', 'epf', 'esi', 'slf', 'society',
-      'recovery', 'wf', 'med', 'water', 'other', 'ddext1', 'ddext2', 'ddext3', 'ddext4',
-    ];
+    if (manualOverrides.contains('totalded')) {
+      result['totalded'] = monthData['totalded']?.toString() ?? '0';
+    } else {
+      List<String> dedFields = [
+        'incometax', 'gis', 'gpf', 'nps', 'epf', 'esi', 'slf', 'society',
+        'recovery', 'wf', 'med', 'water', 'other', 'ddext1', 'ddext2', 'ddext3', 'ddext4',
+      ];
 
-    double dedTotal = 0;
-    for (String field in dedFields) {
-      double val = double.tryParse(result[field] ?? '0') ?? 0;
-      dedTotal += val;
+      double dedTotal = 0;
+      for (String field in dedFields) {
+        double val = double.tryParse(result[field] ?? '0') ?? 0;
+        dedTotal += val;
+      }
+
+      result['totalded'] = dedTotal.round().toString();
     }
 
-    result['totalded'] = dedTotal.round().toString();
-    result['netsalary'] = (grossInt - dedTotal.round()).toString();
+    if (manualOverrides.contains('netsalary')) {
+      result['netsalary'] = monthData['netsalary']?.toString() ?? '0';
+    } else {
+      int dedInt = int.tryParse(result['totalded'] ?? '0') ?? 0;
+      result['netsalary'] = (grossInt - dedInt).toString();
+    }
+
+    if (manualOverrides.isNotEmpty) {
+      result['manual_overrides'] = manualOverrides.join(',');
+    } else {
+      result.remove('manual_overrides');
+    }
 
     return result;
   }

@@ -62,6 +62,18 @@ class MyApp extends StatelessWidget {
           fontFamily: 'NotoSans',
           fontFamilyFallback: kAppFontFallback,
         ),
+        inputDecorationTheme: const InputDecorationTheme(
+          labelStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          hintStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          prefixStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          suffixStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          counterStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          errorStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+        ),
+        dialogTheme: const DialogThemeData(
+          titleTextStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          contentTextStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+        ),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
