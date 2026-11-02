@@ -743,7 +743,7 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        transform: Matrix4.identity()..translate(0.0, _isHovered && !widget.readOnly ? -2.0 : 0.0),
+        transform: Matrix4.translationValues(0.0, _isHovered && !widget.readOnly ? -2.0 : 0.0, 0.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
