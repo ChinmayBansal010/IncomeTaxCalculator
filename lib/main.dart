@@ -25,15 +25,8 @@ void main() async {
 }
 
 const List<String> kAppFontFallback = [
-  'NotoSans',
-  'Noto Sans',
   'NotoSansDevanagari',
-  'Noto Sans Devanagari',
-  'NotoHindi',
-  'NotoColorEmoji',
-  'Noto Color Emoji',
   'NotoEmoji',
-  'Noto Emoji',
   'MaterialIcons',
   'Roboto',
 ];
@@ -43,6 +36,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const defaultFallback = kAppFontFallback;
+    const defaultFontFamily = 'NotoSans';
+
+    final baseTextTheme = Typography.material2021(platform: TargetPlatform.android).black;
+
+    final customTextTheme = baseTextTheme.apply(
+      fontFamily: defaultFontFamily,
+      fontFamilyFallback: defaultFallback,
+    );
+
     return MaterialApp(
       title: 'Income Tax Calculator',
       debugShowCheckedModeBanner: false,
@@ -52,27 +55,21 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        fontFamily: 'NotoSans',
-        fontFamilyFallback: kAppFontFallback,
-        textTheme: Typography.material2021().black.apply(
-          fontFamily: 'NotoSans',
-          fontFamilyFallback: kAppFontFallback,
-        ),
-        primaryTextTheme: Typography.material2021().black.apply(
-          fontFamily: 'NotoSans',
-          fontFamilyFallback: kAppFontFallback,
-        ),
+        fontFamily: defaultFontFamily,
+        fontFamilyFallback: defaultFallback,
+        textTheme: customTextTheme,
+        primaryTextTheme: customTextTheme,
         inputDecorationTheme: const InputDecorationTheme(
-          labelStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
-          hintStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
-          prefixStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
-          suffixStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
-          counterStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
-          errorStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          labelStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
+          hintStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
+          prefixStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
+          suffixStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
+          counterStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
+          errorStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
         ),
         dialogTheme: const DialogThemeData(
-          titleTextStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
-          contentTextStyle: TextStyle(fontFamily: 'NotoSans', fontFamilyFallback: kAppFontFallback),
+          titleTextStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
+          contentTextStyle: TextStyle(fontFamily: defaultFontFamily, fontFamilyFallback: defaultFallback),
         ),
         useMaterial3: true,
       ),
