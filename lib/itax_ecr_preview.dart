@@ -27,6 +27,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
   _EcrPreviewData? _previewData;
   bool _showNewTaxSheet = false;
   bool _showOldTaxSheet = false;
+  bool _isSummaryStripExpanded = false;
   bool _isEmployeeSnapshotExpanded = false;
 
   @override
@@ -197,7 +198,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 children: [
                   _buildHeader(preview),
                   const SizedBox(height: 24),
-                  _buildSummaryStrip(preview),
+                  _buildSummaryStripSection(preview),
                   const SizedBox(height: 24),
                   _buildEmployeeCard(preview),
                   const SizedBox(height: 24),
@@ -357,6 +358,24 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSummaryStripSection(_EcrPreviewData preview) {
+    return _buildSurfaceCard(
+      title: 'Tax Summary',
+      subtitle:
+          'Key regime comparison and tax balance metrics for this employee.',
+      icon: Icons.payments_rounded,
+      accent: const Color(0xFF2563EB),
+      isCollapsible: true,
+      isExpanded: _isSummaryStripExpanded,
+      onToggleExpand: () {
+        setState(() {
+          _isSummaryStripExpanded = !_isSummaryStripExpanded;
+        });
+      },
+      child: _buildSummaryStrip(preview),
     );
   }
 
