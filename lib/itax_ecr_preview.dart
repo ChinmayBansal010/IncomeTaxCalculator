@@ -1411,14 +1411,11 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                       ? const Radius.circular(21)
                       : Radius.zero,
                 ),
-                border: Border(
-                  bottom: BorderSide(
-                    color: (isCollapsible && !isExpanded)
-                        ? Colors.transparent
-                        : const Color(0xFF94A3B8),
-                    width: (isCollapsible && !isExpanded) ? 0 : 2.5,
-                  ),
-                ),
+                border: (isCollapsible && !isExpanded)
+                    ? null
+                    : const Border(
+                        bottom: BorderSide(color: Color(0xFF94A3B8), width: 2.5),
+                      ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
