@@ -27,6 +27,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
   _EcrPreviewData? _previewData;
   bool _showNewTaxSheet = false;
   bool _showOldTaxSheet = false;
+  bool _isEmployeeSnapshotExpanded = false;
 
   @override
   void initState() {
@@ -545,6 +546,13 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
       'Core identity fields copied from the same employee record used during export.',
       icon: Icons.badge_rounded,
       accent: const Color(0xFF2563EB),
+      isCollapsible: true,
+      isExpanded: _isEmployeeSnapshotExpanded,
+      onToggleExpand: () {
+        setState(() {
+          _isEmployeeSnapshotExpanded = !_isEmployeeSnapshotExpanded;
+        });
+      },
       child: LayoutBuilder(
         builder: (context, constraints) {
           final cardWidth =
@@ -1365,6 +1373,9 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     required IconData icon,
     required Color accent,
     required Widget child,
+    bool isCollapsible = false,
+    bool isExpanded = true,
+    VoidCallback? onToggleExpand,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -1382,71 +1393,107 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(21),
-                topRight: Radius.circular(21),
-              ),
-              border: const Border(
-                bottom: BorderSide(color: Color(0xFF94A3B8), width: 2.5),
-              ),
+          InkWell(
+            onTap: isCollapsible ? onToggleExpand : null,
+            borderRadius: BorderRadius.vertical(
+              top: const Radius.circular(21),
+              bottom: (isCollapsible && !isExpanded)
+                  ? const Radius.circular(21)
+                  : Radius.zero,
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                        color: accent.withValues(alpha: 0.3), width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: accent.withValues(alpha: 0.4),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 28),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.vertical(
+                  top: const Radius.circular(21),
+                  bottom: (isCollapsible && !isExpanded)
+                      ? const Radius.circular(21)
+                      : Radius.zero,
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title.toUpperCase(),
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          color: Color(0xFF475569),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+                border: Border(
+                  bottom: BorderSide(
+                    color: (isCollapsible && !isExpanded)
+                        ? Colors.transparent
+                        : const Color(0xFF94A3B8),
+                    width: (isCollapsible && !isExpanded) ? 0 : 2.5,
                   ),
                 ),
-              ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: accent,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: accent.withValues(alpha: 0.3), width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 28),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title.toUpperCase(),
+                          style: const TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          subtitle,
+                          style: const TextStyle(
+                            color: Color(0xFF475569),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isCollapsible) ...[
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: accent.withValues(alpha: 0.3), width: 1.5),
+                      ),
+                      child: Icon(
+                        isExpanded
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        color: accent,
+                        size: 28,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: child,
-          ),
+          if (!isCollapsible || isExpanded)
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: child,
+            ),
         ],
       ),
     );
