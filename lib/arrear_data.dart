@@ -95,6 +95,7 @@ class _ArrearPageState extends State<ArrearPage> with SingleTickerProviderStateM
   }
 
   Future<void> _refreshData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
       errorMessage = '';

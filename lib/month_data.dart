@@ -95,6 +95,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   }
 
   Future<void> _refreshData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
       errorMessage = '';
@@ -414,7 +415,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                       ),
                     ),
                   );
-                  if (result == true) {
+                  if (result == true && mounted) {
                     setState(() {
                       isLoading = true;
                       shouldRefetch = true;

@@ -96,6 +96,7 @@ class _DeductionPageState extends State<DeductionPage> with SingleTickerProvider
   }
 
   Future<void> _refreshData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
       errorMessage = '';

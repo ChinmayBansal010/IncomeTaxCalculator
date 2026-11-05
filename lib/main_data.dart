@@ -93,6 +93,7 @@ class _MainDataPageState extends State<MainDataPage> with SingleTickerProviderSt
   }
 
   Future<void> _refreshData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
       errorMessage = '';
@@ -173,13 +174,13 @@ class _MainDataPageState extends State<MainDataPage> with SingleTickerProviderSt
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          bool? result = await Navigator.pushReplacement(
+          bool? result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const MainAddPage(),
             ),
           );
-          if (result == true) {
+          if (result == true && mounted) {
             _refreshData();
           }
         },
@@ -451,7 +452,7 @@ class _MainDataPageState extends State<MainDataPage> with SingleTickerProviderSt
         ),
       ),
     );
-    if (result == true) {
+    if (result == true && mounted) {
       _refreshData();
     }
   }

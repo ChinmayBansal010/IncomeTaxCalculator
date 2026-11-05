@@ -646,7 +646,7 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
                                 AnimatedInputField(label: "AADHAAR NUMBER", controller: aadhaarController, icon: Icons.fingerprint_rounded),
                                 AnimatedInputField(label: "PAN NUMBER", controller: panController, icon: Icons.credit_card_rounded),
                                 AnimatedInputField(label: "VOTER ID", controller: voterIdController, icon: Icons.how_to_vote_rounded),
-                                AnimatedInputField(label: "CYCLE NUMBER", controller: cycleNoController, icon: Icons.pedal_bike_rounded),
+                                AnimatedInputField(label: "VEHICLE NUMBER", controller: cycleNoController, icon: Icons.directions_car_rounded),
                                 AnimatedInputField(label: "GPF NUMBER", controller: gpfNoController, icon: Icons.savings_rounded),
                                 AnimatedInputField(label: "NPS NUMBER", controller: npsNoController, icon: Icons.account_balance_wallet_rounded),
                                 AnimatedInputField(label: "EPF NUMBER", controller: epfNoController, icon: Icons.volunteer_activism_rounded),
@@ -702,71 +702,82 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
   }
 
   Widget _buildSectionCard(String title, IconData icon, List<Widget> children) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF64748B).withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isMobile = constraints.maxWidth < 600;
+        return Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF64748B).withValues(alpha: 0.06),
+                blurRadius: isMobile ? 12 : 20,
+                offset: Offset(0, isMobile ? 4 : 6),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9), width: 2)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(icon, color: const Color(0xFF2563EB), size: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 16 : 24,
+                  vertical: isMobile ? 12 : 20,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
-                      letterSpacing: 0.2,
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9), width: 2)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 8 : 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
+                      ),
+                      child: Icon(icon, color: const Color(0xFF2563EB), size: isMobile ? 18 : 24),
                     ),
-                  ),
+                    SizedBox(width: isMobile ? 12 : 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: isMobile ? 15 : 18,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF0F172A),
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                int crossAxisCount = constraints.maxWidth > 800 ? 3 : (constraints.maxWidth > 500 ? 2 : 1);
-                double spacing = 20.0;
-                double itemWidth = (constraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+              ),
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 12 : 24),
+                child: LayoutBuilder(
+                  builder: (context, innerConstraints) {
+                    int crossAxisCount = innerConstraints.maxWidth > 800
+                        ? 3
+                        : (innerConstraints.maxWidth > 450 ? 2 : 1);
+                    double spacing = isMobile ? 12.0 : 20.0;
+                    double runSpacing = isMobile ? 12.0 : 24.0;
+                    double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
 
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: 24.0,
-                  children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
-                );
-              },
-            ),
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: runSpacing,
+                      children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -796,6 +807,8 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -806,26 +819,26 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 4 : 8),
               child: Text(
                 widget.label,
-                style: const TextStyle(
-                  fontSize: 13,
+                style: TextStyle(
+                  fontSize: isMobile ? 12 : 13,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF475569),
+                  color: const Color(0xFF475569),
                   letterSpacing: 0.5,
                 ),
               ),
             ),
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                 boxShadow: [
                   if (_isHovered)
                     BoxShadow(
                       color: const Color(0xFF2563EB).withValues(alpha: 0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      blurRadius: isMobile ? 8 : 12,
+                      offset: Offset(0, isMobile ? 2 : 4),
                     ),
                 ],
               ),
@@ -836,9 +849,9 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                   ...widget.inputFormatters,
                 ],
                 controller: widget.controller,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 15,
+                style: TextStyle(
+                  color: const Color(0xFF0F172A),
+                  fontSize: isMobile ? 14 : 15,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
@@ -847,26 +860,29 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                   prefixIcon: Icon(
                     widget.icon,
                     color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                    size: 20,
+                    size: isMobile ? 18 : 20,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: isMobile ? 12 : 18,
+                    horizontal: isMobile ? 14 : 20,
+                  ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: BorderSide(
                       color: _isHovered ? const Color(0xFF93C5FD) : const Color(0xFFE2E8F0),
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
                   ),
                   errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
                   ),
                 ),
@@ -913,6 +929,8 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -923,26 +941,26 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 4 : 8),
               child: Text(
                 widget.label,
-                style: const TextStyle(
-                  fontSize: 13,
+                style: TextStyle(
+                  fontSize: isMobile ? 12 : 13,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF475569),
+                  color: const Color(0xFF475569),
                   letterSpacing: 0.5,
                 ),
               ),
             ),
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                 boxShadow: [
                   if (_isHovered)
                     BoxShadow(
                       color: const Color(0xFF2563EB).withValues(alpha: 0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      blurRadius: isMobile ? 8 : 12,
+                      offset: Offset(0, isMobile ? 2 : 4),
                     ),
                 ],
               ),
@@ -951,10 +969,11 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                 icon: Icon(
                   Icons.unfold_more_rounded,
                   color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
+                  size: isMobile ? 20 : 24,
                 ),
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 15,
+                style: TextStyle(
+                  color: const Color(0xFF0F172A),
+                  fontSize: isMobile ? 14 : 15,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
@@ -963,22 +982,25 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                   prefixIcon: Icon(
                     widget.icon,
                     color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                    size: 20,
+                    size: isMobile ? 18 : 20,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: isMobile ? 12 : 18,
+                    horizontal: isMobile ? 14 : 20,
+                  ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: BorderSide(
                       color: _isHovered ? const Color(0xFF93C5FD) : const Color(0xFFE2E8F0),
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
                   ),
                 ),
@@ -1032,6 +1054,8 @@ class _AnimatedSaveButtonState extends State<_AnimatedSaveButton> with SingleTic
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -1049,7 +1073,7 @@ class _AnimatedSaveButtonState extends State<_AnimatedSaveButton> with SingleTic
               scale: _scaleAnimation.value,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                height: 60,
+                height: isMobile ? 48 : 60,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: _isHovered
@@ -1058,25 +1082,25 @@ class _AnimatedSaveButtonState extends State<_AnimatedSaveButton> with SingleTic
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFF2563EB).withValues(alpha: _isHovered ? 0.4 : 0.2),
-                      blurRadius: _isHovered ? 20 : 10,
-                      offset: const Offset(0, 8),
+                      blurRadius: _isHovered ? (isMobile ? 12 : 20) : (isMobile ? 6 : 10),
+                      offset: Offset(0, isMobile ? 4 : 8),
                     ),
                   ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.save_rounded, color: Colors.white, size: 24),
-                    SizedBox(width: 12),
+                  children: [
+                    Icon(Icons.save_rounded, color: Colors.white, size: isMobile ? 20 : 24),
+                    const SizedBox(width: 10),
                     Text(
                       "SAVE EMPLOYEE DATA",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: isMobile ? 14 : 16,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
                       ),
