@@ -217,143 +217,252 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
   }
 
   Widget _buildHeader(_EcrPreviewData preview) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E293B).withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF60A5FA), width: 2.5),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black54,
-            blurRadius: 15,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
+        if (isMobile) {
+          return Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B82F6),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF93C5FD), width: 2),
-              boxShadow: [
+              color: const Color(0xFF1E293B).withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFF60A5FA), width: 2.0),
+              boxShadow: const [
                 BoxShadow(
-                  color: const Color(0xFF3B82F6).withValues(alpha: 0.5),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                )
+                  color: Colors.black54,
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
               ],
             ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded,
-                  color: Colors.white, size: 28),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LayoutBuilder(builder: (context, constraints) {
-                  return Text(
-                    'ECR PREVIEW',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: constraints.maxWidth < 250 ? 24 : 32,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3B82F6),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFF93C5FD), width: 1.5),
+                      ),
+                      child: IconButton(
+                        padding: const EdgeInsets.all(8),
+                        constraints: const BoxConstraints(),
+                        icon: const Icon(Icons.arrow_back_rounded,
+                            color: Colors.white, size: 22),
+                        onPressed: () => Navigator.pop(context),
+                      ),
                     ),
-                  );
-                }),
-                const SizedBox(height: 10),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        'ECR PREVIEW',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF59E0B),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
+                      ),
+                      child: IconButton(
+                        padding: const EdgeInsets.all(8),
+                        constraints: const BoxConstraints(),
+                        tooltip: 'Refresh Preview',
+                        onPressed: _loadPreview,
+                        icon: const Icon(Icons.refresh_rounded,
+                            color: Colors.white, size: 22),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: const Color(0xFF0F172A),
                     borderRadius: BorderRadius.circular(10),
-                    border:
-                    Border.all(color: const Color(0xFF64748B), width: 2),
+                    border: Border.all(color: const Color(0xFF64748B), width: 1.5),
                   ),
                   child: Text(
-                    '${preview.mainData['name'] ?? ''}  \nID: ${widget.biometricId}',
+                    '${preview.mainData['name'] ?? ''}\nID: ${widget.biometricId}',
                     style: const TextStyle(
                       color: Color(0xFFF8FAFC),
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: _buildHeaderChip(
-                      Icons.apartment_rounded,
-                      sharedData.zone.toUpperCase(),
-                      const Color(0xFF10B981)),
-                ),
                 const SizedBox(height: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Forces elements to align to the left
-                  children: [
-                    _buildHeaderChip(
-                        Icons.calendar_month_rounded,
-                        sharedData.ccurrentYear,
-                        const Color(0xFFF59E0B)),
+                _buildHeaderChip(
+                  Icons.apartment_rounded,
+                  sharedData.zone.toUpperCase(),
+                  const Color(0xFF10B981),
+                  isMobile: true,
+                ),
+                const SizedBox(height: 8),
+                _buildHeaderChip(
+                  Icons.calendar_month_rounded,
+                  sharedData.ccurrentYear,
+                  const Color(0xFFF59E0B),
+                  isMobile: true,
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Desktop / Tablet Layout
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E293B).withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFF60A5FA), width: 2.5),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black54,
+                blurRadius: 15,
+                offset: Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF93C5FD), width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.5),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
                   ],
                 ),
-              ],
-            ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded,
+                      color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'ECR PREVIEW',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A),
+                        borderRadius: BorderRadius.circular(10),
+                        border:
+                            Border.all(color: const Color(0xFF64748B), width: 2),
+                      ),
+                      child: Text(
+                        '${preview.mainData['name'] ?? ''}  \nID: ${widget.biometricId}',
+                        style: const TextStyle(
+                          color: Color(0xFFF8FAFC),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildHeaderChip(
+                      Icons.apartment_rounded,
+                      sharedData.zone.toUpperCase(),
+                      const Color(0xFF10B981),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildHeaderChip(
+                      Icons.calendar_month_rounded,
+                      sharedData.ccurrentYear,
+                      const Color(0xFFF59E0B),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFFDE68A), width: 2.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: IconButton(
+                  tooltip: 'Refresh Preview',
+                  onPressed: _loadPreview,
+                  icon: const Icon(Icons.refresh_rounded,
+                      color: Colors.white, size: 28),
+                ),
+              ),
+            ],
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFFDE68A), width: 2.5),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: IconButton(
-              tooltip: 'Refresh Preview',
-              onPressed: _loadPreview,
-              icon: const Icon(Icons.refresh_rounded,
-                  color: Colors.white, size: 28),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildHeaderChip(IconData icon, String label, Color accentColor) {
+  Widget _buildHeaderChip(IconData icon, String label, Color accentColor, {bool isMobile = false}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 14,
+        vertical: isMobile ? 8 : 10,
+      ),
       decoration: BoxDecoration(
         color: accentColor.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: accentColor, width: 2.5),
+        border: Border.all(color: accentColor, width: isMobile ? 2.0 : 2.5),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: accentColor),
+          Padding(
+            padding: const EdgeInsets.only(top: 1.0),
+            child: Icon(icon, size: isMobile ? 16 : 18, color: accentColor),
+          ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: accentColor,
-              fontWeight: FontWeight.w900,
-              fontSize: 13,
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: accentColor,
+                fontWeight: FontWeight.w900,
+                fontSize: isMobile ? 12 : 13,
+                height: 1.3,
+              ),
+              softWrap: true,
             ),
           ),
         ],
