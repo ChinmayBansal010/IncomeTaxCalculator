@@ -187,29 +187,38 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 ? _buildErrorState()
                 : preview == null
                 ? _buildErrorState()
-                : RefreshIndicator(
-              onRefresh: _loadPreview,
-              color: const Color(0xFF1D4ED8),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics()),
-                padding:
-                const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                children: [
-                  _buildHeader(preview),
-                  const SizedBox(height: 24),
-                  _buildSummaryStripSection(preview),
-                  const SizedBox(height: 24),
-                  _buildEmployeeCard(preview),
-                  const SizedBox(height: 24),
-                  // _buildTaxSnapshotCard(preview),
-                  // const SizedBox(height: 24),
-                  _buildTaxSheetDetailSection(preview),
-                  const SizedBox(height: 24),
-                  _buildCombinedMatrixCard(preview),
-                ],
-              ),
-            ),
+                : Builder(
+                    builder: (context) {
+                      final isMobile = MediaQuery.of(context).size.width < 600;
+                      final sectionGap = isMobile ? 12.0 : 24.0;
+
+                      return RefreshIndicator(
+                        onRefresh: _loadPreview,
+                        color: const Color(0xFF1D4ED8),
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(
+                              parent: BouncingScrollPhysics()),
+                          padding: EdgeInsets.fromLTRB(
+                            isMobile ? 10 : 16,
+                            isMobile ? 10 : 16,
+                            isMobile ? 10 : 16,
+                            isMobile ? 24 : 32,
+                          ),
+                          children: [
+                            _buildHeader(preview),
+                            SizedBox(height: sectionGap),
+                            _buildSummaryStripSection(preview),
+                            SizedBox(height: sectionGap),
+                            _buildEmployeeCard(preview),
+                            SizedBox(height: sectionGap),
+                            _buildTaxSheetDetailSection(preview),
+                            SizedBox(height: sectionGap),
+                            _buildCombinedMatrixCard(preview),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -473,8 +482,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
   Widget _buildSummaryStripSection(_EcrPreviewData preview) {
     return _buildSurfaceCard(
       title: 'Tax Summary',
-      subtitle:
-          'Key regime comparison and tax balance metrics for this employee.',
+      subtitle: '',
       icon: Icons.payments_rounded,
       accent: const Color(0xFF2563EB),
       isCollapsible: true,
@@ -491,20 +499,24 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
   Widget _buildSummaryStrip(_EcrPreviewData preview) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
         final children = [
           _buildSummaryCard(
             title: 'New Regime Payable',
-            value:  _formatCurrency(_toInt(preview.itaxNew['ttp'])),
+            value: _formatCurrency(_toInt(preview.itaxNew['ttp'])),
             icon: Icons.payments_rounded,
             accent: const Color(0xFF2563EB),
             bgColor: const Color(0xFFEFF6FF),
+            isMobile: isMobile,
           ),
           _buildSummaryCard(
             title: 'New Regime Balance',
-            value:  _formatCurrency(_toInt(preview.itaxNew['nitpi'])),
+            value: _formatCurrency(_toInt(preview.itaxNew['nitpi'])),
             icon: Icons.payments_rounded,
             accent: const Color(0xFF2563EB),
             bgColor: const Color(0xFFEFF6FF),
+            isMobile: isMobile,
           ),
           _buildSummaryCard(
             title: 'New Regime Excess Paid',
@@ -512,13 +524,15 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
             icon: Icons.remove_circle_outline_rounded,
             accent: const Color(0xFFDC2626),
             bgColor: const Color(0xFFFEF2F2),
+            isMobile: isMobile,
           ),
           _buildSummaryCard(
             title: 'Old Regime Payable',
-            value:  _formatCurrency(_toInt(preview.itaxOld['ttp'])),
+            value: _formatCurrency(_toInt(preview.itaxOld['ttp'])),
             icon: Icons.payments_rounded,
             accent: const Color(0xFF2563EB),
             bgColor: const Color(0xFFEFF6FF),
+            isMobile: isMobile,
           ),
           _buildSummaryCard(
             title: 'Old Regime Balance',
@@ -526,6 +540,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
             icon: Icons.account_balance_wallet_rounded,
             accent: const Color(0xFF059669),
             bgColor: const Color(0xFFECFDF5),
+            isMobile: isMobile,
           ),
           _buildSummaryCard(
             title: 'Old Regime Excess Paid',
@@ -533,13 +548,15 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
             icon: Icons.receipt_rounded,
             accent: const Color(0xFF7C3AED),
             bgColor: const Color(0xFFF5F3FF),
+            isMobile: isMobile,
           ),
           _buildSummaryCard(
             title: 'Tax Already Paid',
-            value:  _formatCurrency(_toInt(preview.itaxNew['deduct'])),
+            value: _formatCurrency(_toInt(preview.itaxNew['deduct'])),
             icon: Icons.payments_rounded,
             accent: const Color(0xFF2563EB),
             bgColor: const Color(0xFFEFF6FF),
+            isMobile: isMobile,
           ),
         ];
 
@@ -558,9 +575,9 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
           itemCount: children.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            mainAxisExtent: 126,
+            crossAxisSpacing: isMobile ? 8 : 10,
+            mainAxisSpacing: isMobile ? 8 : 10,
+            mainAxisExtent: isMobile ? 82 : 126,
           ),
           itemBuilder: (context, index) => children[index],
         );
@@ -574,58 +591,60 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     required IconData icon,
     required Color accent,
     required Color bgColor,
+    bool isMobile = false,
   }) {
     return Container(
       height: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(isMobile ? 10 : 20),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: accent, width: 2.5),
+        borderRadius: BorderRadius.circular(isMobile ? 14 : 20),
+        border: Border.all(color: accent, width: isMobile ? 1.5 : 2.5),
         boxShadow: [
           BoxShadow(
             color: accent.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: isMobile ? 6 : 10,
+            offset: Offset(0, isMobile ? 2 : 4),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(isMobile ? 8 : 16),
             decoration: BoxDecoration(
               color: accent,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(isMobile ? 10 : 16),
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.5), width: 2),
+                  color: Colors.white.withValues(alpha: 0.5), width: isMobile ? 1.5 : 2),
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: Icon(icon, color: Colors.white, size: isMobile ? 18 : 28),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: isMobile ? 10 : 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   title.toUpperCase(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: isMobile ? 10 : 12,
                     fontWeight: FontWeight.w900,
                     color: accent.withValues(alpha: 0.8),
                     letterSpacing: 0,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: isMobile ? 2 : 6),
                 Container(
                   constraints: const BoxConstraints(maxWidth: double.infinity),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 6 : 10, vertical: isMobile ? 2 : 4),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                     border: Border.all(
                         color: accent.withValues(alpha: 0.3), width: 1.5),
                   ),
@@ -636,7 +655,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                       value,
                       maxLines: 1,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: isMobile ? 14 : 20,
                         fontWeight: FontWeight.w900,
                         color: accent,
                       ),
@@ -670,8 +689,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
 
     return _buildSurfaceCard(
       title: 'Employee Snapshot',
-      subtitle:
-      'Core identity fields copied from the same employee record used during export.',
+      subtitle: '',
       icon: Icons.badge_rounded,
       accent: const Color(0xFF2563EB),
       isCollapsible: true,
@@ -683,9 +701,10 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
           final cardWidth =
           constraints.maxWidth > 600 ? 280.0 : constraints.maxWidth;
-          const itemSpacing = 16.0;
+          final itemSpacing = isMobile ? 10.0 : 16.0;
           final columnCount = constraints.maxWidth > 600
               ? ((constraints.maxWidth + itemSpacing) /
                       (cardWidth + itemSpacing))
@@ -705,11 +724,11 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                     ? rowWidth
                     : cardWidth,
                 child: Container(
-                  clipBehavior: Clip.antiAlias, // Ensures inner border trims correctly
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF94A3B8), width: 1.5), // Uniform border for radius
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+                    border: Border.all(color: const Color(0xFF94A3B8), width: 1.5),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF0F172A).withValues(alpha: 0.04),
@@ -719,10 +738,10 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                     ],
                   ),
                   child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
+                    padding: EdgeInsets.all(isMobile ? 10 : 16),
+                    decoration: BoxDecoration(
                       border: Border(
-                        left: BorderSide(color: Color(0xFF2563EB), width: 6), // Inner straight left border
+                        left: BorderSide(color: const Color(0xFF2563EB), width: isMobile ? 4 : 6),
                       ),
                     ),
                     child: Column(
@@ -730,19 +749,19 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                       children: [
                         Text(
                           item.label.toUpperCase(),
-                          style: const TextStyle(
-                            color: Color(0xFF475569),
-                            fontSize: 12,
+                          style: TextStyle(
+                            color: const Color(0xFF475569),
+                            fontSize: isMobile ? 11 : 12,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.5,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: isMobile ? 4 : 8),
                         Text(
                           item.value.isEmpty ? 'N/A' : item.value,
-                          style: const TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 15,
+                          style: TextStyle(
+                            color: const Color(0xFF0F172A),
+                            fontSize: isMobile ? 13 : 15,
                             fontWeight: FontWeight.w800,
                           ),
                           maxLines: item.label == 'Address' ? 1 : null,
@@ -891,82 +910,90 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
 
     return _buildSurfaceCard(
       title: 'Income Tax Sheet Details',
-      subtitle:
-      'Full old-regime and new-regime sheet fields from the ITAX calculation, available side by side.',
+      subtitle: '',
       icon: Icons.view_sidebar_rounded,
       accent: const Color(0xFF0F766E),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTaxToggleButton(
-                label: _showNewTaxSheet ? 'HIDE NEW SHEET' : 'SHOW NEW SHEET',
-                icon: Icons.auto_graph_rounded,
-                isActive: _showNewTaxSheet,
-                accent: const Color(0xFF2563EB),
-                onTap: () =>
-                    setState(() => _showNewTaxSheet = !_showNewTaxSheet),
+              Wrap(
+                spacing: isMobile ? 8 : 16,
+                runSpacing: isMobile ? 8 : 16,
+                children: [
+                  _buildTaxToggleButton(
+                    label: _showNewTaxSheet ? 'HIDE NEW SHEET' : 'SHOW NEW SHEET',
+                    icon: Icons.auto_graph_rounded,
+                    isActive: _showNewTaxSheet,
+                    accent: const Color(0xFF2563EB),
+                    isMobile: isMobile,
+                    onTap: () =>
+                        setState(() => _showNewTaxSheet = !_showNewTaxSheet),
+                  ),
+                  _buildTaxToggleButton(
+                    label: _showOldTaxSheet ? 'HIDE OLD SHEET' : 'SHOW OLD SHEET',
+                    icon: Icons.history_edu_rounded,
+                    isActive: _showOldTaxSheet,
+                    accent: const Color(0xFF0F766E),
+                    isMobile: isMobile,
+                    onTap: () =>
+                        setState(() => _showOldTaxSheet = !_showOldTaxSheet),
+                  ),
+                ],
               ),
-              _buildTaxToggleButton(
-                label: _showOldTaxSheet ? 'HIDE OLD SHEET' : 'SHOW OLD SHEET',
-                icon: Icons.history_edu_rounded,
-                isActive: _showOldTaxSheet,
-                accent: const Color(0xFF0F766E),
-                onTap: () =>
-                    setState(() => _showOldTaxSheet = !_showOldTaxSheet),
-              ),
+              if (_showNewTaxSheet || _showOldTaxSheet) ...[
+                SizedBox(height: isMobile ? 12 : 24),
+                LayoutBuilder(
+                  builder: (context, innerConstraints) {
+                    final canShowSideBySide =
+                        showBoth && innerConstraints.maxWidth > 1100;
+
+                    if (canShowSideBySide) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildTaxSheetPanel(
+                              preview.newSheetDetail,
+                              accent: const Color(0xFF2563EB),
+                            ),
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: _buildTaxSheetPanel(
+                              preview.oldSheetDetail,
+                              accent: const Color(0xFF0F766E),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        if (_showNewTaxSheet)
+                          _buildTaxSheetPanel(
+                            preview.newSheetDetail,
+                            accent: const Color(0xFF2563EB),
+                          ),
+                        if (_showNewTaxSheet && _showOldTaxSheet)
+                          SizedBox(height: isMobile ? 12 : 24),
+                        if (_showOldTaxSheet)
+                          _buildTaxSheetPanel(
+                            preview.oldSheetDetail,
+                            accent: const Color(0xFF0F766E),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ],
-          ),
-          const SizedBox(height: 24),
-          if (_showNewTaxSheet || _showOldTaxSheet)
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final canShowSideBySide =
-                    showBoth && constraints.maxWidth > 1100;
-
-                if (canShowSideBySide) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: _buildTaxSheetPanel(
-                          preview.newSheetDetail,
-                          accent: const Color(0xFF2563EB),
-                        ),
-                      ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: _buildTaxSheetPanel(
-                          preview.oldSheetDetail,
-                          accent: const Color(0xFF0F766E),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return Column(
-                  children: [
-                    if (_showNewTaxSheet)
-                      _buildTaxSheetPanel(
-                        preview.newSheetDetail,
-                        accent: const Color(0xFF2563EB),
-                      ),
-                    if (_showNewTaxSheet && _showOldTaxSheet)
-                      const SizedBox(height: 24),
-                    if (_showOldTaxSheet)
-                      _buildTaxSheetPanel(
-                        preview.oldSheetDetail,
-                        accent: const Color(0xFF0F766E),
-                      ),
-                  ],
-                );
-              },
-            ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -977,13 +1004,17 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     required bool isActive,
     required Color accent,
     required VoidCallback onTap,
+    bool isMobile = false,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(isMobile ? 10 : 16),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 12 : 20,
+          vertical: isMobile ? 10 : 16,
+        ),
         decoration: BoxDecoration(
           gradient: isActive
               ? LinearGradient(
@@ -994,29 +1025,29 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
               : const LinearGradient(
             colors: [Colors.white, Colors.white],
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(isMobile ? 10 : 16),
           border: Border.all(
             color: isActive ? accent.withValues(alpha: 0.9) : accent,
-            width: 3,
+            width: isMobile ? 2 : 3,
           ),
           boxShadow: [
             BoxShadow(
               color: accent.withValues(alpha: isActive ? 0.4 : 0.1),
-              blurRadius: isActive ? 12 : 4,
-              offset: const Offset(0, 4),
+              blurRadius: isActive ? (isMobile ? 8 : 12) : 4,
+              offset: Offset(0, isMobile ? 2 : 4),
             )
           ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 22, color: isActive ? Colors.white : accent),
-            const SizedBox(width: 12),
+            Icon(icon, size: isMobile ? 18 : 22, color: isActive ? Colors.white : accent),
+            SizedBox(width: isMobile ? 8 : 12),
             Text(
               label,
               style: TextStyle(
                 color: isActive ? Colors.white : accent,
-                fontSize: 14,
+                fontSize: isMobile ? 12 : 14,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.5,
               ),
@@ -1031,113 +1062,126 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
       _TaxSheetDetail detail, {
         required Color accent,
       }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: accent, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withValues(alpha: 0.15),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            decoration: BoxDecoration(
-              color: accent,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.5), width: 2),
-                  ),
-                  child: Icon(detail.icon, color: Colors.white, size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    detail.title.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: detail.sections
-                  .map(
-                    (section) => Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: _buildTaxSheetSectionCard(section, accent: accent),
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
+            border: Border.all(color: accent, width: isMobile ? 2 : 3),
+            boxShadow: [
+              BoxShadow(
+                color: accent.withValues(alpha: 0.15),
+                blurRadius: isMobile ? 10 : 16,
+                offset: Offset(0, isMobile ? 4 : 8),
               )
-                  .toList(),
-            ),
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 12 : 20,
+                  vertical: isMobile ? 12 : 20,
+                ),
+                decoration: BoxDecoration(
+                  color: accent,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(isMobile ? 14 : 20),
+                    topRight: Radius.circular(isMobile ? 14 : 20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 8 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
+                        border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+                      ),
+                      child: Icon(detail.icon, color: Colors.white, size: isMobile ? 18 : 24),
+                    ),
+                    SizedBox(width: isMobile ? 12 : 16),
+                    Expanded(
+                      child: Text(
+                        detail.title.toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 14 : 18,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 10 : 20),
+                child: Column(
+                  children: detail.sections
+                      .map(
+                        (section) => Padding(
+                      padding: EdgeInsets.only(bottom: isMobile ? 12 : 24),
+                      child: _buildTaxSheetSectionCard(section, accent: accent, isMobile: isMobile),
+                    ),
+                  )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildTaxSheetSectionCard(
       _TaxSheetSection section, {
         required Color accent,
+        bool isMobile = false,
       }) {
     final hasCodes = section.entries.any((e) => e.code.isNotEmpty);
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accent, width: 2),
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+        border: Border.all(color: accent, width: isMobile ? 1.5 : 2),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0F172A).withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            blurRadius: isMobile ? 4 : 8,
+            offset: Offset(0, isMobile ? 2 : 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 16,
+                vertical: isMobile ? 10 : 14,
+              ),
               decoration: BoxDecoration(
                 color: accent.withValues(alpha: 0.15),
                 border: Border(
-                  bottom: BorderSide(color: accent, width: 2),
+                  bottom: BorderSide(color: accent, width: isMobile ? 1.5 : 2),
                 ),
               ),
               child: Text(
                 section.title.toUpperCase(),
                 style: TextStyle(
                   color: accent.withValues(alpha: 1.0),
-                  fontSize: 14,
+                  fontSize: isMobile ? 12 : 14,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
                 ),
@@ -1164,10 +1208,10 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                     ? TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(isMobile ? 6 : 12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 6 : 8, vertical: isMobile ? 4 : 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE2E8F0),
                         borderRadius: BorderRadius.circular(6),
@@ -1178,9 +1222,9 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                         child: Text(
                           item.code,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF334155),
-                            fontSize: 12.5,
+                          style: TextStyle(
+                            color: const Color(0xFF334155),
+                            fontSize: isMobile ? 11 : 12.5,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -1193,14 +1237,14 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 final labelCell = TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
-                    padding: const EdgeInsets.all(14),
+                    padding: EdgeInsets.all(isMobile ? 8 : 14),
                     child: Text(
                       item.label,
                       style: TextStyle(
                         color: item.highlight
                             ? const Color(0xFF92400E)
                             : const Color(0xFF0F172A),
-                        fontSize: 13.5,
+                        fontSize: isMobile ? 12 : 13.5,
                         fontWeight:
                         item.highlight ? FontWeight.w900 : FontWeight.w700,
                       ),
@@ -1211,17 +1255,17 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 final valueCell = TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
-                    padding: const EdgeInsets.all(14),
+                    padding: EdgeInsets.all(isMobile ? 8 : 14),
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 8 : 10, vertical: isMobile ? 4 : 6),
                         decoration: BoxDecoration(
                           color: item.highlight
                               ? Colors.white
                               : const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                           border: Border.all(
                             color: item.highlight
                                 ? const Color(0xFFD97706)
@@ -1236,7 +1280,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                             color: item.highlight
                                 ? const Color(0xFF92400E)
                                 : const Color(0xFF0F172A),
-                            fontSize: 14,
+                            fontSize: isMobile ? 12 : 14,
                             fontWeight: item.highlight
                                 ? FontWeight.w900
                                 : FontWeight.w800,
@@ -1288,7 +1332,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     return _buildSurfaceCard(
       title: 'ECR COMPLETE MATRIX',
       subtitle:
-      'Unified Earnings and Deductions layout with distinct quarter and gross totals.',
+      '.',
       icon: Icons.table_view_rounded,
       accent: const Color(0xFF0EA5E9),
       child: Column(
