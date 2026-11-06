@@ -354,7 +354,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildSectionCard(String title, IconData icon, List<Widget> children, {bool isGrid = true}) {
+  Widget _buildSectionCard(String title, IconData icon, List<Widget> children, {bool isGrid = true, int? forceCrossAxisCount}) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
@@ -420,7 +420,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                 child: isGrid
                     ? LayoutBuilder(
                   builder: (context, innerConstraints) {
-                    int crossAxisCount = innerConstraints.maxWidth > 800 ? 3 : 2;
+                    int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
                     double spacing = isMobile ? 8.0 : 20.0;
                     double runSpacing = isMobile ? 10.0 : 24.0;
                     double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
@@ -702,6 +702,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   readOnly: true, // Field Disabled
                                 ),
                               ],
+                              forceCrossAxisCount: 1,
                             ),
                           ),
                           const SizedBox(height: 24),
