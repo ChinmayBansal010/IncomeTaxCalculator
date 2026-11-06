@@ -355,80 +355,93 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   }
 
   Widget _buildSectionCard(String title, IconData icon, List<Widget> children, {bool isGrid = true}) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF64748B).withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(22), topRight: Radius.circular(22)),
-              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFDBEAFE), width: 1.5),
-                  ),
-                  child: Icon(icon, color: const Color(0xFF2563EB), size: 22),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: isGrid
-                ? LayoutBuilder(
-              builder: (context, constraints) {
-                int crossAxisCount = constraints.maxWidth > 800 ? 3 : (constraints.maxWidth > 500 ? 2 : 1);
-                double spacing = 20.0;
-                double itemWidth = (constraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
 
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: 24.0,
-                  children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
-                );
-              },
-            )
-                : Wrap(
-              spacing: 16.0,
-              runSpacing: 16.0,
-              children: children,
-            ),
+        return Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
+            border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF64748B).withValues(alpha: 0.06),
+                blurRadius: isMobile ? 10 : 20,
+                offset: Offset(0, isMobile ? 4 : 6),
+              ),
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 12 : 24,
+                  vertical: isMobile ? 10 : 20,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(isMobile ? 14 : 22),
+                    topRight: Radius.circular(isMobile ? 14 : 22),
+                  ),
+                  border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 6 : 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                        border: Border.all(color: const Color(0xFFDBEAFE), width: 1.5),
+                      ),
+                      child: Icon(icon, color: const Color(0xFF2563EB), size: isMobile ? 18 : 22),
+                    ),
+                    SizedBox(width: isMobile ? 10 : 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: isMobile ? 15 : 18,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF0F172A),
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 10 : 24),
+                child: isGrid
+                    ? LayoutBuilder(
+                  builder: (context, innerConstraints) {
+                    int crossAxisCount = innerConstraints.maxWidth > 800 ? 3 : 2;
+                    double spacing = isMobile ? 8.0 : 20.0;
+                    double runSpacing = isMobile ? 10.0 : 24.0;
+                    double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: runSpacing,
+                      children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                    );
+                  },
+                )
+                    : Wrap(
+                  spacing: isMobile ? 8.0 : 16.0,
+                  runSpacing: isMobile ? 8.0 : 16.0,
+                  children: children,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -495,40 +508,50 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     required ValueChanged<bool?> onChanged,
     required ValueChanged<String> onFieldChanged,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = MediaQuery.of(context).size.width < 600;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 21),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, right: 12.0),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: Checkbox(
-                  value: isChecked,
-                  activeColor: const Color(0xFF2563EB),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                  side: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
-                  onChanged: onChanged,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: isMobile ? 12 : 21),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: isMobile ? 8.0 : 16.0,
+                    right: isMobile ? 4.0 : 12.0,
+                  ),
+                  child: SizedBox(
+                    width: isMobile ? 18 : 24,
+                    height: isMobile ? 18 : 24,
+                    child: Checkbox(
+                      value: isChecked,
+                      activeColor: const Color(0xFF2563EB),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(isMobile ? 4 : 6)),
+                      side: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
+                      onChanged: onChanged,
+                    ),
+                  ),
                 ),
+              ],
+            ),
+            Expanded(
+              child: AnimatedInputField(
+                label: label,
+                controller: controller,
+                icon: icon,
+                keyboardType: TextInputType.number,
+                enabled: isChecked,
+                onChanged: onFieldChanged,
               ),
             ),
           ],
-        ),
-        Expanded(
-          child: AnimatedInputField(
-            label: label,
-            controller: controller,
-            icon: icon,
-            keyboardType: TextInputType.number,
-            enabled: isChecked,
-            onChanged: onFieldChanged,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -1440,6 +1463,7 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
   @override
   Widget build(BuildContext context) {
     bool isEffectivelyReadOnly = widget.readOnly || !widget.enabled;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -1451,11 +1475,11 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 3 : 8),
               child: Text(
                 widget.label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: isMobile ? 11 : 13,
                   fontWeight: FontWeight.w800,
                   color: isEffectivelyReadOnly ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                   letterSpacing: 0.5,
@@ -1464,13 +1488,13 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
             ),
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                 boxShadow: [
                   if (_isHovered && !isEffectivelyReadOnly)
                     BoxShadow(
                       color: const Color(0xFF2563EB).withValues(alpha: 0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      blurRadius: isMobile ? 8 : 12,
+                      offset: Offset(0, isMobile ? 2 : 4),
                     ),
                 ],
               ),
@@ -1482,7 +1506,7 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                 controller: widget.controller,
                 style: TextStyle(
                   color: isEffectivelyReadOnly ? const Color(0xFF64748B) : const Color(0xFF0F172A),
-                  fontSize: 15,
+                  fontSize: isMobile ? 13 : 15,
                   fontWeight: isEffectivelyReadOnly ? FontWeight.w700 : FontWeight.w600,
                 ),
                 decoration: InputDecoration(
@@ -1495,34 +1519,36 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                     color: isEffectivelyReadOnly
                         ? const Color(0xFF94A3B8)
                         : (_isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8)),
-                    size: 20,
+                    size: isMobile ? 16 : 20,
                   ),
-                  // Lock Icon on disabled fields helps UX significantly
                   suffixIcon: isEffectivelyReadOnly
-                      ? const Icon(Icons.lock_outline_rounded, color: Color(0xFFCBD5E1), size: 18)
+                      ? Icon(Icons.lock_outline_rounded, color: const Color(0xFFCBD5E1), size: isMobile ? 14 : 18)
                       : null,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: isMobile ? 10 : 18,
+                    horizontal: isMobile ? 10 : 20,
+                  ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: BorderSide(
                       color: _isHovered && !isEffectivelyReadOnly ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
                   ),
                   errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
                   ),
                   disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                     borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
                   ),
                 ),
@@ -1589,6 +1615,8 @@ class _AnimatedActionButtonState extends State<_AnimatedActionButton> with Singl
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -1606,20 +1634,20 @@ class _AnimatedActionButtonState extends State<_AnimatedActionButton> with Singl
               scale: _scaleAnimation.value,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                height: 60,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                height: isMobile ? 44 : 60,
+                padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: widget.gradientColors,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                   boxShadow: [
                     BoxShadow(
                       color: widget.gradientColors.first.withValues(alpha: _isHovered ? 0.4 : 0.2),
-                      blurRadius: _isHovered ? 20 : 10,
-                      offset: const Offset(0, 8),
+                      blurRadius: _isHovered ? (isMobile ? 12 : 20) : (isMobile ? 6 : 10),
+                      offset: Offset(0, isMobile ? 4 : 8),
                     ),
                   ],
                 ),
@@ -1627,15 +1655,15 @@ class _AnimatedActionButtonState extends State<_AnimatedActionButton> with Singl
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(widget.icon, color: Colors.white, size: 24),
-                    const SizedBox(width: 12),
+                    Icon(widget.icon, color: Colors.white, size: isMobile ? 18 : 24),
+                    SizedBox(width: isMobile ? 6 : 12),
                     Text(
                       widget.label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: isMobile ? 13 : 16,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ],

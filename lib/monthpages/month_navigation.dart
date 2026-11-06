@@ -196,19 +196,25 @@ class _MonthNavigationPageState extends State<MonthNavigationPage> with SingleTi
 
   Widget _buildGrid() {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
-    final int crossAxisCount =
-    screenWidth < 600 ? 1 :
-    screenWidth < 1000 ? 2 : 3;
+    final int crossAxisCount = screenWidth < 600
+        ? 2
+        : (screenWidth < 1000 ? 2 : 3);
 
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? 12 : 24,
+        0,
+        isMobile ? 12 : 24,
+        isMobile ? 24 : 40,
+      ),
       physics: const BouncingScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        mainAxisExtent: 100,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
+        mainAxisExtent: isMobile ? 68 : 100,
+        crossAxisSpacing: isMobile ? 10 : 20,
+        mainAxisSpacing: isMobile ? 10 : 20,
       ),
       itemCount: _monthsData.length,
       itemBuilder: (context, index) {
@@ -241,7 +247,6 @@ class _MonthNavigationPageState extends State<MonthNavigationPage> with SingleTi
             opacity: fadeAnimation,
             child: MonthActionTile(
               label: month['label'],
-              subtitle: "Edit statements for ${month['label'].toLowerCase()}",
               icon: month['icon'],
               color: month['color'],
               onPressed: () {
@@ -266,14 +271,12 @@ class _MonthNavigationPageState extends State<MonthNavigationPage> with SingleTi
 
 class MonthActionTile extends StatefulWidget {
   final String label;
-  final String subtitle;
   final IconData icon;
   final Color color;
   final VoidCallback onPressed;
 
   const MonthActionTile({
     required this.label,
-    required this.subtitle,
     required this.icon,
     required this.color,
     required this.onPressed,
@@ -322,6 +325,8 @@ class _MonthActionTileState extends State<MonthActionTile> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return MouseRegion(
       onEnter: (_) => _onHoverChanged(true),
       onExit: (_) => _onHoverChanged(false),
@@ -345,7 +350,7 @@ class _MonthActionTileState extends State<MonthActionTile> with SingleTickerProv
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 20),
                     border: Border.all(
                       color: _isHovered ? widget.color.withValues(alpha: 0.4) : const Color(0xFFE2E8F0),
                       width: _isHovered ? 2 : 1.5,
@@ -353,21 +358,24 @@ class _MonthActionTileState extends State<MonthActionTile> with SingleTickerProv
                     boxShadow: [
                       BoxShadow(
                         color: widget.color.withValues(alpha: 0.05 + (0.1 * _elevationAnimation.value)),
-                        blurRadius: 10 + (10 * _elevationAnimation.value),
-                        offset: Offset(0, 4 + (4 * _elevationAnimation.value)),
+                        blurRadius: isMobile ? 6 : (10 + (10 * _elevationAnimation.value)),
+                        offset: Offset(0, isMobile ? 2 : (4 + (4 * _elevationAnimation.value))),
                       ),
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 10 : 20,
+                      vertical: isMobile ? 8 : 16,
+                    ),
                     child: Row(
                       children: [
                         Container(
-                          height: 56,
-                          width: 56,
+                          height: isMobile ? 40 : 56,
+                          width: isMobile ? 40 : 56,
                           decoration: BoxDecoration(
                             color: widget.color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(isMobile ? 10 : 16),
                             border: Border.all(
                               color: widget.color.withValues(alpha: 0.2),
                               width: 1.5,
@@ -375,49 +383,34 @@ class _MonthActionTileState extends State<MonthActionTile> with SingleTickerProv
                           ),
                           child: Icon(
                             widget.icon,
-                            size: 28,
+                            size: isMobile ? 20 : 28,
                             color: widget.color,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: isMobile ? 8 : 16),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                widget.label,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color(0xFF0F172A),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                widget.subtitle,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF64748B),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                          child: Text(
+                            widget.label,
+                            style: TextStyle(
+                              fontSize: isMobile ? 13 : 16,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF0F172A),
+                              letterSpacing: 0.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: isMobile ? 4 : 12),
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(isMobile ? 4 : 8),
                           decoration: BoxDecoration(
                             color: _isHovered ? widget.color.withValues(alpha: 0.1) : Colors.transparent,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
-                            size: 16,
+                            size: isMobile ? 12 : 16,
                             color: _isHovered ? widget.color : const Color(0xFFCBD5E1),
                           ),
                         ),
