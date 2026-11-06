@@ -1167,21 +1167,18 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 12 : 16,
-                vertical: isMobile ? 10 : 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: accent.withValues(alpha: 0.15),
                 border: Border(
-                  bottom: BorderSide(color: accent, width: isMobile ? 1.5 : 2),
+                  bottom: BorderSide(color: accent, width: 2),
                 ),
               ),
               child: Text(
                 section.title.toUpperCase(),
                 style: TextStyle(
                   color: accent.withValues(alpha: 1.0),
-                  fontSize: isMobile ? 12 : 14,
+                  fontSize: 14,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
                 ),
@@ -1208,10 +1205,10 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                     ? TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
-                    padding: EdgeInsets.all(isMobile ? 6 : 12),
+                    padding: const EdgeInsets.all(12),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 6 : 8, vertical: isMobile ? 4 : 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE2E8F0),
                         borderRadius: BorderRadius.circular(6),
@@ -1222,9 +1219,9 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                         child: Text(
                           item.code,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: const Color(0xFF334155),
-                            fontSize: isMobile ? 11 : 12.5,
+                          style: const TextStyle(
+                            color: Color(0xFF334155),
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -1237,14 +1234,14 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 final labelCell = TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
-                    padding: EdgeInsets.all(isMobile ? 8 : 14),
+                    padding: const EdgeInsets.all(14),
                     child: Text(
                       item.label,
                       style: TextStyle(
                         color: item.highlight
                             ? const Color(0xFF92400E)
                             : const Color(0xFF0F172A),
-                        fontSize: isMobile ? 12 : 13.5,
+                        fontSize: 13.5,
                         fontWeight:
                         item.highlight ? FontWeight.w900 : FontWeight.w700,
                       ),
@@ -1255,17 +1252,17 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                 final valueCell = TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
-                    padding: EdgeInsets.all(isMobile ? 8 : 14),
+                    padding: const EdgeInsets.all(14),
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: isMobile ? 8 : 10, vertical: isMobile ? 4 : 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: item.highlight
                               ? Colors.white
                               : const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: item.highlight
                                 ? const Color(0xFFD97706)
@@ -1280,7 +1277,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
                             color: item.highlight
                                 ? const Color(0xFF92400E)
                                 : const Color(0xFF0F172A),
-                            fontSize: isMobile ? 12 : 14,
+                            fontSize: 14,
                             fontWeight: item.highlight
                                 ? FontWeight.w900
                                 : FontWeight.w800,
@@ -1331,8 +1328,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
 
     return _buildSurfaceCard(
       title: 'ECR COMPLETE MATRIX',
-      subtitle:
-      '.',
+      subtitle: '',
       icon: Icons.table_view_rounded,
       accent: const Color(0xFF0EA5E9),
       child: Column(
