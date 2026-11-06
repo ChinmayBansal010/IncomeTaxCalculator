@@ -1545,122 +1545,144 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
     bool isExpanded = true,
     VoidCallback? onToggleExpand,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF94A3B8), width: 2.5),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 16,
-            offset: Offset(0, 8),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
+            border: Border.all(
+                color: const Color(0xFF94A3B8), width: isMobile ? 1.5 : 2.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: isMobile ? 10 : 16,
+                offset: Offset(0, isMobile ? 4 : 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: isCollapsible ? onToggleExpand : null,
-            borderRadius: BorderRadius.vertical(
-              top: const Radius.circular(21),
-              bottom: (isCollapsible && !isExpanded)
-                  ? const Radius.circular(21)
-                  : Radius.zero,
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: isCollapsible ? onToggleExpand : null,
                 borderRadius: BorderRadius.vertical(
-                  top: const Radius.circular(21),
+                  top: Radius.circular(isMobile ? 14 : 21),
                   bottom: (isCollapsible && !isExpanded)
-                      ? const Radius.circular(21)
+                      ? Radius.circular(isMobile ? 14 : 21)
                       : Radius.zero,
                 ),
-                border: (isCollapsible && !isExpanded)
-                    ? null
-                    : const Border(
-                        bottom: BorderSide(color: Color(0xFF94A3B8), width: 2.5),
-                      ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: accent,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                          color: accent.withValues(alpha: 0.3), width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: accent.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        )
-                      ],
-                    ),
-                    child: Icon(icon, color: Colors.white, size: 28),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 12 : 24,
+                    vertical: isMobile ? 10 : 24,
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title.toUpperCase(),
-                          style: const TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(isMobile ? 14 : 21),
+                      bottom: (isCollapsible && !isExpanded)
+                          ? Radius.circular(isMobile ? 14 : 21)
+                          : Radius.zero,
+                    ),
+                    border: (isCollapsible && !isExpanded)
+                        ? null
+                        : Border(
+                            bottom: BorderSide(
+                              color: const Color(0xFF94A3B8),
+                              width: isMobile ? 1.5 : 2.5,
+                            ),
+                          ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(isMobile ? 6 : 14),
+                        decoration: BoxDecoration(
+                          color: accent,
+                          borderRadius:
+                              BorderRadius.circular(isMobile ? 10 : 16),
+                          border: Border.all(
+                              color: accent.withValues(alpha: 0.3),
+                              width: isMobile ? 1.5 : 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withValues(alpha: 0.4),
+                              blurRadius: isMobile ? 4 : 8,
+                              offset: Offset(0, isMobile ? 2 : 4),
+                            )
+                          ],
+                        ),
+                        child:
+                            Icon(icon, color: Colors.white, size: isMobile ? 18 : 28),
+                      ),
+                      SizedBox(width: isMobile ? 10 : 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title.toUpperCase(),
+                              style: TextStyle(
+                                color: const Color(0xFF0F172A),
+                                fontSize: isMobile ? 14 : 20,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            if (!isMobile &&
+                                subtitle.isNotEmpty &&
+                                subtitle != '.') ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                subtitle,
+                                style: const TextStyle(
+                                  color: Color(0xFF475569),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      if (isCollapsible) ...[
+                        SizedBox(width: isMobile ? 8 : 12),
+                        Container(
+                          padding: EdgeInsets.all(isMobile ? 5 : 8),
+                          decoration: BoxDecoration(
+                            color: accent.withValues(alpha: 0.1),
+                            borderRadius:
+                                BorderRadius.circular(isMobile ? 8 : 12),
+                            border: Border.all(
+                                color: accent.withValues(alpha: 0.3),
+                                width: 1.5),
+                          ),
+                          child: Icon(
+                            isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded,
+                            color: accent,
+                            size: isMobile ? 18 : 28,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          subtitle,
-                          style: const TextStyle(
-                            color: Color(0xFF475569),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
                       ],
-                    ),
+                    ],
                   ),
-                  if (isCollapsible) ...[
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: accent.withValues(alpha: 0.3), width: 1.5),
-                      ),
-                      child: Icon(
-                        isExpanded
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        color: accent,
-                        size: 28,
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
-            ),
+              if (!isCollapsible || isExpanded)
+                Padding(
+                  padding: EdgeInsets.all(isMobile ? 10 : 24),
+                  child: child,
+                ),
+            ],
           ),
-          if (!isCollapsible || isExpanded)
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: child,
-            ),
-        ],
-      ),
+        );
+      },
     );
   }
 
