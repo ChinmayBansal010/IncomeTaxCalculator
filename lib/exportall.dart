@@ -284,39 +284,85 @@ Future<Map<String, dynamic>> fetchdedData() async {
 }
 
 
-Future<Map<String, dynamic>> fetchitaxNewData() async {
+Future<Map<String, dynamic>> fetchitaxNewData([Map<String, dynamic>? mainDataMap]) async {
   try {
     DatabaseEvent event = await database.child('itaxnew').once();
     DataSnapshot snapshot = event.snapshot;
 
-    if (snapshot.exists) {
+    Map<String, dynamic> rawMainMap = {};
+    if (mainDataMap != null) {
+      rawMainMap = mainDataMap;
+    } else {
+      final mainSnap = await database.child('maindata').once();
+      if (mainSnap.snapshot.exists && mainSnap.snapshot.value != null) {
+        rawMainMap = Map<String, dynamic>.from(mainSnap.snapshot.value as Map);
+      }
+    }
+
+    if (snapshot.exists && snapshot.value != null) {
       final itfNewData = Map<String, dynamic>.from(snapshot.value as Map);
 
       final orderedKeys = [
-        'biometricid', 'tg', 'convdrive', 'uniform', 'gti', 'atccd2',
+        'biometricid', 'name', 'panno', 'tg', 'convdrive', 'uniform', 'gti', 'atccd2',
         'ti', 'sd', 'other', 'tti', 't1', 't2', 't3', 't4',
         't5', 't6', 't7', 'tt', 'sur', 'tl', 'tre', 'ttl', 'ec',
         'ttp', 'deduct', 'nitp', 'relief', 'nitpi', 'ep'
       ];
 
       final labelMap = {
-        'biometricid': 'Biometric ID', 'tg': 'Total Gross', 'convdrive': 'Conv&Cont',
-        'uniform': 'Uniform', 'gti': 'Gross Taxable Income', 'atccd2': '80CCD(2)',
-        'ti': 'Taxable Income', 'sd': 'Standard Deduction', 'other': 'Other',
-        'tti': 'Total Taxable Income', 't1': 'Tax Slab 1', 't2': 'Tax Slab 2', 't3': 'Tax Slab 3',
-        't4': 'Tax Slab 4', 't5': 'Tax Slab 5', 't6': 'Tax Slab 6', 't7': 'Tax Slab 7', 'tt': 'Total Tax',
-        'sur': 'Surcharge', 'tl': 'Tax Liability', 'tre': 'Tax Rebate', 'ttl': 'Total Tax Liability',
-        'ec': 'Cess', 'ttp': 'Total Tax Payble', 'deduct': 'Tax Already Paid', 'nitp': 'Tax Payble',
-        'relief': 'tax Relief', 'nitpi': 'Net Tax Payble', 'ep': 'Excess'
+        'biometricid': 'Biometric ID',
+        'name': 'Name',
+        'panno': 'PAN Number',
+        'tg': 'Total Gross',
+        'convdrive': 'Conv&Cont',
+        'uniform': 'Uniform',
+        'gti': 'Gross Taxable Income',
+        'atccd2': '80CCD(2)',
+        'ti': 'Taxable Income',
+        'sd': 'Standard Deduction',
+        'other': 'Other',
+        'tti': 'Total Taxable Income',
+        't1': 'Tax Slab 1',
+        't2': 'Tax Slab 2',
+        't3': 'Tax Slab 3',
+        't4': 'Tax Slab 4',
+        't5': 'Tax Slab 5',
+        't6': 'Tax Slab 6',
+        't7': 'Tax Slab 7',
+        'tt': 'Total Tax',
+        'sur': 'Surcharge',
+        'tl': 'Tax Liability',
+        'tre': 'Tax Rebate',
+        'ttl': 'Total Tax Liability',
+        'ec': 'Cess',
+        'ttp': 'Total Tax Payble',
+        'deduct': 'Tax Already Paid',
+        'nitp': 'Tax Payble',
+        'relief': 'tax Relief',
+        'nitpi': 'Net Tax Payble',
+        'ep': 'Excess'
       };
 
       final mappedData = <String, Map<String, dynamic>>{};
       itfNewData.forEach((key, value) {
         if (value is Map) {
           final innerMap = Map<String, dynamic>.from(value);
+          final bioId = innerMap['biometricid']?.toString() ?? key;
+
+          final mainRecord = rawMainMap[bioId] ?? rawMainMap[key];
+          String name = '';
+          String panNo = '';
+          if (mainRecord is Map) {
+            name = (mainRecord['name'] ?? mainRecord['Name'] ?? '').toString();
+            panNo = (mainRecord['panno'] ?? mainRecord['PAN No.'] ?? mainRecord['PAN Number'] ?? '').toString();
+          }
+
+          innerMap['name'] = name;
+          innerMap['panno'] = panNo;
+
           final labeledMap = {
             for (var k in orderedKeys)
-              if (innerMap.containsKey(k)) labelMap[k] ?? k: innerMap[k]
+              labelMap[k] ?? k: innerMap[k] ?? ''
           };
           mappedData[key] = labeledMap;
         }
@@ -330,6 +376,7 @@ Future<Map<String, dynamic>> fetchitaxNewData() async {
     return {};
   }
 }
+
 
 
 
@@ -398,7 +445,7 @@ Future<void> exportAll() async {
   Map<String, dynamic> febdata = monthdata['feb']!;
   Map<String, dynamic> arrdata = await fetcharrearData();
   Map<String, dynamic> deddata = await fetchdedData();
-  Map<String, dynamic> itaxnewdata = await fetchitaxNewData();
+  Map<String, dynamic> itaxnewdata = await fetchitaxNewData(maindata);
   Map<String, dynamic> dadata = await fetchDaData();
 
 

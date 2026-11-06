@@ -635,7 +635,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
                           _buildAnimatedSection(
                             0,
                             _buildSectionCard(
-                              "Employee Identity",
+                              "Employee Information",
                               Icons.badge_rounded,
                               [
                                 _AnimatedInputField(label: "BIOMETRIC ID", controller: biometricIdController, icon: Icons.fingerprint_rounded, readOnly: true),
