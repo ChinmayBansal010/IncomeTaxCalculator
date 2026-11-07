@@ -12,67 +12,78 @@ import 'package:universal_html/html.dart' as html;
 final database = FirebaseDatabase.instance.ref().child(sharedData.userPlace);
 
 Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
-  final mainSnap = await database.child("maindata").once();
-  final mainMap = Map<String, dynamic>.from(mainSnap.snapshot.value as Map);
+  try {
+    final mainSnap = await database.child("maindata").once();
+    if (!mainSnap.snapshot.exists || mainSnap.snapshot.value == null) {
+      return {};
+    }
+    final mainMap = Map<String, dynamic>.from(mainSnap.snapshot.value as Map);
 
-  final orderedKeys = [
-    "biometricid","name", "fhname", "designation", "dob", "doa", "dort", "group", "category",
-    "sex", "address", "aadhaarno", "mobileno", "accountno", "branch", "micrno",
-    "ifsc", "panno", "payscale", "level", "gpfno", "npsno","epfno", "esino", "emailid", "cycleno",
-    "voterid", "dojo", "place", "bloodgrp", "emergencyno", "nicemailid", "dorn",
-    "education", "emptype", "bname", "ext3", "ext4"
-  ];
+    final orderedKeys = [
+      "biometricid","name", "fhname", "designation", "dob", "doa", "dort", "group", "category",
+      "sex", "address", "aadhaarno", "mobileno", "accountno", "branch", "micrno",
+      "ifsc", "panno", "payscale", "level", "gpfno", "npsno","epfno", "esino", "emailid", "cycleno",
+      "voterid", "dojo", "place", "bloodgrp", "emergencyno", "nicemailid", "dorn",
+      "education", "emptype", "bname", "ext3", "ext4"
+    ];
 
-  final Map<String, String> labelMap = {
-    "biometricid": "Biometric ID",
-    "name": "Name",
-    "fhname": "Father/Husband Name",
-    "designation": "Designation",
-    "dob": "Date of Birth",
-    "doa": "Date of Appointment",
-    "dort": "Date of Retirement",
-    "group": "Group",
-    "category": "Category",
-    "sex": "Gender",
-    "address": "Address",
-    "aadhaarno": "Aadhaar No.",
-    "mobileno": "Mobile No.",
-    "accountno": "Bank Account No.",
-    "branch": "Bank Branch",
-    "micrno": "MICR No.",
-    "ifsc": "IFSC Code",
-    "panno": "PAN No.",
-    "payscale": "Pay Scale",
-    "level": "Pay Level",
-    "gpfno": "GPF No.",
-    "npsno": "NPS No.",
-    "epfno": "EPF No.",
-    "esino": "ESI No.",
-    "emailid": "Email ID",
-    "cycleno": "Cycle No.",
-    "voterid": "Voter ID",
-    "dojo": "Date of Joining Office",
-    "place": "Place",
-    "bloodgrp": "Blood Group",
-    "emergencyno": "Emergency No.",
-    "nicemailid": "NIC Email ID",
-    "dorn": "Date of Resignation",
-    "education": "Educational",
-    "emptype": "Employment Type",
-    "bname": "Bank Name",
-    "ext3": "Extra Field 3",
-    "ext4": "Extra Field 4",
-  };
-
-  final mappedData = mainMap.map((key, value) {
-    final labeledMap = {
-      for (var k in orderedKeys)
-        if (value[k] != null) labelMap[k] ?? k: value[k]
+    final Map<String, String> labelMap = {
+      "biometricid": "Biometric ID",
+      "name": "Name",
+      "fhname": "Father/Husband Name",
+      "designation": "Designation",
+      "dob": "Date of Birth",
+      "doa": "Date of Appointment",
+      "dort": "Date of Retirement",
+      "group": "Group",
+      "category": "Category",
+      "sex": "Gender",
+      "address": "Address",
+      "aadhaarno": "Aadhaar No.",
+      "mobileno": "Mobile No.",
+      "accountno": "Bank Account No.",
+      "branch": "Bank Branch",
+      "micrno": "MICR No.",
+      "ifsc": "IFSC Code",
+      "panno": "PAN No.",
+      "payscale": "Pay Scale",
+      "level": "Pay Level",
+      "gpfno": "GPF No.",
+      "npsno": "NPS No.",
+      "epfno": "EPF No.",
+      "esino": "ESI No.",
+      "emailid": "Email ID",
+      "cycleno": "Vehicle No.",
+      "voterid": "Voter ID",
+      "dojo": "Date of Joining Office",
+      "place": "Place",
+      "bloodgrp": "Blood Group",
+      "emergencyno": "Emergency No.",
+      "nicemailid": "NIC Email ID",
+      "dorn": "Date of Resignation",
+      "education": "Educational",
+      "emptype": "Employment Type",
+      "bname": "Bank Name",
+      "ext3": "Extra Field 3",
+      "ext4": "Extra Field 4",
     };
-    return MapEntry(key, labeledMap);
-  });
 
-  return mappedData;
+    final mappedData = <String, Map<String, dynamic>>{};
+    mainMap.forEach((key, value) {
+      if (value is Map) {
+        final innerMap = Map<String, dynamic>.from(value);
+        final labeledMap = {
+          for (var k in orderedKeys)
+            labelMap[k] ?? k: (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : ''
+        };
+        mappedData[key] = labeledMap;
+      }
+    });
+
+    return mappedData;
+  } catch (error) {
+    return {};
+  }
 }
 
 
@@ -93,9 +104,8 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
     DatabaseEvent event = await database.child('monthdata').child(month).once();
     DataSnapshot snapshot = event.snapshot;
 
-    if (snapshot.exists) {
-      final rawData = event;
-      final monthMap = Map<String, dynamic>.from(rawData.snapshot.value as Map);
+    if (snapshot.exists && snapshot.value != null) {
+      final monthMap = Map<String, dynamic>.from(snapshot.value as Map);
 
       final orderedKeys = [
         "biometricid", "name", "designation", "bp", "da", "hra", "npa", "splpay", "conv", "pg", "annual",
@@ -167,7 +177,7 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
           final innerMap = Map<String, dynamic>.from(value);
           final labeledMap = {
             for (var k in orderedKeys)
-              if (innerMap.containsKey(k)) labelMap[k] ?? k: innerMap[k]
+              labelMap[k] ?? k: (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : ''
           };
           mappedData[key] = labeledMap;
         }
@@ -186,8 +196,8 @@ Future<Map<String, dynamic>> fetcharrearData() async {
     DatabaseEvent event = await database.child('arrdata').once();
     DataSnapshot snapshot = event.snapshot;
 
-    if (snapshot.exists) {
-      final arrData = Map<String, dynamic>.from(event.snapshot.value as Map);
+    if (snapshot.exists && snapshot.value != null) {
+      final arrData = Map<String, dynamic>.from(snapshot.value as Map);
 
       final orderedKeys = [
         "biometricid","name",
@@ -218,7 +228,7 @@ Future<Map<String, dynamic>> fetcharrearData() async {
           final innerMap = Map<String, dynamic>.from(value);
           final labeledMap = {
             for (var k in orderedKeys)
-              if (innerMap.containsKey(k)) labelMap[k] ?? k: innerMap[k]
+              labelMap[k] ?? k: (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : ''
           };
           mappedData[key] = labeledMap;
         }
@@ -239,8 +249,8 @@ Future<Map<String, dynamic>> fetchdedData() async {
     DatabaseEvent event = await database.child('deddata').once();
     DataSnapshot snapshot = event.snapshot;
 
-    if (snapshot.exists) {
-      final dedData = Map<String, dynamic>.from(event.snapshot.value as Map);
+    if (snapshot.exists && snapshot.value != null) {
+      final dedData = Map<String, dynamic>.from(snapshot.value as Map);
 
       final orderedKeys = [
         "biometricid", "name", "oname", "opan", "po", "hrr", "ppf", "lic", "hlp",
@@ -268,7 +278,7 @@ Future<Map<String, dynamic>> fetchdedData() async {
           final innerMap = Map<String, dynamic>.from(value);
           final labeledMap = {
             for (var k in orderedKeys)
-              if (innerMap.containsKey(k)) labelMap[k] ?? k: innerMap[k]
+              labelMap[k] ?? k: (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : ''
           };
           mappedData[key] = labeledMap;
         }
