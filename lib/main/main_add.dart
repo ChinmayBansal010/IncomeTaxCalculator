@@ -564,97 +564,118 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1200),
-                      child: ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                          _buildAnimatedSection(
-                            0,
-                            _buildSectionCard(
-                              "Identity & Personal Information",
-                              Icons.person_rounded,
-                              [
-                                AnimatedInputField(label: "BIOMETRIC ID", controller: biometricIdController, icon: Icons.fingerprint_rounded),
-                                AnimatedInputField(label: "NAME", controller: nameController, icon: Icons.person_outline_rounded),
-                                AnimatedInputField(label: "FATHER/HUSBAND NAME", controller: fhNameController, icon: Icons.people_alt_rounded),
-                                AnimatedInputField(label: "DATE OF BIRTH", controller: dobController, icon: Icons.cake_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
-                                AnimatedDropdownField(label: "BLOOD GROUP", currentValue: bloodGroupController, items: const ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], icon: Icons.bloodtype_rounded, onChanged: (v) => setState(() => bloodGroupController = v)),
-                                AnimatedDropdownField(label: "SEX", currentValue: sexController, items: const ['', 'MALE', 'FEMALE', 'OTHER'], icon: Icons.wc_rounded, onChanged: (v) => setState(() => sexController = v)),
-                                AnimatedInputField(label: "EDUCATION QUALIFICATION", controller: educationController, icon: Icons.school_rounded),
-                              ],
+                      child: Builder(
+                        builder: (context) {
+                          final isMobile = MediaQuery.of(context).size.width < 600;
+
+                          return ListView(
+                            padding: EdgeInsets.fromLTRB(
+                              isMobile ? 10 : 16,
+                              isMobile ? 8 : 8,
+                              isMobile ? 10 : 16,
+                              120,
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildAnimatedSection(
-                            1,
-                            _buildSectionCard(
-                              "Employment Details",
-                              Icons.work_rounded,
-                              [
-                                AnimatedInputField(label: "DESIGNATION", controller: designationController, icon: Icons.badge_rounded),
-                                AnimatedDropdownField(label: "EMPLOYEE TYPE", currentValue: empTypeController, items: const ['', 'REGULAR', 'CONTRACTUAL', 'DAILY WAGER'], icon: Icons.work_outline_rounded, onChanged: (v) => setState(() => empTypeController = v)),
-                                AnimatedDropdownField(label: "GROUP", currentValue: groupController, items: const ['', 'A', 'B', 'C', 'D'], icon: Icons.group_work_rounded, onChanged: (v) => setState(() => groupController = v)),
-                                AnimatedDropdownField(label: "CATEGORY", currentValue: categoryController, items: const ['', 'GENERAL', 'SC', 'ST', 'OBC'], icon: Icons.category_rounded, onChanged: (v) => setState(() => categoryController = v)),
-                                AnimatedInputField(label: "DATE OF APPOINTMENT", controller: doaController, icon: Icons.event_available_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
-                                AnimatedInputField(label: "DATE OF RETIREMENT", controller: dortController, icon: Icons.event_busy_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
-                                AnimatedInputField(label: "DATE OF JOINING OFFICE", controller: dojoController, icon: Icons.login_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
-                                AnimatedInputField(label: "DATE OF RESIGNATION", controller: dornController, icon: Icons.logout_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
-                                AnimatedInputField(label: "PLACE OF DUTY", controller: placeController, icon: Icons.place_rounded),
-                                AnimatedInputField(label: "PAY SCALE", controller: payScaleController, icon: Icons.payments_rounded),
-                                AnimatedInputField(label: "LEVEL", controller: levelController, icon: Icons.trending_up_rounded),
-                                AnimatedDropdownField(label: "INCREMENT MONTH", currentValue: mincrementController, items: const ['', 'JULY', 'JANUARY'], icon: Icons.event_note_rounded, onChanged: (v) => setState(() => mincrementController = v)),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildAnimatedSection(
-                            2,
-                            _buildSectionCard(
-                              "Contact & Address",
-                              Icons.contact_phone_rounded,
-                              [
-                                AnimatedInputField(label: "MOBILE NUMBER", controller: mobileController, icon: Icons.phone_android_rounded, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
-                                AnimatedInputField(label: "EMERGENCY NUMBER", controller: emergencyNoController, icon: Icons.emergency_rounded, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
-                                AnimatedInputField(label: "EMAIL ID", controller: emailController, icon: Icons.email_rounded),
-                                AnimatedInputField(label: "NIC EMAIL ID", controller: nicEmailController, icon: Icons.alternate_email_rounded),
-                                AnimatedInputField(label: "ADDRESS", controller: addressController, icon: Icons.home_rounded),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildAnimatedSection(
-                            3,
-                            _buildSectionCard(
-                              "Bank & Financial Info",
-                              Icons.account_balance_rounded,
-                              [
-                                AnimatedInputField(label: "BANK NAME", controller: bankNameController, icon: Icons.account_balance_rounded),
-                                AnimatedInputField(label: "BRANCH", controller: branchController, icon: Icons.store_rounded),
-                                AnimatedInputField(label: "ACCOUNT NUMBER", controller: accountController, icon: Icons.account_balance_wallet_rounded),
-                                AnimatedInputField(label: "IFSC CODE", controller: ifscController, icon: Icons.account_tree_rounded),
-                                AnimatedInputField(label: "MICR NUMBER", controller: micrController, icon: Icons.numbers_rounded),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildAnimatedSection(
-                            4,
-                            _buildSectionCard(
-                              "Identifications & Accounts",
-                              Icons.assignment_ind_rounded,
-                              [
-                                AnimatedInputField(label: "AADHAAR NUMBER", controller: aadhaarController, icon: Icons.fingerprint_rounded),
-                                AnimatedInputField(label: "PAN NUMBER", controller: panController, icon: Icons.credit_card_rounded),
-                                AnimatedInputField(label: "VOTER ID", controller: voterIdController, icon: Icons.how_to_vote_rounded),
-                                AnimatedInputField(label: "VEHICLE NUMBER", controller: cycleNoController, icon: Icons.directions_car_rounded),
-                                AnimatedInputField(label: "GPF NUMBER", controller: gpfNoController, icon: Icons.savings_rounded),
-                                AnimatedInputField(label: "NPS NUMBER", controller: npsNoController, icon: Icons.account_balance_wallet_rounded),
-                                AnimatedInputField(label: "EPF NUMBER", controller: epfNoController, icon: Icons.volunteer_activism_rounded),
-                                AnimatedInputField(label: "ESI NUMBER", controller: esiNoController, icon: Icons.health_and_safety_rounded),
-                              ],
-                            ),
-                          ),
-                        ],
+                            physics: const BouncingScrollPhysics(),
+                            children: [
+                              _buildAnimatedSection(
+                                0,
+                                _buildSectionCard(
+                                  "Identity & Personal Information",
+                                  Icons.person_rounded,
+                                  _buildMobileItems([
+                                    AnimatedInputField(label: "BIOMETRIC ID", controller: biometricIdController, icon: Icons.fingerprint_rounded),
+                                    AnimatedInputField(label: "NAME", controller: nameController, icon: Icons.person_outline_rounded),
+                                    AnimatedInputField(label: "FATHER/HUSBAND NAME", controller: fhNameController, icon: Icons.people_alt_rounded),
+                                    AnimatedInputField(label: "DATE OF BIRTH", controller: dobController, icon: Icons.cake_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    [
+                                      AnimatedDropdownField(label: "BLOOD GROUP", currentValue: bloodGroupController, items: const ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], icon: Icons.bloodtype_rounded, onChanged: (v) => setState(() => bloodGroupController = v)),
+                                      AnimatedDropdownField(label: "SEX", currentValue: sexController, items: const ['', 'MALE', 'FEMALE', 'OTHER'], icon: Icons.wc_rounded, onChanged: (v) => setState(() => sexController = v)),
+                                    ],
+                                    AnimatedInputField(label: "EDUCATION QUALIFICATION", controller: educationController, icon: Icons.school_rounded),
+                                  ], isMobile),
+                                ),
+                              ),
+                              SizedBox(height: isMobile ? 12 : 24),
+                              _buildAnimatedSection(
+                                1,
+                                _buildSectionCard(
+                                  "Employment Details",
+                                  Icons.work_rounded,
+                                  _buildMobileItems([
+                                    AnimatedInputField(label: "DESIGNATION", controller: designationController, icon: Icons.badge_rounded),
+                                    [
+                                      AnimatedDropdownField(label: "EMPLOYEE TYPE", currentValue: empTypeController, items: const ['', 'REGULAR', 'CONTRACTUAL', 'DAILY WAGER'], icon: Icons.work_outline_rounded, onChanged: (v) => setState(() => empTypeController = v)),
+                                      AnimatedDropdownField(label: "GROUP", currentValue: groupController, items: const ['', 'A', 'B', 'C', 'D'], icon: Icons.group_work_rounded, onChanged: (v) => setState(() => groupController = v)),
+                                    ],
+                                    AnimatedDropdownField(label: "CATEGORY", currentValue: categoryController, items: const ['', 'GENERAL', 'SC', 'ST', 'OBC'], icon: Icons.category_rounded, onChanged: (v) => setState(() => categoryController = v)),
+                                    AnimatedInputField(label: "DATE OF APPOINTMENT", controller: doaController, icon: Icons.event_available_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    AnimatedInputField(label: "DATE OF RETIREMENT", controller: dortController, icon: Icons.event_busy_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    AnimatedInputField(label: "DATE OF JOINING OFFICE", controller: dojoController, icon: Icons.login_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    AnimatedInputField(label: "DATE OF RESIGNATION", controller: dornController, icon: Icons.logout_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    AnimatedInputField(label: "PLACE OF DUTY", controller: placeController, icon: Icons.place_rounded),
+                                    [
+                                      AnimatedInputField(label: "PAY SCALE", controller: payScaleController, icon: Icons.payments_rounded),
+                                      AnimatedInputField(label: "LEVEL", controller: levelController, icon: Icons.trending_up_rounded),
+                                    ],
+                                    AnimatedDropdownField(label: "INCREMENT MONTH", currentValue: mincrementController, items: const ['', 'JULY', 'JANUARY'], icon: Icons.event_note_rounded, onChanged: (v) => setState(() => mincrementController = v)),
+                                  ], isMobile),
+                                ),
+                              ),
+                              SizedBox(height: isMobile ? 12 : 24),
+                              _buildAnimatedSection(
+                                2,
+                                _buildSectionCard(
+                                  "Contact & Address",
+                                  Icons.contact_phone_rounded,
+                                  _buildMobileItems([
+                                    [
+                                      AnimatedInputField(label: "MOBILE NUMBER", controller: mobileController, icon: Icons.phone_android_rounded, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
+                                      AnimatedInputField(label: "EMERGENCY NUMBER", controller: emergencyNoController, icon: Icons.emergency_rounded, keyboardType: TextInputType.number, inputFormatters: [MobileNumberFormatter()]),
+                                    ],
+                                    AnimatedInputField(label: "EMAIL ID", controller: emailController, icon: Icons.email_rounded),
+                                    AnimatedInputField(label: "NIC EMAIL ID", controller: nicEmailController, icon: Icons.alternate_email_rounded),
+                                    AnimatedInputField(label: "ADDRESS", controller: addressController, icon: Icons.home_rounded),
+                                  ], isMobile),
+                                ),
+                              ),
+                              SizedBox(height: isMobile ? 12 : 24),
+                              _buildAnimatedSection(
+                                3,
+                                _buildSectionCard(
+                                  "Bank & Financial Info",
+                                  Icons.account_balance_rounded,
+                                  _buildMobileItems([
+                                    AnimatedInputField(label: "BANK NAME", controller: bankNameController, icon: Icons.account_balance_rounded),
+                                    AnimatedInputField(label: "BRANCH", controller: branchController, icon: Icons.store_rounded),
+                                    AnimatedInputField(label: "ACCOUNT NUMBER", controller: accountController, icon: Icons.account_balance_wallet_rounded),
+                                    [
+                                      AnimatedInputField(label: "IFSC CODE", controller: ifscController, icon: Icons.account_tree_rounded),
+                                      AnimatedInputField(label: "MICR NUMBER", controller: micrController, icon: Icons.numbers_rounded),
+                                    ],
+                                  ], isMobile),
+                                ),
+                              ),
+                              SizedBox(height: isMobile ? 12 : 24),
+                              _buildAnimatedSection(
+                                4,
+                                _buildSectionCard(
+                                  "Identifications & Accounts",
+                                  Icons.assignment_ind_rounded,
+                                  [
+                                    AnimatedInputField(label: "AADHAAR NUMBER", controller: aadhaarController, icon: Icons.fingerprint_rounded),
+                                    AnimatedInputField(label: "PAN NUMBER", controller: panController, icon: Icons.credit_card_rounded),
+                                    AnimatedInputField(label: "VOTER ID", controller: voterIdController, icon: Icons.how_to_vote_rounded),
+                                    AnimatedInputField(label: "VEHICLE NUMBER", controller: cycleNoController, icon: Icons.directions_car_rounded),
+                                    AnimatedInputField(label: "GPF NUMBER", controller: gpfNoController, icon: Icons.savings_rounded),
+                                    AnimatedInputField(label: "NPS NUMBER", controller: npsNoController, icon: Icons.account_balance_wallet_rounded),
+                                    AnimatedInputField(label: "EPF NUMBER", controller: epfNoController, icon: Icons.volunteer_activism_rounded),
+                                    AnimatedInputField(label: "ESI NUMBER", controller: esiNoController, icon: Icons.health_and_safety_rounded),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -779,6 +800,39 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
         );
       },
     );
+  }
+
+  List<Widget> _buildMobileItems(List<dynamic> items, bool isMobile) {
+    if (!isMobile) {
+      List<Widget> result = [];
+      for (var item in items) {
+        if (item is List<Widget>) {
+          result.addAll(item);
+        } else if (item is Widget) {
+          result.add(item);
+        }
+      }
+      return result;
+    }
+
+    List<Widget> result = [];
+    for (var item in items) {
+      if (item is List<Widget> && item.length == 2) {
+        result.add(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: item[0]),
+              const SizedBox(width: 8),
+              Expanded(child: item[1]),
+            ],
+          ),
+        );
+      } else if (item is Widget) {
+        result.add(item);
+      }
+    }
+    return result;
   }
 }
 
