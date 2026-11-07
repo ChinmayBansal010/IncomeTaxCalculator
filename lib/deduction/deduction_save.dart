@@ -928,6 +928,15 @@ class _AnimatedInputFieldState extends State<_AnimatedInputField> {
               child: TextField(
                 readOnly: widget.readOnly,
                 controller: widget.controller,
+                keyboardType: TextInputType.number,
+                onTap: () {
+                  if (!widget.readOnly && widget.controller.text == '0') {
+                    widget.controller.text = '';
+                    if (widget.onChanged != null) {
+                      widget.onChanged!('');
+                    }
+                  }
+                },
                 style: TextStyle(
                   color: widget.readOnly ? const Color(0xFF64748B) : const Color(0xFF0F172A),
                   fontSize: isMobile ? 13 : 15,
@@ -970,16 +979,22 @@ class _AnimatedInputFieldState extends State<_AnimatedInputField> {
                   ),
                 ),
                 onChanged: (value) {
+                  String newValue = value;
+                  if (!widget.readOnly &&
+                      newValue.length > 1 &&
+                      newValue.startsWith('0')) {
+                    newValue = newValue.replaceFirst(RegExp(r'^0+'), '');
+                    if (newValue.isEmpty) newValue = '0';
+                  }
+                  if (widget.controller.text != newValue) {
+                    final cursorPosition = TextSelection.collapsed(offset: newValue.length);
+                    widget.controller.value = TextEditingValue(
+                      text: newValue,
+                      selection: cursorPosition,
+                    );
+                  }
                   if (widget.onChanged != null) {
-                    widget.onChanged!(value);
-                  } else {
-                    if (widget.controller.text != value) {
-                      final cursorPosition = widget.controller.selection;
-                      widget.controller.value = TextEditingValue(
-                        text: value,
-                        selection: cursorPosition,
-                      );
-                    }
+                    widget.onChanged!(newValue);
                   }
                 },
               ),
