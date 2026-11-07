@@ -1168,15 +1168,16 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                 ],
               ),
               child: DropdownButtonFormField<String?>(
+                isExpanded: true,
                 initialValue: widget.currentValue,
                 icon: Icon(
                   Icons.unfold_more_rounded,
                   color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                  size: isMobile ? 20 : 24,
+                  size: isMobile ? 18 : 24,
                 ),
                 style: TextStyle(
                   color: const Color(0xFF0F172A),
-                  fontSize: isMobile ? 14 : 15,
+                  fontSize: isMobile ? 13 : 15,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
@@ -1185,11 +1186,11 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                   prefixIcon: Icon(
                     widget.icon,
                     color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                    size: isMobile ? 18 : 20,
+                    size: isMobile ? 16 : 20,
                   ),
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: isMobile ? 12 : 18,
-                    horizontal: isMobile ? 14 : 20,
+                    vertical: isMobile ? 10 : 18,
+                    horizontal: isMobile ? 10 : 20,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
@@ -1210,7 +1211,10 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                 items: widget.items.map<DropdownMenuItem<String?>>((String value) {
                   return DropdownMenuItem<String?>(
                     value: value,
-                    child: Text(value.isEmpty ? "SELECT" : value),
+                    child: Text(
+                      value.isEmpty ? "SELECT" : value,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }).toList(),
                 onChanged: widget.onChanged,
