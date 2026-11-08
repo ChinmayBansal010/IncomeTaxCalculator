@@ -1319,60 +1319,76 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                     ),
                 ],
               ),
-              child: DropdownButtonFormField<String?>(
-                isExpanded: true,
-                initialValue: widget.currentValue,
-                icon: Icon(
-                  Icons.unfold_more_rounded,
-                  color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                  size: isMobile ? 18 : 24,
-                ),
-                style: TextStyle(
-                  color: const Color(0xFF0F172A),
-                  fontSize: isMobile ? 13 : 15,
-                  fontWeight: FontWeight.w600,
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: _isHovered ? Colors.white : const Color(0xFFF8FAFC),
-                  prefixIcon: Icon(
-                    widget.icon,
-                    color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                    size: isMobile ? 16 : 20,
-                  ),
-                  prefixIconConstraints: isMobile
-                      ? const BoxConstraints(minWidth: 32, minHeight: 32)
-                      : null,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: isMobile ? 10 : 18,
-                    horizontal: isMobile ? 8 : 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-                    borderSide: BorderSide(
-                      color: _isHovered ? const Color(0xFF93C5FD) : const Color(0xFFE2E8F0),
-                      width: 1.5,
+              child: Builder(
+                builder: (context) {
+                  final Set<String> dropdownItemsSet = {};
+                  for (var item in widget.items) {
+                    dropdownItemsSet.add(item);
+                  }
+                  if (widget.currentValue != null && widget.currentValue!.trim().isNotEmpty) {
+                    dropdownItemsSet.add(widget.currentValue!.trim().toUpperCase());
+                  }
+                  final List<String> dropdownItems = dropdownItemsSet.toList();
+                  final String? selectedVal = (widget.currentValue != null && widget.currentValue!.trim().isNotEmpty)
+                      ? widget.currentValue!.trim().toUpperCase()
+                      : (dropdownItemsSet.contains('') ? '' : null);
+
+                  return DropdownButtonFormField<String?>(
+                    isExpanded: true,
+                    value: selectedVal,
+                    icon: Icon(
+                      Icons.unfold_more_rounded,
+                      color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
+                      size: isMobile ? 18 : 24,
                     ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-                    borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
-                  ),
-                ),
-                items: widget.items.map<DropdownMenuItem<String?>>((String value) {
-                  return DropdownMenuItem<String?>(
-                    value: value,
-                    child: Text(
-                      value.isEmpty ? "SELECT" : value,
-                      overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: const Color(0xFF0F172A),
+                      fontSize: isMobile ? 13 : 15,
+                      fontWeight: FontWeight.w600,
                     ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: _isHovered ? Colors.white : const Color(0xFFF8FAFC),
+                      prefixIcon: Icon(
+                        widget.icon,
+                        color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
+                        size: isMobile ? 16 : 20,
+                      ),
+                      prefixIconConstraints: isMobile
+                          ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                          : null,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: isMobile ? 10 : 18,
+                        horizontal: isMobile ? 8 : 20,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+                        borderSide: BorderSide(
+                          color: _isHovered ? const Color(0xFF93C5FD) : const Color(0xFFE2E8F0),
+                          width: 1.5,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+                        borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                      ),
+                    ),
+                    items: dropdownItems.map<DropdownMenuItem<String?>>((String value) {
+                      return DropdownMenuItem<String?>(
+                        value: value,
+                        child: Text(
+                          value.isEmpty ? "SELECT" : value,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: widget.onChanged,
                   );
-                }).toList(),
-                onChanged: widget.onChanged,
+                },
               ),
             ),
           ],
