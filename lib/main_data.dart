@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'main/main_update.dart';
 import 'main/main_add.dart';
+import 'place_of_duty_page.dart';
 import 'shared.dart';
 
 class MainDataPage extends StatefulWidget {
@@ -259,6 +260,45 @@ class _MainDataPageState extends State<MainDataPage> with SingleTickerProviderSt
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 6),
+                InkWell(
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PlaceOfDutyPage(),
+                      ),
+                    );
+                    if (mounted) {
+                      _refreshData();
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.22),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.place_rounded, color: Colors.white, size: 13),
+                        SizedBox(width: 5),
+                        Text(
+                          "Place of Duty",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),

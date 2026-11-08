@@ -117,7 +117,8 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
   final cycleNoController = TextEditingController();
   final voterIdController = TextEditingController();
   final dojoController = TextEditingController();
-  final placeController = TextEditingController();
+  String? placeController;
+  List<String> placeOptions = [''];
   String? bloodGroupController;
   final emergencyNoController = TextEditingController(text: '0');
   final nicEmailController = TextEditingController();
@@ -166,7 +167,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
     cycleNoController.text = widget.cycleNo;
     voterIdController.text = widget.voterId;
     dojoController.text = widget.dojo;
-    placeController.text = widget.place;
+    placeController = widget.place;
     bloodGroupController = widget.bloodGroup;
     emergencyNoController.text = widget.emergencyNo;
     nicEmailController.text = widget.nicEmail;
@@ -174,6 +175,52 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
     educationController.text = widget.education;
     empTypeController = widget.empType;
     bankNameController.text = widget.bankName;
+
+    _fetchPlaces();
+  }
+
+  Future<void> _fetchPlaces() async {
+    try {
+      final placesSnap = await database.child(sharedData.userPlace).child('places').once();
+      final mainSnap = await database.child(sharedData.userPlace).child('maindata').once();
+
+      final Set<String> placesSet = {};
+
+      if (placesSnap.snapshot.exists && placesSnap.snapshot.value != null) {
+        final data = placesSnap.snapshot.value;
+        if (data is Map) {
+          for (final v in data.values) {
+            if (v != null && v.toString().trim().isNotEmpty) {
+              placesSet.add(v.toString().trim().toUpperCase());
+            }
+          }
+        }
+      }
+
+      if (mainSnap.snapshot.exists && mainSnap.snapshot.value != null) {
+        final mainMap = mainSnap.snapshot.value as Map;
+        for (final rec in mainMap.values) {
+          if (rec is Map && rec['place'] != null && rec['place'].toString().trim().isNotEmpty) {
+            placesSet.add(rec['place'].toString().trim().toUpperCase());
+          }
+        }
+      }
+
+      if (widget.place.trim().isNotEmpty) {
+        placesSet.add(widget.place.trim().toUpperCase());
+      }
+
+      final sortedList = placesSet.toList()..sort();
+
+      if (mounted) {
+        setState(() {
+          placeOptions = ['', ...sortedList];
+          if (placeController != null && placeController!.isNotEmpty && !placeOptions.contains(placeController)) {
+            placeOptions.add(placeController!);
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   List<String> month = ['mar','apr','may','jun','jul','aug','sept','oct','nov','dec','jan','feb'];
@@ -209,7 +256,6 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
     cycleNoController.dispose();
     voterIdController.dispose();
     dojoController.dispose();
-    placeController.dispose();
     emergencyNoController.dispose();
     nicEmailController.dispose();
     dornController.dispose();
@@ -320,7 +366,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
         'cycleno': cycleNoController.text,
         'voterid': voterIdController.text,
         'dojo': dojoController.text,
-        'place': placeController.text,
+        'place': placeController ?? '',
         'bloodgrp': bloodGroupController,
         'emergencyno': emergencyNoController.text,
         'nicemailid': nicEmailController.text,
@@ -747,7 +793,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
                                     AnimatedInputField(label: "DATE OF BIRTH", controller: dobController, icon: Icons.cake_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     [
                                       AnimatedDropdownField(label: "BLOOD GROUP", currentValue: bloodGroupController, items: const ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], icon: Icons.bloodtype_rounded, onChanged: (v) => setState(() => bloodGroupController = v)),
-                                      AnimatedDropdownField(label: "SEX", currentValue: sexController, items: const ['', 'MALE', 'FEMALE', 'OTHER'], icon: Icons.wc_rounded, onChanged: (v) => setState(() => sexController = v)),
+                                      AnimatedDropdownField(label: "SEX", currentValue: sexController, items: const ['', 'MALE', 'FEMALE', 'TRANSGENDER'], icon: Icons.wc_rounded, onChanged: (v) => setState(() => sexController = v)),
                                     ],
                                     AnimatedInputField(label: "EDUCATION QUALIFICATION", controller: educationController, icon: Icons.school_rounded),
                                   ], isMobile),
@@ -770,7 +816,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
                                     AnimatedInputField(label: "DATE OF RETIREMENT", controller: dortController, icon: Icons.event_busy_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     AnimatedInputField(label: "DATE OF JOINING OFFICE", controller: dojoController, icon: Icons.login_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     AnimatedInputField(label: "DATE OF RESIGNATION", controller: dornController, icon: Icons.logout_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
-                                    AnimatedInputField(label: "PLACE OF DUTY", controller: placeController, icon: Icons.place_rounded),
+                                    AnimatedDropdownField(label: "PLACE OF DUTY", currentValue: placeController, items: placeOptions, icon: Icons.place_rounded, onChanged: (v) => setState(() => placeController = v)),
                                     [
                                       AnimatedInputField(label: "PAY SCALE", controller: payScaleController, icon: Icons.payments_rounded),
                                       AnimatedInputField(label: "LEVEL", controller: levelController, icon: Icons.trending_up_rounded),
