@@ -47,6 +47,7 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
   final dornController = TextEditingController();
   final educationController = TextEditingController();
   String? empTypeController;
+  final otherEmpTypeController = TextEditingController();
   final bankNameController = TextEditingController();
 
   String? npschk = '0', gpfchk = '0', epfchk = '0', esichk = '0';
@@ -138,6 +139,7 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
     nicEmailController.dispose();
     dornController.dispose();
     educationController.dispose();
+    otherEmpTypeController.dispose();
     bankNameController.dispose();
     super.dispose();
   }
@@ -182,6 +184,27 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
         builder: (ctx) => AlertDialog(
           title: const Text("Error"),
           content: const Text("Both NPS and GPF cannot coexist"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final finalEmpType = (empTypeController == 'OTHER')
+        ? otherEmpTypeController.text.trim().toUpperCase()
+        : (empTypeController ?? '');
+
+    if (empTypeController == 'OTHER' && finalEmpType.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text("Error"),
+          content: const Text("Please enter custom Employee Type."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -261,7 +284,7 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
         'nicemailid': nicEmailController.text,
         'dorn': dornController.text,
         'education': educationController.text,
-        'emptype': empTypeController,
+        'emptype': finalEmpType,
         'bname': bankNameController.text,
       });
       for (String months in month) {
@@ -642,9 +665,22 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
                                   _buildMobileItems([
                                     AnimatedInputField(label: "DESIGNATION", controller: designationController, icon: Icons.badge_rounded),
                                     [
-                                      AnimatedDropdownField(label: "EMPLOYEE TYPE", currentValue: empTypeController, items: const ['', 'REGULAR', 'CONTRACTUAL', 'DAILY WAGER'], icon: Icons.work_outline_rounded, onChanged: (v) => setState(() => empTypeController = v)),
+                                      AnimatedDropdownField(
+                                        label: "EMPLOYEE TYPE",
+                                        currentValue: empTypeController,
+                                        items: const ['', 'REGULAR', 'CONTRACTUAL', 'DAILY WAGER', 'OUTSOURCED', 'OTHER'],
+                                        icon: Icons.work_outline_rounded,
+                                        onChanged: (v) => setState(() {
+                                          empTypeController = v;
+                                          if (v != 'OTHER') {
+                                            otherEmpTypeController.clear();
+                                          }
+                                        }),
+                                      ),
                                       AnimatedDropdownField(label: "GROUP", currentValue: groupController, items: const ['', 'A', 'B', 'C', 'D'], icon: Icons.group_work_rounded, onChanged: (v) => setState(() => groupController = v)),
                                     ],
+                                    if (empTypeController == 'OTHER')
+                                      AnimatedInputField(label: "SPECIFY OTHER EMPLOYEE TYPE", controller: otherEmpTypeController, icon: Icons.work_outline_rounded),
                                     AnimatedDropdownField(label: "CATEGORY", currentValue: categoryController, items: const ['', 'GENERAL', 'SC', 'ST', 'OBC'], icon: Icons.category_rounded, onChanged: (v) => setState(() => categoryController = v)),
                                     AnimatedInputField(label: "DATE OF APPOINTMENT", controller: doaController, icon: Icons.event_available_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     AnimatedInputField(label: "DATE OF RETIREMENT", controller: dortController, icon: Icons.event_busy_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
