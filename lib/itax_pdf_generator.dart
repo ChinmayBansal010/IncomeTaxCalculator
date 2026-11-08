@@ -35,17 +35,16 @@ class ItaxPdfGenerator {
       } catch (_) {}
     }
 
-    // Set page template watermark for all pages
     if (watermarkLogo != null) {
       document.template.top = _createWatermarkTemplate(watermarkLogo);
     }
 
     // Fonts & Styles
     final PdfFont titleFont = PdfStandardFont(PdfFontFamily.helvetica, 16, style: PdfFontStyle.bold);
-    final PdfFont sectionHeaderFont = PdfStandardFont(PdfFontFamily.helvetica, 12, style: PdfFontStyle.bold);
-    final PdfFont gridHeaderFont = PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold);
-    final PdfFont cellFont = PdfStandardFont(PdfFontFamily.helvetica, 8.5, style: PdfFontStyle.regular);
-    final PdfFont cellFontBold = PdfStandardFont(PdfFontFamily.helvetica, 8.5, style: PdfFontStyle.bold);
+    final PdfFont sectionHeaderFont = PdfStandardFont(PdfFontFamily.helvetica, 11, style: PdfFontStyle.bold);
+    final PdfFont gridHeaderFont = PdfStandardFont(PdfFontFamily.helvetica, 8, style: PdfFontStyle.bold);
+    final PdfFont cellFont = PdfStandardFont(PdfFontFamily.helvetica, 8, style: PdfFontStyle.regular);
+    final PdfFont cellFontBold = PdfStandardFont(PdfFontFamily.helvetica, 8, style: PdfFontStyle.bold);
 
     // Colors
     final PdfColor headerBgColor = PdfColor(241, 245, 249);
@@ -62,6 +61,7 @@ class ItaxPdfGenerator {
 
     PdfPage page1 = document.pages.add();
     double y = 0;
+    final double printableWidth = page1.getClientSize().width;
 
     // Header Title
     final PdfTextElement titleElement = PdfTextElement(
@@ -69,8 +69,11 @@ class ItaxPdfGenerator {
       font: titleFont,
       brush: PdfSolidBrush(PdfColor(30, 58, 138)),
     );
-    final PdfLayoutResult titleResult = titleElement.draw(page: page1, bounds: Rect.fromLTWH(0, y, page1.getClientSize().width, 24))!;
-    y = titleResult.bounds.bottom + 10;
+    final PdfLayoutResult titleResult = titleElement.draw(
+      page: page1,
+      bounds: Rect.fromLTWH(0, y, printableWidth, 24),
+    )!;
+    y = titleResult.bounds.bottom + 8;
 
     // Employee Information Table (Grid)
     final PdfGrid empGrid = PdfGrid();
@@ -78,6 +81,7 @@ class ItaxPdfGenerator {
     empGrid.columns[0].width = 110;
     empGrid.columns[1].width = 220;
     empGrid.columns[2].width = 110;
+    empGrid.columns[3].width = printableWidth - 440 > 100 ? printableWidth - 440 : 200;
 
     _addGridRow(empGrid, ["BIOMETRIC ID", biometricId, "NAME", (mainpgData['name'] ?? '').toString()], cellFontBold, cellFont);
     _addGridRow(empGrid, ["FATHER/HUSBAND NAME", (mainpgData['fhname'] ?? '').toString(), "SEX", (mainpgData['sex'] ?? '').toString()], cellFontBold, cellFont);
@@ -87,23 +91,35 @@ class ItaxPdfGenerator {
     _addGridRow(empGrid, ["MOBILE NO.", (mainpgData['mobileno'] ?? '').toString(), "GPF/NPS NO.", (mainpgData['gpfno'] ?? mainpgData['npsno'] ?? '').toString()], cellFontBold, cellFont);
     _addGridRow(empGrid, ["PLACE OF DUTY", (mainpgData['place'] ?? '').toString(), "ADDRESS", (mainpgData['address'] ?? '').toString()], cellFontBold, cellFont);
 
-    empGrid.style.cellPadding = PdfPaddings(left: 6, top: 4, right: 6, bottom: 4);
+    empGrid.style.cellPadding = PdfPaddings(left: 5, top: 3, right: 5, bottom: 3);
     _applyGridBorders(empGrid, borderGridColor);
 
-    final PdfLayoutResult empResult = empGrid.draw(page: page1, bounds: Rect.fromLTWH(0, y, 0, 0))!;
-    y = empResult.bounds.bottom + 15;
+    final PdfLayoutResult empResult = empGrid.draw(
+      page: page1,
+      bounds: Rect.fromLTWH(0, y, printableWidth, 0),
+      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
+    )!;
+    y = empResult.bounds.bottom + 12;
 
     // ECR Complete Matrix Table
     final PdfTextElement matrixHeader = PdfTextElement(
       text: "MONTHLY SALARY & DEDUCTION MATRIX",
       font: sectionHeaderFont,
-      brush: PdfSolidBrush(PdfColor(15, 23, 42)),
+      brush: PdfSolidBrush(textColor),
     );
-    final PdfLayoutResult matrixHeaderResult = matrixHeader.draw(page: page1, bounds: Rect.fromLTWH(0, y, 0, 0))!;
+    final PdfLayoutResult matrixHeaderResult = matrixHeader.draw(
+      page: page1,
+      bounds: Rect.fromLTWH(0, y, printableWidth, 0),
+    )!;
     y = matrixHeaderResult.bounds.bottom + 6;
 
     final PdfGrid matrixGrid = PdfGrid();
     matrixGrid.columns.add(count: 11);
+
+    final colWidths = [90.0, 65.0, 55.0, 55.0, 75.0, 65.0, 65.0, 65.0, 70.0, 70.0, 75.0];
+    for (int i = 0; i < colWidths.length; i++) {
+      matrixGrid.columns[i].width = colWidths[i];
+    }
 
     final List<String> matrixCols = [
       "PERIOD", "BASIC PAY", "DA", "HRA", "OTHER ALLOW", "GROSS", "INC TAX", "GPF/NPS", "OTHER DED", "TOTAL DED", "NET SALARY"
@@ -118,7 +134,6 @@ class ItaxPdfGenerator {
       headerRow.cells[i].style.stringFormat = PdfStringFormat(alignment: PdfTextAlignment.center, lineAlignment: PdfVerticalAlignment.middle);
     }
 
-    // Populate 12 Months + Quarter Totals
     const months = ['mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sept', 'oct', 'nov', 'dec', 'jan', 'feb'];
     final yearStr = sharedData.ccurrentYear.replaceAll('20', '');
 
@@ -153,31 +168,42 @@ class ItaxPdfGenerator {
       }
     }
 
-    matrixGrid.style.cellPadding = PdfPaddings(left: 4, top: 3, right: 4, bottom: 3);
+    matrixGrid.style.cellPadding = PdfPaddings(left: 3, top: 2.5, right: 3, bottom: 2.5);
     _applyGridBorders(matrixGrid, borderGridColor);
-    matrixGrid.draw(page: page1, bounds: Rect.fromLTWH(0, y, 0, 0));
+    matrixGrid.draw(
+      page: page1,
+      bounds: Rect.fromLTWH(0, y, printableWidth, page1.getClientSize().height - y),
+      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
+    );
 
     // =========================================================================
     // PAGE 2: TAX COMPUTATION STATEMENT (Portrait)
     // =========================================================================
     document.pageSettings.orientation = PdfPageOrientation.portrait;
     document.pageSettings.size = PdfPageSize.a4;
+    document.pageSettings.margins.all = 20;
 
     PdfPage page2 = document.pages.add();
     y = 0;
+    final double p2Width = page2.getClientSize().width;
 
     final PdfTextElement page2Header = PdfTextElement(
       text: "TAX COMPUTATION STATEMENT (${sharedData.ccurrentYear})",
       font: titleFont,
       brush: PdfSolidBrush(PdfColor(30, 58, 138)),
     );
-    final PdfLayoutResult p2HeaderResult = page2Header.draw(page: page2, bounds: Rect.fromLTWH(0, y, 0, 0))!;
+    final PdfLayoutResult p2HeaderResult = page2Header.draw(
+      page: page2,
+      bounds: Rect.fromLTWH(0, y, p2Width, 24),
+    )!;
     y = p2HeaderResult.bounds.bottom + 12;
 
     // Summary Table (New vs Old Tax Regime)
     final PdfGrid summaryGrid = PdfGrid();
     summaryGrid.columns.add(count: 3);
-    summaryGrid.columns[0].width = 240;
+    summaryGrid.columns[0].width = 200;
+    summaryGrid.columns[1].width = 110;
+    summaryGrid.columns[2].width = 110;
 
     final PdfGridRow sHeader = summaryGrid.headers.add(1)[0];
     sHeader.cells[0].value = "PARTICULARS";
@@ -187,6 +213,7 @@ class ItaxPdfGenerator {
       sHeader.cells[i].style.backgroundBrush = PdfSolidBrush(headerBgColor);
       sHeader.cells[i].style.font = gridHeaderFont;
       sHeader.cells[i].style.textBrush = PdfSolidBrush(textColor);
+      sHeader.cells[i].style.stringFormat = PdfStringFormat(alignment: PdfTextAlignment.center, lineAlignment: PdfVerticalAlignment.middle);
     }
 
     final newTtp = _toInt(itaxnewData['ttp']);
@@ -202,10 +229,14 @@ class ItaxPdfGenerator {
     _addGridRow(summaryGrid, ["Net Tax Payable / (Balance)", "Rs. $newNitpi", "Rs. $oldNitpi"], cellFontBold, cellFont);
     _addGridRow(summaryGrid, ["Excess Tax Paid", "Rs. $newExcess", "Rs. $oldExcess"], cellFontBold, cellFont);
 
-    summaryGrid.style.cellPadding = PdfPaddings(left: 8, top: 5, right: 8, bottom: 5);
+    summaryGrid.style.cellPadding = PdfPaddings(left: 6, top: 4, right: 6, bottom: 4);
     _applyGridBorders(summaryGrid, borderGridColor);
-    final PdfLayoutResult sGridResult = summaryGrid.draw(page: page2, bounds: Rect.fromLTWH(0, y, 0, 0))!;
-    y = sGridResult.bounds.bottom + 20;
+    final PdfLayoutResult sGridResult = summaryGrid.draw(
+      page: page2,
+      bounds: Rect.fromLTWH(0, y, p2Width, 0),
+      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
+    )!;
+    y = sGridResult.bounds.bottom + 16;
 
     // Detailed Deductions & Exemptions Breakdown Table
     final PdfTextElement dedHeader = PdfTextElement(
@@ -213,12 +244,16 @@ class ItaxPdfGenerator {
       font: sectionHeaderFont,
       brush: PdfSolidBrush(textColor),
     );
-    final PdfLayoutResult dedHeaderResult = dedHeader.draw(page: page2, bounds: Rect.fromLTWH(0, y, 0, 0))!;
-    y = dedHeaderResult.bounds.bottom + 8;
+    final PdfLayoutResult dedHeaderResult = dedHeader.draw(
+      page: page2,
+      bounds: Rect.fromLTWH(0, y, p2Width, 0),
+    )!;
+    y = dedHeaderResult.bounds.bottom + 6;
 
     final PdfGrid breakdownGrid = PdfGrid();
     breakdownGrid.columns.add(count: 2);
-    breakdownGrid.columns[0].width = 320;
+    breakdownGrid.columns[0].width = 240;
+    breakdownGrid.columns[1].width = 180;
 
     _addGridRow(breakdownGrid, ["80C Savings Total", "Rs. ${_toInt(dedData['totalsav'])}"], cellFont, cellFontBold);
     _addGridRow(breakdownGrid, ["80C Max Eligible", "Rs. ${_toInt(dedData['maxsav'])}"], cellFont, cellFontBold);
@@ -228,9 +263,13 @@ class ItaxPdfGenerator {
     _addGridRow(breakdownGrid, ["80G Donations", "Rs. ${_toInt(dedData['80g'])}"], cellFont, cellFontBold);
     _addGridRow(breakdownGrid, ["Relief u/s 89", "Rs. ${_toInt(dedData['relief'])}"], cellFont, cellFontBold);
 
-    breakdownGrid.style.cellPadding = PdfPaddings(left: 8, top: 5, right: 8, bottom: 5);
+    breakdownGrid.style.cellPadding = PdfPaddings(left: 6, top: 4, right: 6, bottom: 4);
     _applyGridBorders(breakdownGrid, borderGridColor);
-    breakdownGrid.draw(page: page2, bounds: Rect.fromLTWH(0, y, 0, 0));
+    breakdownGrid.draw(
+      page: page2,
+      bounds: Rect.fromLTWH(0, y, p2Width, page2.getClientSize().height - y),
+      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
+    );
 
     // Save and Output PDF Bytes
     final List<int> pdfBytes = document.saveSync();
@@ -255,7 +294,6 @@ class ItaxPdfGenerator {
   }
 
   static PdfPageTemplateElement _createWatermarkTemplate(PdfBitmap watermarkImage) {
-    // Standard A4 landscape size 842 x 595
     const Size templateSize = Size(842, 595);
     final PdfPageTemplateElement template = PdfPageTemplateElement(
       Rect.fromLTWH(0, 0, templateSize.width, templateSize.height),
@@ -263,9 +301,9 @@ class ItaxPdfGenerator {
 
     final PdfGraphics graphics = template.graphics;
     graphics.save();
-    graphics.setTransparency(0.09); // Subtle background watermark
+    graphics.setTransparency(0.08);
 
-    double imageWidth = 320;
+    double imageWidth = 300;
     double imageHeight = imageWidth * (watermarkImage.height / watermarkImage.width);
 
     double x = (templateSize.width - imageWidth) / 2;
@@ -282,6 +320,11 @@ class ItaxPdfGenerator {
     for (int i = 0; i < values.length; i++) {
       row.cells[i].value = values[i];
       row.cells[i].style.font = (i % 2 == 0) ? headerFont : valueFont;
+      if (i % 2 != 0) {
+        row.cells[i].style.stringFormat = PdfStringFormat(alignment: PdfTextAlignment.right, lineAlignment: PdfVerticalAlignment.middle);
+      } else {
+        row.cells[i].style.stringFormat = PdfStringFormat(alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle);
+      }
     }
   }
 
@@ -295,6 +338,8 @@ class ItaxPdfGenerator {
       }
       if (i > 0) {
         row.cells[i].style.stringFormat = PdfStringFormat(alignment: PdfTextAlignment.right, lineAlignment: PdfVerticalAlignment.middle);
+      } else {
+        row.cells[i].style.stringFormat = PdfStringFormat(alignment: PdfTextAlignment.left, lineAlignment: PdfVerticalAlignment.middle);
       }
     }
   }

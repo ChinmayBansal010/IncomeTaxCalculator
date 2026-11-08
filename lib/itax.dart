@@ -4,7 +4,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:incometax/itax_ecr_preview.dart';
-import 'package:incometax/itax_pdf_generator.dart';
 import 'package:incometax/shared.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -939,12 +938,6 @@ class _ItaxPageState extends State<ItaxPage>
           }
           createExcel();
         }),
-        _buildPdfBtn("Export Single PDF", Icons.picture_as_pdf_rounded, () {
-          if (!_hasSelectedBiometricId()) {
-            return;
-          }
-          createPdf();
-        }),
         _buildSecondaryBtn("View ECR", Icons.grid_view_rounded, _previewEcr),
         PopupMenuButton<ExportAllMode>(
           onSelected: (mode) => exportAll(mode),
@@ -1075,22 +1068,6 @@ class _ItaxPageState extends State<ItaxPage>
     );
   }
 
-  Widget _buildPdfBtn(String label, IconData icon, VoidCallback onTap) {
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFDC2626),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 0,
-      ),
-      icon: Icon(icon, size: 20),
-      label: Text(label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-    );
-  }
-
   Widget _buildSecondaryBtn(String label, IconData icon, VoidCallback onTap) {
     return OutlinedButton.icon(
       onPressed: onTap,
@@ -1105,90 +1082,6 @@ class _ItaxPageState extends State<ItaxPage>
       label: Text(label,
           style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
     );
-  }
-
-  Future<void> createPdf({
-    String? biometricId,
-    ExportAllMode? exportMode,
-    bool? isExportAll = false,
-  }) async {
-    setState(() {
-      toLoad = true;
-    });
-
-    try {
-      final selectedId = (biometricId == null || biometricId.isEmpty)
-          ? biometricIdController.text.trim()
-          : biometricId;
-
-      await fetchmainpgData(selectedId);
-      Map<String, Map<String?, dynamic>> monthdata =
-          await fetchAllMonthData(selectedId);
-      await fetchdedData(selectedId);
-      await fetcharrearData(selectedId);
-      await fetchitaxData(selectedId);
-
-      final itaxNewSnap = await bioRef.child('itaxnew').child(selectedId).once();
-      final itaxOldSnap = await bioRef.child('itaxold').child(selectedId).once();
-
-      final Map<String, dynamic> itaxnewData = itaxNewSnap.snapshot.exists && itaxNewSnap.snapshot.value is Map
-          ? Map<String, dynamic>.from(itaxNewSnap.snapshot.value as Map)
-          : {};
-      final Map<String, dynamic> itaxoldData = itaxOldSnap.snapshot.exists && itaxOldSnap.snapshot.value is Map
-          ? Map<String, dynamic>.from(itaxOldSnap.snapshot.value as Map)
-          : {};
-
-      final Map<String, dynamic> stringMainPg = mainpgData.map((k, v) => MapEntry(k?.toString() ?? '', v));
-
-      final mode = exportMode ?? ExportAllMode.defaultId;
-      String name = selectedId;
-      if (mode == ExportAllMode.pan) {
-        name = (stringMainPg['panno'] != null &&
-                stringMainPg['panno'].toString().trim().isNotEmpty)
-            ? stringMainPg['panno'].toString().trim()
-            : selectedId;
-      } else if (mode == ExportAllMode.name) {
-        name = (stringMainPg['name'] != null &&
-                stringMainPg['name'].toString().trim().isNotEmpty)
-            ? stringMainPg['name'].toString().trim()
-            : selectedId;
-      }
-
-      await ItaxPdfGenerator.generateAndDownloadPdf(
-        biometricId: selectedId,
-        mainpgData: stringMainPg,
-        monthdata: monthdata,
-        dedData: dedData.map((k, v) => MapEntry(k?.toString() ?? '', v)),
-        arrData: arrearData.map((k, v) => MapEntry(k?.toString() ?? '', v)),
-        itaxData: itfData.map((k, v) => MapEntry(k?.toString() ?? '', v)),
-        itaxnewData: itaxnewData,
-        itaxoldData: itaxoldData,
-        fileName: name,
-        isExportAll: isExportAll ?? false,
-      );
-    } catch (e) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text("Error"),
-            content: Text("Failed to generate PDF: \n$e"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          toLoad = false;
-        });
-      }
-    }
   }
 
   Widget _buildMainContent() {
