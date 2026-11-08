@@ -1053,11 +1053,13 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 4 : 8),
+              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 3 : 8),
               child: Text(
                 widget.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: isMobile ? 12 : 13,
+                  fontSize: isMobile ? 11 : 13,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF475569),
                   letterSpacing: 0.5,
@@ -1093,7 +1095,7 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                 },
                 style: TextStyle(
                   color: widget.readOnly ? const Color(0xFF64748B) : const Color(0xFF0F172A),
-                  fontSize: isMobile ? 14 : 15,
+                  fontSize: isMobile ? 13 : 15,
                   fontWeight: widget.readOnly ? FontWeight.w700 : FontWeight.w600,
                 ),
                 decoration: InputDecoration(
@@ -1106,11 +1108,14 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                     color: widget.readOnly
                         ? const Color(0xFF94A3B8)
                         : (_isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8)),
-                    size: isMobile ? 18 : 20,
+                    size: isMobile ? 16 : 20,
                   ),
+                  prefixIconConstraints: isMobile
+                      ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                      : null,
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: isMobile ? 12 : 18,
-                    horizontal: isMobile ? 14 : 20,
+                    vertical: isMobile ? 10 : 18,
+                    horizontal: isMobile ? 8 : 20,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
@@ -1198,11 +1203,13 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 4 : 8),
+              padding: EdgeInsets.only(left: 4, bottom: isMobile ? 3 : 8),
               child: Text(
                 widget.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: isMobile ? 12 : 13,
+                  fontSize: isMobile ? 11 : 13,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF475569),
                   letterSpacing: 0.5,
@@ -1242,9 +1249,12 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                     color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
                     size: isMobile ? 16 : 20,
                   ),
+                  prefixIconConstraints: isMobile
+                      ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                      : null,
                   contentPadding: EdgeInsets.symmetric(
                     vertical: isMobile ? 10 : 18,
-                    horizontal: isMobile ? 10 : 20,
+                    horizontal: isMobile ? 8 : 20,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
