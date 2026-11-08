@@ -23,7 +23,7 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "biometricid","name", "fhname", "designation", "dob", "doa", "dort", "group", "category",
       "sex", "address", "aadhaarno", "mobileno", "accountno", "branch", "micrno",
       "ifsc", "panno", "payscale", "level", "gpfno", "npsno","epfno", "esino", "emailid", "cycleno",
-      "voterid", "dojo", "place", "bloodgrp", "emergencyno", "nicemailid", "dorn",
+      "voterid", "dojo", "place", "bloodgrp", "emergencyno", "nicemailid", "dorn", "dot", "pot", "dod",
       "education", "emptype", "bname", "ext3", "ext4"
     ];
 
@@ -61,6 +61,9 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "emergencyno": "Emergency No.",
       "nicemailid": "NIC Email ID",
       "dorn": "Date of Resignation",
+      "dot": "Date of Transfer",
+      "pot": "Place of Transfer",
+      "dod": "Date of Death",
       "education": "Educational",
       "emptype": "Employment Type",
       "bname": "Bank Name",

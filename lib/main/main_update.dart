@@ -41,6 +41,9 @@ class MainUpdatePage extends StatefulWidget {
   final String education;
   final String empType;
   final String bankName;
+  final String dot;
+  final String pot;
+  final String dod;
 
   const MainUpdatePage({
     super.key,
@@ -80,7 +83,10 @@ class MainUpdatePage extends StatefulWidget {
     required this.dorn,
     required this.education,
     required this.empType,
-    required this.bankName
+    required this.bankName,
+    this.dot = '',
+    this.pot = '',
+    this.dod = '',
   });
 
   @override
@@ -124,6 +130,9 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
   final nicEmailController = TextEditingController();
   final dornController = TextEditingController();
   final educationController = TextEditingController();
+  final dotController = TextEditingController();
+  String? potController;
+  final dodController = TextEditingController();
   String? empTypeController;
   final otherEmpTypeController = TextEditingController();
   final bankNameController = TextEditingController();
@@ -174,6 +183,9 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
     nicEmailController.text = widget.nicEmail;
     dornController.text = widget.dorn;
     educationController.text = widget.education;
+    dotController.text = widget.dot;
+    potController = widget.pot;
+    dodController.text = widget.dod;
 
     const predefinedEmpTypes = ['REGULAR', 'CONTRACTUAL', 'DAILY WAGER', 'OUTSOURCED'];
     final rawType = widget.empType.trim().toUpperCase();
@@ -274,6 +286,8 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
     nicEmailController.dispose();
     dornController.dispose();
     educationController.dispose();
+    dotController.dispose();
+    dodController.dispose();
     otherEmpTypeController.dispose();
     bankNameController.dispose();
     super.dispose();
@@ -404,6 +418,9 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
         'nicemailid': nicEmailController.text,
         'dorn': dornController.text,
         'education': educationController.text,
+        'dot': dotController.text,
+        'pot': (dotController.text.trim().isNotEmpty) ? (potController ?? '') : '',
+        'dod': dodController.text,
         'emptype': finalEmpType,
         'bname': bankNameController.text,
       });
@@ -823,6 +840,7 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
                                     AnimatedInputField(label: "NAME", controller: nameController, icon: Icons.person_outline_rounded),
                                     AnimatedInputField(label: "FATHER/HUSBAND NAME", controller: fhNameController, icon: Icons.people_alt_rounded),
                                     AnimatedInputField(label: "DATE OF BIRTH", controller: dobController, icon: Icons.cake_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    AnimatedInputField(label: "DATE OF DEATH", controller: dodController, icon: Icons.event_busy_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     [
                                       AnimatedDropdownField(label: "BLOOD GROUP", currentValue: bloodGroupController, items: const ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], icon: Icons.bloodtype_rounded, onChanged: (v) => setState(() => bloodGroupController = v)),
                                       AnimatedDropdownField(label: "SEX", currentValue: sexController, items: const ['', 'MALE', 'FEMALE', 'TRANSGENDER'], icon: Icons.wc_rounded, onChanged: (v) => setState(() => sexController = v)),
@@ -861,6 +879,9 @@ class MainUpdatePageState extends State<MainUpdatePage> with SingleTickerProvide
                                     AnimatedInputField(label: "DATE OF RETIREMENT", controller: dortController, icon: Icons.event_busy_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     AnimatedInputField(label: "DATE OF JOINING OFFICE", controller: dojoController, icon: Icons.login_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
                                     AnimatedInputField(label: "DATE OF RESIGNATION", controller: dornController, icon: Icons.logout_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()]),
+                                    AnimatedInputField(label: "DATE OF TRANSFER", controller: dotController, icon: Icons.event_rounded, keyboardType: TextInputType.number, inputFormatters: [DateInputFormatter()], onChanged: (_) => setState(() {})),
+                                    if (dotController.text.trim().isNotEmpty)
+                                      AnimatedDropdownField(label: "PLACE OF TRANSFER", currentValue: potController, items: placeOptions, icon: Icons.transfer_within_a_station_rounded, onChanged: (v) => setState(() => potController = v)),
                                     AnimatedDropdownField(label: "PLACE OF DUTY", currentValue: placeController, items: placeOptions, icon: Icons.place_rounded, onChanged: (v) => setState(() => placeController = v)),
                                     [
                                       AnimatedInputField(label: "PAY SCALE", controller: payScaleController, icon: Icons.payments_rounded),
@@ -1112,6 +1133,7 @@ class AnimatedInputField extends StatefulWidget {
   final TextInputType keyboardType;
   final List<TextInputFormatter> inputFormatters;
   final bool readOnly;
+  final ValueChanged<String>? onChanged;
 
   const AnimatedInputField({
     super.key,
@@ -1121,6 +1143,7 @@ class AnimatedInputField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.inputFormatters = const [],
     this.readOnly = false,
+    this.onChanged,
   });
 
   @override
@@ -1247,6 +1270,9 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                       selection: cursorPosition,
                     );
                   }
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(newValue);
+                  }
                 },
               ),
             ),
@@ -1335,7 +1361,7 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
 
                   return DropdownButtonFormField<String?>(
                     isExpanded: true,
-                    value: selectedVal,
+                    initialValue: selectedVal,
                     icon: Icon(
                       Icons.unfold_more_rounded,
                       color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),

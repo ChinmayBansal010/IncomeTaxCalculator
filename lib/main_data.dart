@@ -489,6 +489,9 @@ class _MainDataPageState extends State<MainDataPage> with SingleTickerProviderSt
           education: details['education'] ?? '',
           empType: details['emptype'] ?? '',
           bankName: details['bname'] ?? '',
+          dot: details['dot'] ?? '',
+          pot: details['pot'] ?? '',
+          dod: details['dod'] ?? '',
         ),
       ),
     );

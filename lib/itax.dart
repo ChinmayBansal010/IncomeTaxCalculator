@@ -14,6 +14,8 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 
+enum ExportAllMode { defaultId, pan, name }
+
 class ItaxPage extends StatefulWidget {
   const ItaxPage({super.key});
 
@@ -937,10 +939,75 @@ class _ItaxPageState extends State<ItaxPage>
           createExcel();
         }),
         _buildSecondaryBtn("View ECR", Icons.grid_view_rounded, _previewEcr),
-        _buildSecondaryBtn(
-            "Export All", Icons.folder_zip_rounded, () => exportAll(false)),
-        _buildSecondaryBtn("Export All (PAN)", Icons.credit_card_rounded,
-            () => exportAll(true)),
+        PopupMenuButton<ExportAllMode>(
+          onSelected: (mode) => exportAll(mode),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          elevation: 6,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.folder_zip_rounded, color: Color(0xFF2563EB), size: 20),
+                SizedBox(width: 8),
+                Text(
+                  "Export All",
+                  style: TextStyle(
+                    color: Color(0xFF0F172A),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(width: 4),
+                Icon(Icons.arrow_drop_down_rounded, color: Color(0xFF64748B), size: 22),
+              ],
+            ),
+          ),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: ExportAllMode.defaultId,
+              child: Row(
+                children: [
+                  Icon(Icons.folder_zip_rounded, color: Color(0xFF2563EB), size: 18),
+                  SizedBox(width: 10),
+                  Text("Export All", style: TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: ExportAllMode.pan,
+              child: Row(
+                children: [
+                  Icon(Icons.credit_card_rounded, color: Color(0xFF059669), size: 18),
+                  SizedBox(width: 10),
+                  Text("Export All (PAN)", style: TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: ExportAllMode.name,
+              child: Row(
+                children: [
+                  Icon(Icons.person_outline_rounded, color: Color(0xFF7C3AED), size: 18),
+                  SizedBox(width: 10),
+                  Text("Export All (NAME)", style: TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -1145,6 +1212,7 @@ class _ItaxPageState extends State<ItaxPage>
   Future<void> createExcel({
     String? biometricId,
     bool? isPan = false,
+    ExportAllMode? exportMode,
     bool? isExportAll = false,
     bool downloadFile = true,
   }) async {
@@ -1344,9 +1412,21 @@ class _ItaxPageState extends State<ItaxPage>
 
     if (downloadFile) {
       final List<int> bytes = workbook.saveAsStream();
-      String? name = isPan!
-          ? (mainpgData['panno'] ?? biometricId).toString()
-          : biometricId.toString();
+      final mode = exportMode ??
+          (isPan == true ? ExportAllMode.pan : ExportAllMode.defaultId);
+
+      String name = biometricId.toString();
+      if (mode == ExportAllMode.pan) {
+        name = (mainpgData['panno'] != null &&
+                mainpgData['panno'].toString().trim().isNotEmpty)
+            ? mainpgData['panno'].toString().trim()
+            : biometricId.toString();
+      } else if (mode == ExportAllMode.name) {
+        name = (mainpgData['name'] != null &&
+                mainpgData['name'].toString().trim().isNotEmpty)
+            ? mainpgData['name'].toString().trim()
+            : biometricId.toString();
+      }
 
       // await uploadExcelAndDownloadPDF(bytes, name, isExportAll!);
       if (kIsWeb) {
@@ -8248,7 +8328,7 @@ class _ItaxPageState extends State<ItaxPage>
     }
   }
 
-  Future<void> exportAll([bool isPan = false]) async {
+  Future<void> exportAll([ExportAllMode mode = ExportAllMode.defaultId]) async {
     try {
       var sortedEntries = biometricData.entries.toList()
         ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key)));
@@ -8263,7 +8343,10 @@ class _ItaxPageState extends State<ItaxPage>
 
       for (int i = startIndex; i < biometricIds.length; i++) {
         await createExcel(
-            biometricId: biometricIds[i], isPan: isPan, isExportAll: true);
+          biometricId: biometricIds[i],
+          exportMode: mode,
+          isExportAll: true,
+        );
       }
     } catch (error) {
       if (mounted) {

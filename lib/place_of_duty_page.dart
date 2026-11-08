@@ -187,12 +187,38 @@ class _PlaceOfDutyPageState extends State<PlaceOfDutyPage> {
 
     if (newName != null && newName != item.name) {
       try {
+        final oldName = item.name;
         await _dbRef
             .child(sharedData.userPlace)
             .child('places')
             .child(item.key)
             .set(newName);
-        _showSnackBar('Updated Place of Duty to "$newName".');
+
+        int updatedEmployeesCount = 0;
+        final mainSnap = await _dbRef.child(sharedData.userPlace).child('maindata').once();
+        if (mainSnap.snapshot.exists && mainSnap.snapshot.value != null) {
+          final mainMap = mainSnap.snapshot.value as Map;
+          for (final entry in mainMap.entries) {
+            final empBioId = entry.key.toString();
+            final record = entry.value;
+            if (record is Map && record['place'] != null) {
+              final pName = record['place'].toString().trim().toUpperCase();
+              if (pName == oldName) {
+                await _dbRef
+                    .child(sharedData.userPlace)
+                    .child('maindata')
+                    .child(empBioId)
+                    .child('place')
+                    .set(newName);
+                updatedEmployeesCount++;
+              }
+            }
+          }
+        }
+
+        _showSnackBar(updatedEmployeesCount > 0
+            ? 'Updated Place of Duty to "$newName" and updated $updatedEmployeesCount assigned employee(s).'
+            : 'Updated Place of Duty to "$newName".');
         _loadData();
       } catch (e) {
         _showSnackBar('Failed to update: $e');
@@ -201,77 +227,280 @@ class _PlaceOfDutyPageState extends State<PlaceOfDutyPage> {
   }
 
   Future<void> _deletePlace(_PlaceItem item) async {
-    final assignedCount = _employeePlaceCounts[item.name] ?? 0;
+    try {
+      final mainSnap = await _dbRef.child(sharedData.userPlace).child('maindata').once();
+      final List<Map<String, String>> affectedEmployees = [];
 
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Delete Place of Duty?',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Are you sure you want to delete "${item.name}" from the list?'),
-            if (assignedCount > 0) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFF59E0B)),
+      if (mainSnap.snapshot.exists && mainSnap.snapshot.value != null) {
+        final mainMap = mainSnap.snapshot.value as Map;
+        for (final entry in mainMap.entries) {
+          final empBioId = entry.key.toString();
+          final record = entry.value;
+          if (record is Map && record['place'] != null) {
+            final pName = record['place'].toString().trim().toUpperCase();
+            if (pName == item.name) {
+              final empName = (record['name'] ?? 'Unknown').toString();
+              affectedEmployees.add({'bioId': empBioId, 'name': empName});
+            }
+          }
+        }
+      }
+
+      final otherPlaces = _places.where((p) => p.name != item.name).map((p) => p.name).toList();
+
+      if (!mounted) return;
+      if (affectedEmployees.isEmpty) {
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Text('Delete Place of Duty?', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+            content: Text('Are you sure you want to delete "${item.name}"?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFDC2626),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline_rounded, color: Color(0xFFD97706), size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '$assignedCount employee record(s) are assigned to "${item.name}". Deleting this entry will remove it from future dropdown selections while preserving existing employee data.',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF92400E), height: 1.3),
-                      ),
-                    ),
-                  ],
-                ),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('DELETE'),
               ),
             ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('CANCEL'),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFDC2626),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('DELETE'),
-          ),
-        ],
-      ),
-    );
+        );
 
-    if (confirm == true) {
-      try {
-        await _dbRef
-            .child(sharedData.userPlace)
-            .child('places')
-            .child(item.key)
-            .remove();
-        _showSnackBar('Place of Duty "${item.name}" deleted.');
-        _loadData();
-      } catch (e) {
-        _showSnackBar('Failed to delete: $e');
+        if (confirm == true) {
+          await _dbRef.child(sharedData.userPlace).child('places').child(item.key).remove();
+          _showSnackBar('Place of Duty "${item.name}" deleted.');
+          _loadData();
+        }
+        return;
       }
+
+      if (!mounted) return;
+      await _showReassignmentDialog(item, affectedEmployees, otherPlaces);
+    } catch (e) {
+      _showSnackBar('Error: $e');
     }
+  }
+
+  Future<void> _showReassignmentDialog(
+    _PlaceItem itemToDelete,
+    List<Map<String, String>> affectedEmployees,
+    List<String> availableTargetPlaces,
+  ) async {
+    if (availableTargetPlaces.isEmpty) {
+      _showSnackBar('Cannot reassign employees because no other Place of Duty exists. Please add another Place of Duty first.');
+      return;
+    }
+
+    final Map<String, String> selectedTargetMap = {
+      for (var emp in affectedEmployees) emp['bioId']!: availableTargetPlaces.first
+    };
+    String bulkSelectedTarget = availableTargetPlaces.first;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            final isMobile = MediaQuery.of(ctx).size.width < 600;
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Reassign Employees before Deleting',
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: isMobile ? 16 : 18),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${affectedEmployees.length} employee(s) currently assigned to "${itemToDelete.name}"',
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: isMobile ? double.maxFinite : 550,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFBFDBFE)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'BULK REASSIGNMENT (CHANGE FOR ALL)',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Color(0xFF1E40AF)),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DropdownButtonFormField<String>(
+                                    initialValue: bulkSelectedTarget,
+                                    isExpanded: true,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                      fillColor: Colors.white,
+                                      filled: true,
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    items: availableTargetPlaces.map((p) => DropdownMenuItem(value: p, child: Text(p, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)))).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) {
+                                        setDialogState(() {
+                                          bulkSelectedTarget = v;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF2563EB),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  ),
+                                  onPressed: () {
+                                    setDialogState(() {
+                                      for (var emp in affectedEmployees) {
+                                        selectedTargetMap[emp['bioId']!] = bulkSelectedTarget;
+                                      }
+                                    });
+                                  },
+                                  child: const Text('CHANGE ALL', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'AFFECTED EMPLOYEES',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF334155)),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        constraints: const BoxConstraints(maxHeight: 220),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: affectedEmployees.length,
+                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          itemBuilder: (ctx, idx) {
+                            final emp = affectedEmployees[idx];
+                            final bioId = emp['bioId']!;
+                            final empName = emp['name']!;
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(empName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                                        Text('ID: $bioId', style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  SizedBox(
+                                    width: 140,
+                                    child: DropdownButtonFormField<String>(
+                                      initialValue: selectedTargetMap[bioId],
+                                      isExpanded: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        fillColor: Colors.white,
+                                        filled: true,
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                                      ),
+                                      items: availableTargetPlaces.map((p) => DropdownMenuItem(value: p, child: Text(p, style: const TextStyle(fontSize: 12)))).toList(),
+                                      onChanged: (v) {
+                                        if (v != null) {
+                                          setDialogState(() {
+                                            selectedTargetMap[bioId] = v;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('CANCEL'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFDC2626),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    try {
+                      for (var emp in affectedEmployees) {
+                        final bioId = emp['bioId']!;
+                        final targetPlace = selectedTargetMap[bioId]!;
+                        await _dbRef
+                            .child(sharedData.userPlace)
+                            .child('maindata')
+                            .child(bioId)
+                            .child('place')
+                            .set(targetPlace);
+                      }
+                      await _dbRef
+                          .child(sharedData.userPlace)
+                          .child('places')
+                          .child(itemToDelete.key)
+                          .remove();
+
+                      _showSnackBar('Reassigned ${affectedEmployees.length} employee(s) and deleted "${itemToDelete.name}".');
+                      _loadData();
+                    } catch (e) {
+                      _showSnackBar('Failed to reassign/delete: $e');
+                    }
+                  },
+                  child: const Text('REASSIGN & DELETE'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   void _showSnackBar(String msg) {
