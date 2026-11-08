@@ -1077,6 +1077,18 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
+    final Set<String> dropdownItemsSet = {};
+    for (var item in widget.items) {
+      dropdownItemsSet.add(item);
+    }
+    if (widget.currentValue != null && widget.currentValue!.trim().isNotEmpty) {
+      dropdownItemsSet.add(widget.currentValue!.trim().toUpperCase());
+    }
+    final List<String> dropdownItems = dropdownItemsSet.toList();
+    final String? selectedVal = (widget.currentValue != null && widget.currentValue!.trim().isNotEmpty)
+        ? widget.currentValue!.trim().toUpperCase()
+        : (dropdownItemsSet.contains('') ? '' : null);
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -1114,7 +1126,7 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
               ),
               child: DropdownButtonFormField<String?>(
                 isExpanded: true,
-                initialValue: widget.currentValue,
+                value: selectedVal,
                 icon: Icon(
                   Icons.unfold_more_rounded,
                   color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
@@ -1156,7 +1168,7 @@ class _AnimatedDropdownFieldState extends State<AnimatedDropdownField> {
                     borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
                   ),
                 ),
-                items: widget.items.map<DropdownMenuItem<String?>>((String value) {
+                items: dropdownItems.map<DropdownMenuItem<String?>>((String value) {
                   return DropdownMenuItem<String?>(
                     value: value,
                     child: Text(
