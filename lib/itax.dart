@@ -6927,7 +6927,7 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C37").cellStyle = commontextStyleBold;
 
       sheet.getRangeByName("B39:D39").merge();
-      sheet.getRangeByName("B39").setValue("EXPEMPTIONS");
+      sheet.getRangeByName("B39").setValue("EXEMPTIONS");
       sheet.getRangeByName("B39:D39").cellStyle = commontextStyleBold;
       sheet.getRangeByName("B39:D39").cellStyle.hAlign = xls.HAlignType.center;
       sheet.getRangeByName("B39:D39").cellStyle.borders.all.lineStyle =
