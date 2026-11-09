@@ -1121,51 +1121,29 @@ class _ItaxPageState extends State<ItaxPage>
           ? biometricIdController.text.trim()
           : biometricId;
 
-      await fetchmainpgData(selectedId);
-      Map<String, Map<String?, dynamic>> monthdata =
-          await fetchAllMonthData(selectedId);
-      await fetchdedData(selectedId);
-      await fetcharrearData(selectedId);
-      await fetchitaxData(selectedId);
-
-      final itaxNewSnap = await bioRef.child('itaxnew').child(selectedId).once();
-      final itaxOldSnap = await bioRef.child('itaxold').child(selectedId).once();
-
-      final Map<String, dynamic> itaxnewData = itaxNewSnap.snapshot.exists && itaxNewSnap.snapshot.value is Map
-          ? Map<String, dynamic>.from(itaxNewSnap.snapshot.value as Map)
-          : {};
-      final Map<String, dynamic> itaxoldData = itaxOldSnap.snapshot.exists && itaxOldSnap.snapshot.value is Map
-          ? Map<String, dynamic>.from(itaxOldSnap.snapshot.value as Map)
-          : {};
-
-      final Map<String, dynamic> stringMainPg = mainpgData.map((k, v) => MapEntry(k?.toString() ?? '', v));
+      final xls.Workbook workbook = await _buildWorkbookForBiometricId(selectedId);
 
       final mode = exportMode ?? ExportAllMode.defaultId;
-      String name = selectedId;
+      String name = selectedId.toString();
       if (mode == ExportAllMode.pan) {
-        name = (stringMainPg['panno'] != null &&
-                stringMainPg['panno'].toString().trim().isNotEmpty)
-            ? stringMainPg['panno'].toString().trim()
-            : selectedId;
+        name = (mainpgData['panno'] != null &&
+                mainpgData['panno'].toString().trim().isNotEmpty)
+            ? mainpgData['panno'].toString().trim()
+            : selectedId.toString();
       } else if (mode == ExportAllMode.name) {
-        name = (stringMainPg['name'] != null &&
-                stringMainPg['name'].toString().trim().isNotEmpty)
-            ? stringMainPg['name'].toString().trim()
-            : selectedId;
+        name = (mainpgData['name'] != null &&
+                mainpgData['name'].toString().trim().isNotEmpty)
+            ? mainpgData['name'].toString().trim()
+            : selectedId.toString();
       }
 
-      await ItaxPdfGenerator.generateAndDownloadPdf(
-        biometricId: selectedId,
-        mainpgData: stringMainPg,
-        monthdata: monthdata,
-        dedData: dedData.map((k, v) => MapEntry(k?.toString() ?? '', v)),
-        arrData: arrearData.map((k, v) => MapEntry(k?.toString() ?? '', v)),
-        itaxData: itfData.map((k, v) => MapEntry(k?.toString() ?? '', v)),
-        itaxnewData: itaxnewData,
-        itaxoldData: itaxoldData,
+      await ItaxPdfGenerator.generatePdfFromWorkbook(
+        workbook: workbook,
         fileName: name,
         isExportAll: isExportAll ?? false,
       );
+
+      workbook.dispose();
     } catch (e) {
       if (mounted) {
         showDialog(
@@ -1316,20 +1294,7 @@ class _ItaxPageState extends State<ItaxPage>
     );
   }
 
-  Future<void> createExcel({
-    String? biometricId,
-    bool? isPan = false,
-    ExportAllMode? exportMode,
-    bool? isExportAll = false,
-    bool downloadFile = true,
-  }) async {
-    setState(() {
-      toLoad = true;
-    });
-    biometricId = (biometricId == null || biometricId.isEmpty)
-        ? biometricIdController.text
-        : biometricId;
-
+  Future<xls.Workbook> _buildWorkbookForBiometricId(String biometricId) async {
     final xls.Workbook workbook = xls.Workbook();
     final xls.Worksheet ecrSheet = workbook.worksheets[0];
     final xls.Worksheet itaxformSheet = workbook.worksheets.add();
@@ -1343,7 +1308,6 @@ class _ItaxPageState extends State<ItaxPage>
     computationSheet.name = "COMPUTATION";
     itaxoldSheet.name = "ITAX CAL-OLD";
 
-    //-------------styles-------------------
     final xls.Style formheaderStyle = workbook.styles.add('formheaderStyle');
     formheaderStyle.fontName = 'Calibri';
     formheaderStyle.fontSize = 14;
@@ -1517,25 +1481,43 @@ class _ItaxPageState extends State<ItaxPage>
         specialtotalrowStyle,
         speciallastrowStyle);
 
+    return workbook;
+  }
+
+  Future<void> createExcel({
+    String? biometricId,
+    bool? isPan = false,
+    ExportAllMode? exportMode,
+    bool? isExportAll = false,
+    bool downloadFile = true,
+  }) async {
+    setState(() {
+      toLoad = true;
+    });
+    final selectedId = (biometricId == null || biometricId.isEmpty)
+        ? biometricIdController.text
+        : biometricId;
+
+    final xls.Workbook workbook = await _buildWorkbookForBiometricId(selectedId);
+
     if (downloadFile) {
       final List<int> bytes = workbook.saveAsStream();
       final mode = exportMode ??
           (isPan == true ? ExportAllMode.pan : ExportAllMode.defaultId);
 
-      String name = biometricId.toString();
+      String name = selectedId.toString();
       if (mode == ExportAllMode.pan) {
         name = (mainpgData['panno'] != null &&
                 mainpgData['panno'].toString().trim().isNotEmpty)
             ? mainpgData['panno'].toString().trim()
-            : biometricId.toString();
+            : selectedId.toString();
       } else if (mode == ExportAllMode.name) {
         name = (mainpgData['name'] != null &&
                 mainpgData['name'].toString().trim().isNotEmpty)
             ? mainpgData['name'].toString().trim()
-            : biometricId.toString();
+            : selectedId.toString();
       }
 
-      // await uploadExcelAndDownloadPDF(bytes, name, isExportAll!);
       if (kIsWeb) {
         uh.AnchorElement(
             href:
