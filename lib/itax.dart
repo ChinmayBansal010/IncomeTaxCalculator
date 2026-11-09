@@ -1122,8 +1122,6 @@ class _ItaxPageState extends State<ItaxPage>
           : biometricId;
 
       final xls.Workbook workbook = await _buildWorkbookForBiometricId(selectedId);
-      final List<int> excelBytes = workbook.saveAsStream();
-      workbook.dispose();
 
       final mode = exportMode ?? ExportAllMode.defaultId;
       String name = selectedId.toString();
@@ -1139,11 +1137,13 @@ class _ItaxPageState extends State<ItaxPage>
             : selectedId.toString();
       }
 
-      await ItaxPdfGenerator.convertExcelBytesToPdf(
-        excelBytes: excelBytes,
+      await ItaxPdfGenerator.generatePdf(
+        workbook: workbook,
         fileName: name,
         isExportAll: isExportAll ?? false,
       );
+
+      workbook.dispose();
     } catch (e) {
       if (mounted) {
         showDialog(
