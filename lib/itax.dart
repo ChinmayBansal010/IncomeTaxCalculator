@@ -939,12 +939,12 @@ class _ItaxPageState extends State<ItaxPage>
           }
           createExcel();
         }),
-        _buildPdfBtn("Export Single PDF", Icons.picture_as_pdf_rounded, () {
-          if (!_hasSelectedBiometricId()) {
-            return;
-          }
-          createPdf();
-        }),
+        // _buildPdfBtn("Export Single PDF", Icons.picture_as_pdf_rounded, () {
+        //   if (!_hasSelectedBiometricId()) {
+        //     return;
+        //   }
+        //   createPdf();
+        // }),
         _buildSecondaryBtn("View ECR", Icons.grid_view_rounded, _previewEcr),
         PopupMenuButton<ExportAllMode>(
           onSelected: (mode) => exportAll(mode),
