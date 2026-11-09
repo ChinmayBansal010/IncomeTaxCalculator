@@ -97,7 +97,6 @@ class ItaxPdfGenerator {
     final PdfLayoutResult empResult = empGrid.draw(
       page: page1,
       bounds: Rect.fromLTWH(0, y, printableWidth, 0),
-      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
     )!;
     y = empResult.bounds.bottom + 12;
 
@@ -173,7 +172,6 @@ class ItaxPdfGenerator {
     matrixGrid.draw(
       page: page1,
       bounds: Rect.fromLTWH(0, y, printableWidth, page1.getClientSize().height - y),
-      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
     );
 
     // =========================================================================
@@ -234,7 +232,6 @@ class ItaxPdfGenerator {
     final PdfLayoutResult sGridResult = summaryGrid.draw(
       page: page2,
       bounds: Rect.fromLTWH(0, y, p2Width, 0),
-      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
     )!;
     y = sGridResult.bounds.bottom + 16;
 
@@ -268,7 +265,6 @@ class ItaxPdfGenerator {
     breakdownGrid.draw(
       page: page2,
       bounds: Rect.fromLTWH(0, y, p2Width, page2.getClientSize().height - y),
-      format: PdfLayoutFormat(layout: PdfLayoutType.paginate),
     );
 
     // Save and Output PDF Bytes
@@ -301,7 +297,7 @@ class ItaxPdfGenerator {
 
     final PdfGraphics graphics = template.graphics;
     graphics.save();
-    graphics.setTransparency(0.08);
+    graphics.setTransparency(0.09);
 
     double imageWidth = 300;
     double imageHeight = imageWidth * (watermarkImage.height / watermarkImage.width);
