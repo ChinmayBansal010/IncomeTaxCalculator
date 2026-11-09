@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xls;
@@ -16,65 +14,7 @@ class ItaxPdfGenerator {
     required String fileName,
     bool isExportAll = false,
   }) async {
-    List<int>? rawPdfBytes;
-    String? tempXlsxPath;
-    String? tempPdfPath;
-
-    final List<int> excelBytes = workbook.saveAsStream();
-
-    try {
-      if (!kIsWeb) {
-        final Directory tempDir = await getTemporaryDirectory();
-        final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-        tempXlsxPath = '${tempDir.path}/temp_$timestamp.xlsx';
-        final File tempXlsxFile = File(tempXlsxPath);
-        await tempXlsxFile.writeAsBytes(excelBytes, flush: true);
-
-        final ProcessResult result = await Process.run('libreoffice', [
-          '--headless',
-          '--convert-to',
-          'pdf',
-          '--outdir',
-          tempDir.path,
-          tempXlsxPath,
-        ]);
-
-        tempPdfPath = '${tempDir.path}/temp_$timestamp.pdf';
-        final File tempPdfFile = File(tempPdfPath);
-
-        if (result.exitCode == 0 && await tempPdfFile.exists()) {
-          rawPdfBytes = await tempPdfFile.readAsBytes();
-        } else {
-          rawPdfBytes = await _convertViaServer(excelBytes, fileName);
-        }
-      } else {
-        rawPdfBytes = await _convertViaServer(excelBytes, fileName);
-      }
-    } catch (_) {
-      rawPdfBytes = null;
-    } finally {
-      if (tempXlsxPath != null) {
-        try {
-          final f = File(tempXlsxPath);
-          if (await f.exists()) await f.delete();
-        } catch (_) {}
-      }
-    }
-
-    List<int> finalPdfBytes;
-
-    if (rawPdfBytes != null && rawPdfBytes.isNotEmpty) {
-      finalPdfBytes = await _stampWatermarkOnPdf(rawPdfBytes);
-      if (tempPdfPath != null) {
-        try {
-          final f = File(tempPdfPath);
-          if (await f.exists()) await f.delete();
-        } catch (_) {}
-      }
-    } else {
-      // Fallback: Direct high-fidelity rendering from Excel Workbook
-      finalPdfBytes = await generatePdfBytesFromWorkbook(workbook);
-    }
+    final List<int> finalPdfBytes = await generatePdfBytesFromWorkbook(workbook);
 
     final String pdfFileName = "$fileName.pdf";
     if (kIsWeb) {
@@ -90,62 +30,6 @@ class ItaxPdfGenerator {
       if (!isExportAll) {
         OpenFile.open(filePath);
       }
-    }
-  }
-
-  static Future<List<int>?> _convertViaServer(List<int> excelBytes, String fileName) async {
-    final List<String> serverUris = [
-      "http://127.0.0.1:5000/convert",
-      "http://192.168.1.36:5000/convert",
-    ];
-
-    for (final uriStr in serverUris) {
-      try {
-        final uri = Uri.parse(uriStr);
-        final request = http.MultipartRequest("POST", uri);
-        request.files.add(http.MultipartFile.fromBytes(
-          'file',
-          excelBytes,
-          filename: "$fileName.xlsx",
-          contentType: MediaType("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-        ));
-
-        final response = await request.send().timeout(const Duration(seconds: 4));
-        if (response.statusCode == 200) {
-          return await response.stream.toBytes();
-        }
-      } catch (_) {}
-    }
-    return null;
-  }
-
-  static Future<List<int>> _stampWatermarkOnPdf(List<int> rawPdfBytes) async {
-    try {
-      final PdfDocument document = PdfDocument(inputBytes: rawPdfBytes);
-
-      PdfBitmap? watermarkLogo;
-      try {
-        final ByteData logoData = await rootBundle.load('assets/images/mcd_logo.png');
-        watermarkLogo = PdfBitmap(logoData.buffer.asUint8List());
-      } catch (_) {
-        try {
-          final ByteData logoData = await rootBundle.load('assets/icon.png');
-          watermarkLogo = PdfBitmap(logoData.buffer.asUint8List());
-        } catch (_) {}
-      }
-
-      if (watermarkLogo != null) {
-        for (int i = 0; i < document.pages.count; i++) {
-          final PdfPage page = document.pages[i];
-          _drawWatermark(page, watermarkLogo);
-        }
-      }
-
-      final List<int> stampedBytes = document.saveSync();
-      document.dispose();
-      return stampedBytes;
-    } catch (_) {
-      return rawPdfBytes;
     }
   }
 
@@ -250,6 +134,13 @@ class ItaxPdfGenerator {
 
         final PdfGridCell pdfCell = pdfRow.cells[c - 1];
         pdfCell.value = text;
+
+        if (cell.columnSpan > 1) {
+          pdfCell.columnSpan = cell.columnSpan;
+        }
+        if (cell.rowSpan > 1) {
+          pdfCell.rowSpan = cell.rowSpan;
+        }
 
         final xls.Style cellStyle = cell.cellStyle;
         final bool isBold = cellStyle.bold;
