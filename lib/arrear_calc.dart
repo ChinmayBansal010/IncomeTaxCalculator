@@ -51,11 +51,9 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   bool recalculateNpa = false;
 
   List<String> availableYears = [];
+  Map<String, bool> selectedYears = {};
   List<MonthSelectionItem> allChronologicalMonths = [];
   Map<String, bool> selectedTargetMonths = {};
-
-  MonthSelectionItem? fromMonthItem;
-  MonthSelectionItem? toMonthItem;
 
   static const Set<String> _nonAllowanceKeys = {
     // Metadata & control flags
@@ -201,10 +199,28 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
       DatabaseEvent event = await _dbRef.once();
       if (event.snapshot.exists && event.snapshot.value is Map) {
         Map dbMap = event.snapshot.value as Map;
+
+        List<String> placeParts = sharedData.userPlace.split('/');
+        String username = placeParts.length > 1 ? placeParts[1] : (sharedData.viewingAsUsername ?? '');
+
         dbMap.forEach((key, value) {
           String kStr = key.toString();
-          if (RegExp(r'^\d{4}-\d{2}$').hasMatch(kStr)) {
-            yearSet.add(kStr);
+          if (RegExp(r'^\d{4}-\d{2}$').hasMatch(kStr) && value is Map) {
+            bool hasData = false;
+            if (username.isNotEmpty && value.containsKey(username) && value[username] is Map) {
+              Map userNode = value[username] as Map;
+              if (userNode.containsKey('monthdata') && userNode['monthdata'] is Map) {
+                Map mData = userNode['monthdata'] as Map;
+                if (mData.isNotEmpty) hasData = true;
+              }
+            } else if (value.containsKey('monthdata') && value['monthdata'] is Map) {
+              Map mData = value['monthdata'] as Map;
+              if (mData.isNotEmpty) hasData = true;
+            }
+
+            if (hasData) {
+              yearSet.add(kStr);
+            }
           }
         });
       }
@@ -258,44 +274,35 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
       setState(() {
         availableYears = years;
         allChronologicalMonths = items;
-        for (var item in items) {
-          selectedTargetMonths.putIfAbsent(item.uniqueKey, () => false);
+
+        for (var yr in years) {
+          selectedYears.putIfAbsent(yr, () => false);
         }
 
-        if (items.isNotEmpty && fromMonthItem == null) {
-          String currentYr = sharedData.ccurrentYear;
-          int startIndex = items.indexWhere((it) => it.year == currentYr);
-          if (startIndex != -1) {
-            fromMonthItem = items[startIndex];
-            int endIndex = startIndex + 11 < items.length ? startIndex + 11 : items.length - 1;
-            toMonthItem = items[endIndex];
-          } else {
-            fromMonthItem = items.first;
-            toMonthItem = items.last;
-          }
-          _updateSelectionFromRange();
+        for (var item in items) {
+          bool isYrSelected = selectedYears[item.year] ?? false;
+          selectedTargetMonths.putIfAbsent(item.uniqueKey, () => isYrSelected);
         }
       });
     }
   }
 
-  void _updateSelectionFromRange() {
-    if (fromMonthItem == null || toMonthItem == null) return;
-    int fromIdx = allChronologicalMonths.indexOf(fromMonthItem!);
-    int toIdx = allChronologicalMonths.indexOf(toMonthItem!);
-
-    if (fromIdx == -1 || toIdx == -1) return;
-
-    if (fromIdx > toIdx) {
-      int tmp = fromIdx;
-      fromIdx = toIdx;
-      toIdx = tmp;
-    }
-
+  void _toggleFinancialYear(String yr, bool isSelected) {
     setState(() {
-      for (int i = 0; i < allChronologicalMonths.length; i++) {
-        String uKey = allChronologicalMonths[i].uniqueKey;
-        selectedTargetMonths[uKey] = (i >= fromIdx && i <= toIdx);
+      selectedYears[yr] = isSelected;
+      for (var item in allChronologicalMonths) {
+        if (item.year == yr) {
+          selectedTargetMonths[item.uniqueKey] = isSelected;
+        }
+      }
+    });
+  }
+
+  void _selectAllFinancialYears(bool selectAll) {
+    setState(() {
+      selectedYears.updateAll((yr, val) => selectAll);
+      for (var item in allChronologicalMonths) {
+        selectedTargetMonths[item.uniqueKey] = selectAll && (selectedYears[item.year] ?? false);
       }
     });
   }
@@ -358,7 +365,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
         setState(() {
           allEmployees = employees;
           for (var emp in allEmployees) {
-            selectedEmployees[emp['id']!] = true;
+            selectedEmployees[emp['id']!] = false;
           }
         });
       }
@@ -1342,179 +1349,168 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                   title: const Text('Target Months Selection', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
                   leading: const Icon(Icons.calendar_month_rounded, color: Color(0xFF64748B), size: 20),
                   children: [
+                    // Section 1: Financial Years (FY) Selection
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Select Month Range (From - To)",
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF64748B)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Financial Years (FY)",
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E3A8A)),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: const Color(0xFFEFF6FF), borderRadius: BorderRadius.circular(6)),
+                                child: Text(
+                                  '${selectedYears.values.where((v) => v).length}/${availableYears.length} FYs Selected',
+                                  style: const TextStyle(fontSize: 11, color: Color(0xFF2563EB), fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("From", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
-                                    const SizedBox(height: 4),
-                                    DropdownButtonFormField<MonthSelectionItem>(
-                                      initialValue: fromMonthItem,
-                                      isExpanded: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                        filled: true,
-                                        fillColor: const Color(0xFFF8FAFC),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                                      ),
-                                      items: allChronologicalMonths.map((item) {
-                                        return DropdownMenuItem<MonthSelectionItem>(
-                                          value: item,
-                                          child: Text(
-                                            "${item.displayLabel} (${item.year})",
-                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (val) {
-                                        if (val != null) {
-                                          setState(() {
-                                            fromMonthItem = val;
-                                            _updateSelectionFromRange();
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ],
+                              TextButton(
+                                onPressed: () => _selectAllFinancialYears(true),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: const Color(0xFF2563EB),
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(60, 24),
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
+                                child: const Text('Select All FYs', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                               ),
                               const SizedBox(width: 12),
-                              Expanded(
+                              TextButton(
+                                onPressed: () => _selectAllFinancialYears(false),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: const Color(0xFFEF4444),
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(60, 24),
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('Clear All FYs', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: availableYears.map((yr) {
+                              bool isSelected = selectedYears[yr] ?? false;
+                              String fyLabel = "FY ${yr.replaceAll('-', '–')}";
+                              return FilterChip(
+                                label: Text(
+                                  fyLabel,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                    color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                                  ),
+                                ),
+                                selected: isSelected,
+                                selectedColor: const Color(0xFF1E3A8A),
+                                backgroundColor: const Color(0xFFF1F5F9),
+                                checkmarkColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFCBD5E1)),
+                                ),
+                                onSelected: (selected) => _toggleFinancialYear(yr, selected),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 1, indent: 20, endIndent: 20, color: Color(0xFFE2E8F0)),
+                    // Section 2: Month Filter Chips Grouped by Selected Financial Years
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Target Months",
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF475569)),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
+                                child: Text(
+                                  '${selectedTargetMonths.values.where((v) => v).length} Months Selected',
+                                  style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: availableYears.where((yr) => selectedYears[yr] == true).map((yr) {
+                              final yearItems = allChronologicalMonths.where((m) => m.year == yr).toList();
+                              if (yearItems.isEmpty) return const SizedBox.shrink();
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text("To", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
-                                    const SizedBox(height: 4),
-                                    DropdownButtonFormField<MonthSelectionItem>(
-                                      initialValue: toMonthItem,
-                                      isExpanded: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                        filled: true,
-                                        fillColor: const Color(0xFFF8FAFC),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 6.0),
+                                      child: Text(
+                                        "FY ${yr.replaceAll('-', '–')}",
+                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF2563EB)),
                                       ),
-                                      items: allChronologicalMonths.map((item) {
-                                        return DropdownMenuItem<MonthSelectionItem>(
-                                          value: item,
-                                          child: Text(
-                                            "${item.displayLabel} (${item.year})",
-                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
-                                            overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Wrap(
+                                      spacing: 6,
+                                      runSpacing: 6,
+                                      children: yearItems.map((item) {
+                                        bool isSelected = selectedTargetMonths[item.uniqueKey] ?? false;
+                                        return FilterChip(
+                                          label: Text(
+                                            item.displayLabel,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                                            ),
                                           ),
+                                          selected: isSelected,
+                                          selectedColor: const Color(0xFF2563EB),
+                                          backgroundColor: const Color(0xFFF1F5F9),
+                                          checkmarkColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFE2E8F0)),
+                                          ),
+                                          onSelected: (selected) {
+                                            setState(() {
+                                              selectedTargetMonths[item.uniqueKey] = selected;
+                                              selectedYears[item.year] = allChronologicalMonths
+                                                  .where((m) => m.year == item.year)
+                                                  .any((m) => selectedTargetMonths[m.uniqueKey] == true);
+                                            });
+                                          },
                                         );
                                       }).toList(),
-                                      onChanged: (val) {
-                                        if (val != null) {
-                                          setState(() {
-                                            toMonthItem = val;
-                                            _updateSelectionFromRange();
-                                          });
-                                        }
-                                      },
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                              );
+                            }).toList(),
                           ),
                         ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              TextButton(
-                                onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => true)),
-                                style: TextButton.styleFrom(foregroundColor: const Color(0xFF2563EB)),
-                                child: const Text('Select All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              ),
-                              TextButton(
-                                onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => false)),
-                                style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
-                                child: const Text('Clear All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
-                            child: Text(
-                              '${selectedTargetMonths.values.where((v) => v).length}/${allChronologicalMonths.length} Selected',
-                              style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w800),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: availableYears.map((yr) {
-                          final yearItems = allChronologicalMonths.where((m) => m.year == yr).toList();
-                          if (yearItems.isEmpty) return const SizedBox.shrink();
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 6.0),
-                                  child: Text(
-                                    "FY $yr",
-                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E3A8A)),
-                                  ),
-                                ),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: yearItems.map((item) {
-                                    bool isSelected = selectedTargetMonths[item.uniqueKey] ?? false;
-                                    return FilterChip(
-                                      label: Text(
-                                        item.displayLabel,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                          color: isSelected ? Colors.white : const Color(0xFF475569),
-                                        ),
-                                      ),
-                                      selected: isSelected,
-                                      selectedColor: const Color(0xFF2563EB),
-                                      backgroundColor: const Color(0xFFF1F5F9),
-                                      checkmarkColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFE2E8F0)),
-                                      ),
-                                      onSelected: (selected) => setState(() => selectedTargetMonths[item.uniqueKey] = selected),
-                                    );
-                                  }).toList(),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
                       ),
                     ),
                   ],
