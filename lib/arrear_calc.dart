@@ -1345,7 +1345,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
               Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
-                  initiallyExpanded: true,
+                  initiallyExpanded: false,
                   title: const Text('Target Months Selection', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
                   leading: const Icon(Icons.calendar_month_rounded, color: Color(0xFF64748B), size: 20),
                   children: [
