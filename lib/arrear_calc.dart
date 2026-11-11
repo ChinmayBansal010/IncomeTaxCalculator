@@ -9,6 +9,30 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:universal_html/html.dart' as html;
 import 'shared.dart';
 
+class MonthSelectionItem {
+  final String year;
+  final String monthKey;
+  final String displayLabel;
+  final String uniqueKey;
+
+  MonthSelectionItem({
+    required this.year,
+    required this.monthKey,
+    required this.displayLabel,
+    required this.uniqueKey,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MonthSelectionItem &&
+          runtimeType == other.runtimeType &&
+          uniqueKey == other.uniqueKey;
+
+  @override
+  int get hashCode => uniqueKey.hashCode;
+}
+
 class CalcArrearPage extends StatefulWidget {
   const CalcArrearPage({super.key});
 
@@ -26,34 +50,42 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   bool recalculateHra = false;
   bool recalculateNpa = false;
 
-  Map<String, bool> selectedTargetMonths = {
-    'jan_p': false, 'feb_p': false,
-    'mar': false, 'apr': false, 'may': false, 'jun': false,
-    'jul': false, 'aug': false, 'sept': false, 'oct': false,
-    'nov': false, 'dec': false, 'jan': false, 'feb': false,
+  List<String> availableYears = [];
+  List<MonthSelectionItem> allChronologicalMonths = [];
+  Map<String, bool> selectedTargetMonths = {};
+
+  MonthSelectionItem? fromMonthItem;
+  MonthSelectionItem? toMonthItem;
+
+  static const Set<String> _nonAllowanceKeys = {
+    // Metadata & control flags
+    'biometricid', 'biometricId', 'bioId', 'id', 'name', 'designation',
+    'dap', 'hrap', 'tap', 'npap',
+    'dachk', 'hrachk', 'tachk', 'npachk',
+    'gpfchk', 'npschk', 'epfchk', 'esichk',
+    'manual_overrides', 'dort', 'mincrement',
+
+    // Base salary & Base Transport Allowance
+    'bp', 'ta',
+
+    // Automatic allowance calculation fields
+    'da', 'hra', 'npa', 'daonta',
+
+    // Gross & Net totals
+    'gross', 'salary', 'totalgross', 'netsalary', 'totalded',
+
+    // Deductions
+    'incometax', 'gis', 'gpf', 'nps', 'epf', 'esi', 'slf', 'society',
+    'recovery', 'wf', 'med', 'water', 'other', 'ddext1', 'ddext2', 'ddext3', 'ddext4',
   };
 
-  final List<String> monthList = [
-    'jan_p', 'feb_p', 'mar', 'apr', 'may', 'jun', 'jul', 'aug',
-    'sept', 'oct', 'nov', 'dec', 'jan', 'feb'
+  static const List<String> _defaultAllowanceKeys = [
+    'splpay', 'conv', 'pg', 'annual', 'uniform', 'nursing', 'medical',
+    'dirt', 'washing', 'tb', 'night', 'drive', 'cycle', 'pca', 'ot',
+    'daext1', 'daext2', 'daext3', 'daext4',
   ];
 
-  final List<Map<String, String>> valueAllowances = [
-    {'key': 'splpay', 'label': 'SPL PAY'},
-    {'key': 'conv', 'label': 'CONV'},
-    {'key': 'pg', 'label': 'PG'},
-    {'key': 'annual', 'label': 'ANNUAL'},
-    {'key': 'uniform', 'label': 'UNIFORM'},
-    {'key': 'nursing', 'label': 'NURSING'},
-    {'key': 'medical', 'label': 'MEDICAL'},
-    {'key': 'dirt', 'label': 'DIRT'},
-    {'key': 'washing', 'label': 'WASHING'},
-    {'key': 'tb', 'label': 'TB'},
-    {'key': 'night', 'label': 'NIGHT'},
-    {'key': 'drive', 'label': 'DRIVE'},
-    {'key': 'cycle', 'label': 'CYCLE'},
-    {'key': 'pca', 'label': 'PCA'},
-  ];
+  List<Map<String, String>> valueAllowances = [];
 
   final Map<String, TextEditingController> newValControllers = {};
   final Map<String, bool> recalcFlags = {};
@@ -72,6 +104,202 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   Timer? _debounce;
   late AnimationController _entranceController;
 
+  String _getAllowanceLabel(String key) {
+    const Map<String, String> knownLabels = {
+      'splpay': 'SPL PAY',
+      'conv': 'CONV',
+      'pg': 'PG',
+      'annual': 'ANNUAL',
+      'uniform': 'UNIFORM',
+      'nursing': 'NURSING',
+      'medical': 'MEDICAL',
+      'dirt': 'DIRT',
+      'washing': 'WASHING',
+      'tb': 'TB',
+      'night': 'NIGHT',
+      'drive': 'CONTINGENCY',
+      'cycle': 'CYCLE',
+      'pca': 'PCA',
+      'ot': 'OT',
+      'daext1': 'EXTRA 1',
+      'daext2': 'EXTRA 2',
+      'daext3': 'EXTRA 3',
+      'daext4': 'EXTRA 4',
+    };
+
+    if (knownLabels.containsKey(key)) {
+      return knownLabels[key]!;
+    }
+
+    String formatted = key
+        .replaceAll(RegExp(r'([a-z])([A-Z])'), r'$1 $2')
+        .replaceAll('_', ' ')
+        .trim()
+        .toUpperCase();
+    return formatted.isEmpty ? key.toUpperCase() : formatted;
+  }
+
+  void _extractAllowanceKeys(dynamic rawData, Set<String> keySet) {
+    if (rawData is Map) {
+      rawData.forEach((k, v) {
+        if (v is Map || v is List) {
+          _extractAllowanceKeys(v, keySet);
+        } else {
+          String keyStr = k.toString();
+          if (!_nonAllowanceKeys.contains(keyStr)) {
+            keySet.add(keyStr);
+          }
+        }
+      });
+    } else if (rawData is List) {
+      for (var item in rawData) {
+        if (item != null) {
+          _extractAllowanceKeys(item, keySet);
+        }
+      }
+    }
+  }
+
+  void _syncValueAllowances(Set<String> discoveredKeys) {
+    Set<String> allKeysToUse = discoveredKeys.isNotEmpty 
+        ? discoveredKeys 
+        : _defaultAllowanceKeys.toSet();
+
+    List<Map<String, String>> updatedList = [];
+    
+    for (String defaultKey in _defaultAllowanceKeys) {
+      if (allKeysToUse.contains(defaultKey)) {
+        updatedList.add({
+          'key': defaultKey,
+          'label': _getAllowanceLabel(defaultKey),
+        });
+      }
+    }
+    
+    List<String> extraKeys = allKeysToUse
+        .where((k) => !_defaultAllowanceKeys.contains(k))
+        .toList()..sort();
+        
+    for (String k in extraKeys) {
+      updatedList.add({
+        'key': k,
+        'label': _getAllowanceLabel(k),
+      });
+    }
+
+    valueAllowances = updatedList;
+    for (var allow in valueAllowances) {
+      String k = allow['key']!;
+      newValControllers[k] ??= TextEditingController();
+      recalcFlags[k] ??= false;
+    }
+  }
+
+  Future<void> _fetchAvailableYearsAndMonths() async {
+    try {
+      Set<String> yearSet = {};
+      DatabaseEvent event = await _dbRef.once();
+      if (event.snapshot.exists && event.snapshot.value is Map) {
+        Map dbMap = event.snapshot.value as Map;
+        dbMap.forEach((key, value) {
+          String kStr = key.toString();
+          if (RegExp(r'^\d{4}-\d{2}$').hasMatch(kStr)) {
+            yearSet.add(kStr);
+          }
+        });
+      }
+
+      if (sharedData.ccurrentYear.isNotEmpty) {
+        yearSet.add(sharedData.ccurrentYear);
+      }
+
+      List<String> sortedYears = yearSet.toList()..sort();
+      if (sortedYears.isEmpty) {
+        sortedYears = [sharedData.ccurrentYear.isNotEmpty ? sharedData.ccurrentYear : '2024-25'];
+      }
+
+      _buildChronologicalMonthList(sortedYears);
+    } catch (e) {
+      debugPrint("Error fetching years: $e");
+      List<String> fallbackYears = [
+        if (sharedData.ccurrentYear.isNotEmpty) sharedData.ccurrentYear else '2024-25'
+      ];
+      _buildChronologicalMonthList(fallbackYears);
+    }
+  }
+
+  void _buildChronologicalMonthList(List<String> years) {
+    const List<String> fyMonthKeys = [
+      'mar', 'apr', 'may', 'jun', 'jul', 'aug',
+      'sept', 'oct', 'nov', 'dec', 'jan', 'feb'
+    ];
+
+    List<MonthSelectionItem> items = [];
+    for (String yr in years) {
+      List<String> parts = yr.split('-');
+      if (parts.length != 2) continue;
+      int startYear = int.tryParse(parts[0]) ?? 2024;
+      int endYear = 2000 + (int.tryParse(parts[1]) ?? 25);
+
+      for (String mKey in fyMonthKeys) {
+        int y = ['jan', 'feb'].contains(mKey) ? endYear : startYear;
+        String label = "${mKey.toUpperCase()} $y";
+        String uKey = "${yr}_$mKey";
+        items.add(MonthSelectionItem(
+          year: yr,
+          monthKey: mKey,
+          displayLabel: label,
+          uniqueKey: uKey,
+        ));
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        availableYears = years;
+        allChronologicalMonths = items;
+        for (var item in items) {
+          selectedTargetMonths.putIfAbsent(item.uniqueKey, () => false);
+        }
+
+        if (items.isNotEmpty && fromMonthItem == null) {
+          String currentYr = sharedData.ccurrentYear;
+          int startIndex = items.indexWhere((it) => it.year == currentYr);
+          if (startIndex != -1) {
+            fromMonthItem = items[startIndex];
+            int endIndex = startIndex + 11 < items.length ? startIndex + 11 : items.length - 1;
+            toMonthItem = items[endIndex];
+          } else {
+            fromMonthItem = items.first;
+            toMonthItem = items.last;
+          }
+          _updateSelectionFromRange();
+        }
+      });
+    }
+  }
+
+  void _updateSelectionFromRange() {
+    if (fromMonthItem == null || toMonthItem == null) return;
+    int fromIdx = allChronologicalMonths.indexOf(fromMonthItem!);
+    int toIdx = allChronologicalMonths.indexOf(toMonthItem!);
+
+    if (fromIdx == -1 || toIdx == -1) return;
+
+    if (fromIdx > toIdx) {
+      int tmp = fromIdx;
+      fromIdx = toIdx;
+      toIdx = tmp;
+    }
+
+    setState(() {
+      for (int i = 0; i < allChronologicalMonths.length; i++) {
+        String uKey = allChronologicalMonths[i].uniqueKey;
+        selectedTargetMonths[uKey] = (i >= fromIdx && i <= toIdx);
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,10 +310,8 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     _entranceController.forward();
 
     searchController.addListener(_onSearchChanged);
-    for (var allow in valueAllowances) {
-      newValControllers[allow['key']!] = TextEditingController();
-      recalcFlags[allow['key']!] = false;
-    }
+    _syncValueAllowances({});
+    _fetchAvailableYearsAndMonths();
     _fetchEmployees();
   }
 
@@ -116,6 +342,18 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
         }
       }
       employees.sort((a, b) => a['name']!.compareTo(b['name']!));
+
+      Set<String> discoveredKeys = {};
+      try {
+        DatabaseEvent monthDataEvent = await _dbRef.child(sharedData.userPlace).child('monthdata').once();
+        if (monthDataEvent.snapshot.exists) {
+          _extractAllowanceKeys(monthDataEvent.snapshot.value, discoveredKeys);
+        }
+      } catch (e) {
+        debugPrint("Error fetching monthdata for allowances: $e");
+      }
+      _syncValueAllowances(discoveredKeys);
+
       if (mounted) {
         setState(() {
           allEmployees = employees;
@@ -127,34 +365,6 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     } catch (e) {
       debugPrint("Error fetching employees: $e");
     }
-  }
-
-  String _getMonthLabel(String mKey) {
-    String currentYearStr = sharedData.ccurrentYear;
-    List<String> parts = currentYearStr.split('-');
-    if (parts.length != 2) return mKey.toUpperCase().replaceAll('_P', '');
-
-    int startYear = int.parse(parts[0]);
-    int endYear = 2000 + int.parse(parts[1]);
-
-    String monthName = mKey.endsWith('_p') ? mKey.split('_')[0] : mKey;
-    bool isPrevFY = mKey.endsWith('_p');
-
-    int year;
-    if (isPrevFY) {
-      if (['jan', 'feb'].contains(monthName.toLowerCase())) {
-        year = startYear;
-      } else {
-        year = startYear - 1;
-      }
-    } else {
-      if (['jan', 'feb'].contains(monthName.toLowerCase())) {
-        year = endYear;
-      } else {
-        year = startYear;
-      }
-    }
-    return "${monthName.toUpperCase()} $year";
   }
 
   @override
@@ -199,12 +409,11 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
       return;
     }
 
-    List<String> activeTargetMonths = selectedTargetMonths.entries
-        .where((e) => e.value)
-        .map((e) => e.key)
+    List<MonthSelectionItem> activeTargetItems = allChronologicalMonths
+        .where((item) => selectedTargetMonths[item.uniqueKey] == true)
         .toList();
 
-    if (activeTargetMonths.isEmpty) {
+    if (activeTargetItems.isEmpty) {
       _showModernSnackbar('Please select at least one target month', Icons.calendar_today_rounded, const Color(0xFFF59E0B));
       return;
     }
@@ -229,45 +438,61 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     double newNpaPercent = double.tryParse(newNpaPercentController.text) ?? 0;
 
     try {
-      DatabaseEvent mainDataEvent = await _dbRef.child(sharedData.userPlace).child('maindata').once();
+      List<String> userPlaceParts = sharedData.userPlace.split('/');
+      String username = userPlaceParts.length > 1 ? userPlaceParts[1] : (sharedData.viewingAsUsername ?? '');
+
       Map<String, String> employeeNames = {};
-      if (mainDataEvent.snapshot.exists) {
-        dynamic rawMainData = mainDataEvent.snapshot.value;
-        if (rawMainData is Map) {
-          rawMainData.forEach((key, value) {
-            if (value is Map) {
-              employeeNames[key.toString()] = value['name']?.toString() ?? 'Unknown';
-            }
-          });
-        } else if (rawMainData is List) {
-          for (int i = 0; i < rawMainData.length; i++) {
-            if (rawMainData[i] is Map) {
-              employeeNames[i.toString()] = rawMainData[i]['name']?.toString() ?? 'Unknown';
+      Set<String> targetYears = activeTargetItems.map((it) => it.year).toSet();
+      if (sharedData.ccurrentYear.isNotEmpty) targetYears.add(sharedData.ccurrentYear);
+
+      for (String yr in targetYears) {
+        String mainPath = username.isNotEmpty ? '$yr/$username/maindata' : sharedData.userPlace;
+        try {
+          DatabaseEvent mainEvent = await _dbRef.child(mainPath).once();
+          if (mainEvent.snapshot.exists) {
+            dynamic rawData = mainEvent.snapshot.value;
+            if (rawData is Map) {
+              rawData.forEach((k, v) {
+                if (v is Map && v['name'] != null) {
+                  employeeNames[k.toString()] ??= v['name'].toString();
+                }
+              });
+            } else if (rawData is List) {
+              for (int i = 0; i < rawData.length; i++) {
+                if (rawData[i] is Map && rawData[i]['name'] != null) {
+                  employeeNames[i.toString()] ??= rawData[i]['name'].toString();
+                }
+              }
             }
           }
+        } catch (e) {
+          debugPrint("Error fetching maindata for $yr: $e");
         }
       }
 
       Map<String, Map<String, dynamic>> groupedResults = {};
 
-      final List<Future<DatabaseEvent>> futures = activeTargetMonths.map((m) {
-        String pathYear = sharedData.userPlace;
-        String monthName = m;
-        if (m.endsWith('_p')) {
-          String currentYearStr = sharedData.ccurrentYear;
-          List<String> parts = currentYearStr.split('-');
-          int startYear = int.parse(parts[0]);
-          String prevYearStr = "${startYear - 1}-${startYear.toString().substring(2)}";
-          pathYear = sharedData.userPlace.replaceFirst(sharedData.ccurrentYear, prevYearStr);
-          monthName = m.split('_')[0];
-        }
-        return _dbRef.child(pathYear).child('monthdata').child(monthName).once();
+      final List<Future<DatabaseEvent>> futures = activeTargetItems.map((item) {
+        String monthPath = username.isNotEmpty
+            ? '${item.year}/$username/monthdata/${item.monthKey}'
+            : '${sharedData.userPlace}/monthdata/${item.monthKey}';
+        return _dbRef.child(monthPath).once();
       }).toList();
 
       final List<DatabaseEvent> events = await Future.wait(futures);
 
-      for (int i = 0; i < activeTargetMonths.length; i++) {
-        final String targetMonth = activeTargetMonths[i];
+      Set<String> calculationDiscoveredKeys = {};
+      for (var monthEvent in events) {
+        if (monthEvent.snapshot.exists) {
+          _extractAllowanceKeys(monthEvent.snapshot.value, calculationDiscoveredKeys);
+        }
+      }
+      if (calculationDiscoveredKeys.isNotEmpty) {
+        _syncValueAllowances(calculationDiscoveredKeys);
+      }
+
+      for (int i = 0; i < activeTargetItems.length; i++) {
+        final MonthSelectionItem targetItem = activeTargetItems[i];
         final DatabaseEvent monthEvent = events[i];
 
         if (monthEvent.snapshot.exists) {
@@ -278,7 +503,8 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
             var entry = _calculateMonthEntry(
               bId,
               d,
-              targetMonth,
+              targetItem.displayLabel,
+              targetItem.uniqueKey,
               employeeNames,
               recalculateDa: recalculateDa,
               newDaPercent: newDaPercent,
@@ -339,9 +565,11 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
       finalResults.sort((a, b) => a['name'].compareTo(b['name']));
 
       for (var person in finalResults) {
-        (person['monthlyData'] as List).sort((a, b) =>
-            monthList.indexOf(a['monthKey']).compareTo(monthList.indexOf(b['monthKey']))
-        );
+        (person['monthlyData'] as List).sort((a, b) {
+          int indexA = allChronologicalMonths.indexWhere((m) => m.uniqueKey == a['monthKey']);
+          int indexB = allChronologicalMonths.indexWhere((m) => m.uniqueKey == b['monthKey']);
+          return indexA.compareTo(indexB);
+        });
       }
 
       if (mounted) {
@@ -362,7 +590,8 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   Map<String, dynamic> _calculateMonthEntry(
       String bioId,
       Map data,
-      String targetMonth,
+      String displayMonth,
+      String monthKey,
       Map<String, String> employeeNames, {
         bool recalculateDa = false,
         double newDaPercent = 0,
@@ -415,12 +644,10 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     double newHra = (recalculateHra && hra > 0) ? (newBp * (newHraPercent / 100)).roundToDouble() : hra;
     double hraDiff = newHra - hra;
 
-    String displayMonth = _getMonthLabel(targetMonth);
-
     Map<String, dynamic> entry = {
       'name': name,
       'month': displayMonth,
-      'monthKey': targetMonth,
+      'monthKey': monthKey,
       'bp': bp,
       'ta': ta,
       'oldDa': da,
@@ -450,6 +677,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
 
     return entry;
   }
+
 
   Future<void> _exportToExcel() async {
     if (calculationResults.isEmpty) {
@@ -1111,42 +1339,180 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
-                  title: const Text('Target Months', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
+                  title: const Text('Target Months Selection', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF334155))),
                   leading: const Icon(Icons.calendar_month_rounded, color: Color(0xFF64748B), size: 20),
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextButton(
-                            onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => true)),
-                            style: TextButton.styleFrom(foregroundColor: const Color(0xFF2563EB)),
-                            child: const Text('Select All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          const Text(
+                            "Select Month Range (From - To)",
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF64748B)),
                           ),
-                          TextButton(
-                            onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => false)),
-                            style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
-                            child: const Text('Clear All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("From", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
+                                    const SizedBox(height: 4),
+                                    DropdownButtonFormField<MonthSelectionItem>(
+                                      initialValue: fromMonthItem,
+                                      isExpanded: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                        filled: true,
+                                        fillColor: const Color(0xFFF8FAFC),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                      ),
+                                      items: allChronologicalMonths.map((item) {
+                                        return DropdownMenuItem<MonthSelectionItem>(
+                                          value: item,
+                                          child: Text(
+                                            "${item.displayLabel} (${item.year})",
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          setState(() {
+                                            fromMonthItem = val;
+                                            _updateSelectionFromRange();
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("To", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
+                                    const SizedBox(height: 4),
+                                    DropdownButtonFormField<MonthSelectionItem>(
+                                      initialValue: toMonthItem,
+                                      isExpanded: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                        filled: true,
+                                        fillColor: const Color(0xFFF8FAFC),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                                      ),
+                                      items: allChronologicalMonths.map((item) {
+                                        return DropdownMenuItem<MonthSelectionItem>(
+                                          value: item,
+                                          child: Text(
+                                            "${item.displayLabel} (${item.year})",
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          setState(() {
+                                            toMonthItem = val;
+                                            _updateSelectionFromRange();
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: monthList.map((m) {
-                          bool isSelected = selectedTargetMonths[m]!;
-                          String label = _getMonthLabel(m);
-                          return FilterChip(
-                            label: Text(label, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600, color: isSelected ? Colors.white : const Color(0xFF475569))),
-                            selected: isSelected,
-                            selectedColor: const Color(0xFF2563EB),
-                            backgroundColor: const Color(0xFFF1F5F9),
-                            checkmarkColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFE2E8F0))),
-                            onSelected: (selected) => setState(() => selectedTargetMonths[m] = selected),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => true)),
+                                style: TextButton.styleFrom(foregroundColor: const Color(0xFF2563EB)),
+                                child: const Text('Select All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                              ),
+                              TextButton(
+                                onPressed: () => setState(() => selectedTargetMonths.updateAll((k, v) => false)),
+                                style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+                                child: const Text('Clear All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
+                            child: Text(
+                              '${selectedTargetMonths.values.where((v) => v).length}/${allChronologicalMonths.length} Selected',
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: availableYears.map((yr) {
+                          final yearItems = allChronologicalMonths.where((m) => m.year == yr).toList();
+                          if (yearItems.isEmpty) return const SizedBox.shrink();
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6.0),
+                                  child: Text(
+                                    "FY $yr",
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E3A8A)),
+                                  ),
+                                ),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: yearItems.map((item) {
+                                    bool isSelected = selectedTargetMonths[item.uniqueKey] ?? false;
+                                    return FilterChip(
+                                      label: Text(
+                                        item.displayLabel,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                          color: isSelected ? Colors.white : const Color(0xFF475569),
+                                        ),
+                                      ),
+                                      selected: isSelected,
+                                      selectedColor: const Color(0xFF2563EB),
+                                      backgroundColor: const Color(0xFFF1F5F9),
+                                      checkmarkColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFE2E8F0)),
+                                      ),
+                                      onSelected: (selected) => setState(() => selectedTargetMonths[item.uniqueKey] = selected),
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
                           );
                         }).toList(),
                       ),
@@ -1356,22 +1722,24 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
               ),
             ),
             trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: amountColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: amountColor.withValues(alpha: 0.2)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('TOTAL DIFF', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: amountColor.withValues(alpha: 0.8))),
-                  const SizedBox(height: 2),
-                  Text('₹${person['totalArrear'].toStringAsFixed(0)}',
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: amountColor)),
-                ],
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('TOTAL DIFF', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: amountColor.withValues(alpha: 0.8))),
+                    Text('₹${person['totalArrear'].toStringAsFixed(0)}',
+                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: amountColor)),
+                  ],
+                ),
               ),
             ),
             children: [
