@@ -184,11 +184,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     valueAllowances = updatedList;
     for (var allow in valueAllowances) {
       String k = allow['key']!;
-      if (!newValControllers.containsKey(k) || newValControllers[k] == null) {
-        newValControllers[k] = TextEditingController(text: k == 'ot' ? '0' : '');
-      } else if (k == 'ot' && newValControllers[k]!.text.isEmpty) {
-        newValControllers[k]!.text = '0';
-      }
+      newValControllers[k] ??= TextEditingController();
       recalcFlags[k] ??= false;
     }
   }
