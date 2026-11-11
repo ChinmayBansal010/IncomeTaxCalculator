@@ -164,7 +164,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     driveController.text = monthData['drive']?.toString() ?? '';
     cycleController.text = monthData['cycle']?.toString() ?? '';
     pcaController.text = monthData['pca']?.toString() ?? '';
-    otController.text = monthData['ot']?.toString() ?? '';
+    otController.text = (monthData['ot'] == null || monthData['ot'].toString().isEmpty) ? '0' : monthData['ot'].toString();
     daext1Controller.text = monthData['daext1']?.toString() ?? '';
     daext2Controller.text = monthData['daext2']?.toString() ?? '';
     daext3Controller.text = monthData['daext3']?.toString() ?? '';

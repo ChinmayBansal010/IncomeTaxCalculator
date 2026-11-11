@@ -320,6 +320,7 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
           'drive': '0',
           'cycle': '0',
           'pca': '0',
+          'ot': '0',
           'daext1': '0',
           'daext2': '0',
           'daext3': '0',
