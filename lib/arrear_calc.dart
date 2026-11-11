@@ -56,12 +56,12 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   Map<String, bool> selectedTargetMonths = {};
 
   static const Set<String> _nonAllowanceKeys = {
-    // Metadata & control flags
+    // Metadata, employee identification & control flags
     'biometricid', 'biometricId', 'bioId', 'id', 'name', 'designation',
     'dap', 'hrap', 'tap', 'npap',
     'dachk', 'hrachk', 'tachk', 'npachk',
     'gpfchk', 'npschk', 'epfchk', 'esichk',
-    'manual_overrides', 'dort', 'mincrement',
+    'manual_overrides', 'dort', 'mincrement', 'places', 'place',
 
     // Base salary & Base Transport Allowance
     'bp', 'ta',
@@ -75,12 +75,14 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     // Deductions
     'incometax', 'gis', 'gpf', 'nps', 'epf', 'esi', 'slf', 'society',
     'recovery', 'wf', 'med', 'water', 'other', 'ddext1', 'ddext2', 'ddext3', 'ddext4',
+
+    // Excluded fields (Extra 1-4)
+    'daext1', 'daext2', 'daext3', 'daext4',
   };
 
   static const List<String> _defaultAllowanceKeys = [
     'splpay', 'conv', 'pg', 'annual', 'uniform', 'nursing', 'medical',
     'dirt', 'washing', 'tb', 'night', 'drive', 'cycle', 'pca', 'ot',
-    'daext1', 'daext2', 'daext3', 'daext4',
   ];
 
   List<Map<String, String>> valueAllowances = [];
@@ -119,10 +121,6 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
       'cycle': 'CYCLE',
       'pca': 'PCA',
       'ot': 'OT',
-      'daext1': 'EXTRA 1',
-      'daext2': 'EXTRA 2',
-      'daext3': 'EXTRA 3',
-      'daext4': 'EXTRA 4',
     };
 
     if (knownLabels.containsKey(key)) {
