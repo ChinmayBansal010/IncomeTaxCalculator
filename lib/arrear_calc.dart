@@ -157,9 +157,7 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
   }
 
   void _syncValueAllowances(Set<String> discoveredKeys) {
-    Set<String> allKeysToUse = discoveredKeys.isNotEmpty 
-        ? discoveredKeys 
-        : _defaultAllowanceKeys.toSet();
+    Set<String> allKeysToUse = {..._defaultAllowanceKeys, ...discoveredKeys};
 
     List<Map<String, String>> updatedList = [];
     
@@ -186,7 +184,11 @@ class _CalcArrearPageState extends State<CalcArrearPage> with SingleTickerProvid
     valueAllowances = updatedList;
     for (var allow in valueAllowances) {
       String k = allow['key']!;
-      newValControllers[k] ??= TextEditingController();
+      if (!newValControllers.containsKey(k) || newValControllers[k] == null) {
+        newValControllers[k] = TextEditingController(text: k == 'ot' ? '0' : '');
+      } else if (k == 'ot' && newValControllers[k]!.text.isEmpty) {
+        newValControllers[k]!.text = '0';
+      }
       recalcFlags[k] ??= false;
     }
   }
