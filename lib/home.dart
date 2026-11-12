@@ -189,6 +189,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _buildTopNavigation() {
+    bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -205,182 +207,293 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ],
       ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 16,
-        bottom: 16,
-        left: 20,
-        right: 20,
+        top: MediaQuery.of(context).padding.top + (isMobile ? 10 : 16),
+        bottom: isMobile ? 10 : 16,
+        left: isMobile ? 12 : 20,
+        right: isMobile ? 12 : 20,
       ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
+          child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 44,
-                      width: 44,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2563EB),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFF1D4ED8), width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
+                    Row(
+                      children: [
+                        Container(
+                          height: 38,
+                          width: 38,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFF1D4ED8), width: 1.5),
                           ),
-                        ],
-                      ),
-                      child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 22),
+                          child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Income Tax Portal',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF0F172A),
+                                  letterSpacing: -0.3,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 1),
+                              Text(
+                                'Select a module to manage entries',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF64748B),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Income Tax Portal',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF0F172A),
-                              letterSpacing: -0.5,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF6FF),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFBFDBFE), width: 1),
                           ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Select a module to manage your entries',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF64748B),
-                              fontWeight: FontWeight.w600,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.people_alt_rounded, size: 14, color: Color(0xFF2563EB)),
+                              const SizedBox(width: 4),
+                              Text(
+                                _isFetchingRecords
+                                    ? 'Loading...'
+                                    : 'Records: $_totalEmployeeRecords',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1E40AF),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.calendar_month_rounded, size: 14, color: Color(0xFF475569)),
+                              const SizedBox(width: 4),
+                              Text(
+                                'FY: ${sharedData.ccurrentYear}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF334155),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 44,
+                            width: 44,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2563EB),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFF1D4ED8), width: 2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
-                            overflow: TextOverflow.ellipsis,
+                            child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 22),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'Income Tax Portal',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF0F172A),
+                                    letterSpacing: -0.5,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Select a module to manage your entries',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF64748B),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(width: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF6FF),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFBFDBFE), width: 1.5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.people_alt_rounded, size: 16, color: Color(0xFF2563EB)),
+                              const SizedBox(width: 6),
+                              Text(
+                                _isFetchingRecords
+                                    ? 'Loading...'
+                                    : 'Total Records: $_totalEmployeeRecords',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1E40AF),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.calendar_month_rounded, size: 16, color: Color(0xFF475569)),
+                              const SizedBox(width: 6),
+                              Text(
+                                'FY: ${sharedData.ccurrentYear}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF334155),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFBFDBFE), width: 1.5),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.people_alt_rounded, size: 16, color: Color(0xFF2563EB)),
-                        const SizedBox(width: 6),
-                        Text(
-                          _isFetchingRecords
-                              ? 'Loading...'
-                              : 'Total Records: $_totalEmployeeRecords',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1E40AF),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.calendar_month_rounded, size: 16, color: Color(0xFF475569)),
-                        const SizedBox(width: 6),
-                        Text(
-                          'FY: ${sharedData.ccurrentYear}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF334155),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 
   Widget _buildGrid() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
-      child: GridView.builder(
-        physics: const BouncingScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 360,
-          mainAxisExtent: 96,
-          crossAxisSpacing: 24,
-          mainAxisSpacing: 24,
-        ),
-        itemCount: _menuItems.length,
-        itemBuilder: (context, index) {
-          final item = _menuItems[index];
-          final delay = (index * 0.04).clamp(0.0, 1.0);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isMobile = constraints.maxWidth < 600;
 
-          final slideAnimation = Tween<Offset>(
-            begin: const Offset(0, 0.3),
-            end: Offset.zero,
-          ).animate(
-            CurvedAnimation(
-              parent: _animationController,
-              curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
+        return Padding(
+          padding: isMobile
+              ? const EdgeInsets.fromLTRB(12, 12, 12, 20)
+              : const EdgeInsets.fromLTRB(24, 32, 24, 40),
+          child: GridView.builder(
+            physics: const BouncingScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: isMobile ? 600 : 360,
+              mainAxisExtent: isMobile ? 68 : 96,
+              crossAxisSpacing: isMobile ? 8 : 24,
+              mainAxisSpacing: isMobile ? 8 : 24,
             ),
-          );
+            itemCount: _menuItems.length,
+            itemBuilder: (context, index) {
+              final item = _menuItems[index];
+              final delay = (index * 0.04).clamp(0.0, 1.0);
 
-          final fadeAnimation = Tween<double>(
-            begin: 0.0,
-            end: 1.0,
-          ).animate(
-            CurvedAnimation(
-              parent: _animationController,
-              curve: Interval(delay, 1.0, curve: Curves.easeOut),
-            ),
-          );
+              final slideAnimation = Tween<Offset>(
+                begin: const Offset(0, 0.3),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(
+                  parent: _animationController,
+                  curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
+                ),
+              );
 
-          return SlideTransition(
-            position: slideAnimation,
-            child: FadeTransition(
-              opacity: fadeAnimation,
-              child: DashboardActionTile(
-                label: item["label"],
-                subtitle: item["subtitle"],
-                icon: item["icon"],
-                color: item["color"],
-                onPressed: () => _handleMenuAction(item["label"], context),
-              ),
-            ),
-          );
-        },
-      ),
+              final fadeAnimation = Tween<double>(
+                begin: 0.0,
+                end: 1.0,
+              ).animate(
+                CurvedAnimation(
+                  parent: _animationController,
+                  curve: Interval(delay, 1.0, curve: Curves.easeOut),
+                ),
+              );
+
+              return SlideTransition(
+                position: slideAnimation,
+                child: FadeTransition(
+                  opacity: fadeAnimation,
+                  child: DashboardActionTile(
+                    label: item["label"],
+                    subtitle: item["subtitle"],
+                    icon: item["icon"],
+                    color: item["color"],
+                    onPressed: () => _handleMenuAction(item["label"], context),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -764,6 +877,8 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return MouseRegion(
       onEnter: (_) => _onHoverChanged(true),
       onExit: (_) => _onHoverChanged(false),
@@ -784,7 +899,7 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
                 duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                   border: Border.all(
                     color: _isHovered ? widget.color : const Color(0xFFCBD5E1),
                     width: _isHovered ? 2.5 : 1.5,
@@ -800,15 +915,18 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 10 : 16,
+                    vertical: isMobile ? 8 : 12,
+                  ),
                   child: Row(
                     children: [
                       Container(
-                        height: 52,
-                        width: 52,
+                        height: isMobile ? 40 : 52,
+                        width: isMobile ? 40 : 52,
                         decoration: BoxDecoration(
                           color: widget.color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                           border: Border.all(
                             color: widget.color.withValues(alpha: 0.2),
                             width: 1.5,
@@ -816,11 +934,11 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
                         ),
                         child: Icon(
                           widget.icon,
-                          size: 26,
+                          size: isMobile ? 22 : 26,
                           color: widget.color,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: isMobile ? 10 : 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -828,20 +946,20 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
                           children: [
                             Text(
                               widget.label,
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: isMobile ? 14 : 16,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF0F172A),
+                                color: const Color(0xFF0F172A),
                                 letterSpacing: 0.2,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: isMobile ? 1 : 2),
                             Text(
                               widget.subtitle,
-                              style: const TextStyle(
-                                fontSize: 13,
+                              style: TextStyle(
+                                fontSize: isMobile ? 11 : 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF64748B),
+                                color: const Color(0xFF64748B),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -849,13 +967,13 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: isMobile ? 6 : 8),
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(6),
+                        padding: EdgeInsets.all(isMobile ? 4 : 6),
                         decoration: BoxDecoration(
                           color: _isHovered ? widget.color : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                           border: Border.all(
                             color: _isHovered ? widget.color : const Color(0xFFE2E8F0),
                             width: 1.5,
