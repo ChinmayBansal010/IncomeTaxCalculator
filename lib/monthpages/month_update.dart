@@ -380,157 +380,164 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
 
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
-            border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF64748B).withValues(alpha: 0.06),
-                blurRadius: isMobile ? 10 : 20,
-                offset: Offset(0, isMobile ? 4 : 6),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 12 : 24,
-                  vertical: isMobile ? 10 : 20,
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
+          clipBehavior: Clip.antiAlias,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(isMobile ? 16 : 24),
+              border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF64748B).withValues(alpha: 0.06),
+                  blurRadius: isMobile ? 10 : 20,
+                  offset: Offset(0, isMobile ? 4 : 6),
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(isMobile ? 14 : 22),
-                    topRight: Radius.circular(isMobile ? 14 : 22),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 12 : 24,
+                    vertical: isMobile ? 10 : 20,
                   ),
-                  border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(isMobile ? 6 : 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                        border: Border.all(color: const Color(0xFFDBEAFE), width: 1.5),
-                      ),
-                      child: Icon(icon, color: const Color(0xFF2563EB), size: isMobile ? 18 : 22),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(isMobile ? 14 : 22),
+                      topRight: Radius.circular(isMobile ? 14 : 22),
                     ),
-                    SizedBox(width: isMobile ? 10 : 16),
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: isMobile ? 15 : 18,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF0F172A),
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (children.isNotEmpty)
-                Padding(
-                  padding: EdgeInsets.all(isMobile ? 10 : 24),
-                  child: isGrid
-                      ? LayoutBuilder(
-                          builder: (context, innerConstraints) {
-                            int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
-                            double spacing = isMobile ? 8.0 : 20.0;
-                            double runSpacing = isMobile ? 10.0 : 24.0;
-                            double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
-
-                            return Wrap(
-                              spacing: spacing,
-                              runSpacing: runSpacing,
-                              children: children.map<Widget>((child) => SizedBox(width: itemWidth, child: child)).toList(),
-                            );
-                          },
-                        )
-                      : Wrap(
-                          spacing: isMobile ? 8.0 : 16.0,
-                          runSpacing: isMobile ? 8.0 : 16.0,
-                          children: children,
-                        ),
-                ),
-              if (expandableChildren != null && expandableChildren.isNotEmpty) ...[
-                if (children.isNotEmpty)
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    tilePadding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 12 : 24,
-                      vertical: isMobile ? 2 : 6,
-                    ),
-                    childrenPadding: EdgeInsets.fromLTRB(
-                      isMobile ? 10 : 24,
-                      0,
-                      isMobile ? 10 : 24,
-                      isMobile ? 12 : 24,
-                    ),
-                    title: Row(
-                      children: [
-                        Text(
-                          expandableTitle ?? "Other Fields",
-                          style: TextStyle(
-                            fontSize: isMobile ? 13 : 15,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF475569),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFFCBD5E1)),
-                          ),
-                          child: Text(
-                            '${expandableChildren.length}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+                  ),
+                  child: Row(
                     children: [
-                      isGrid
-                          ? LayoutBuilder(
-                              builder: (context, innerConstraints) {
-                                int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
-                                double spacing = isMobile ? 8.0 : 20.0;
-                                double runSpacing = isMobile ? 10.0 : 24.0;
-                                double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
-
-                                return Wrap(
-                                  spacing: spacing,
-                                  runSpacing: runSpacing,
-                                  children: expandableChildren.map<Widget>((child) => SizedBox(width: itemWidth, child: child)).toList(),
-                                );
-                              },
-                            )
-                          : Wrap(
-                              spacing: isMobile ? 8.0 : 16.0,
-                              runSpacing: isMobile ? 8.0 : 16.0,
-                              children: expandableChildren,
-                            ),
+                      Container(
+                        padding: EdgeInsets.all(isMobile ? 6 : 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                          border: Border.all(color: const Color(0xFFDBEAFE), width: 1.5),
+                        ),
+                        child: Icon(icon, color: const Color(0xFF2563EB), size: isMobile ? 18 : 22),
+                      ),
+                      SizedBox(width: isMobile ? 10 : 16),
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: isMobile ? 15 : 18,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF0F172A),
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
+                if (children.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.all(isMobile ? 10 : 24),
+                    child: isGrid
+                        ? LayoutBuilder(
+                            builder: (context, innerConstraints) {
+                              int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
+                              double spacing = isMobile ? 8.0 : 20.0;
+                              double runSpacing = isMobile ? 10.0 : 24.0;
+                              double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+
+                              return Wrap(
+                                spacing: spacing,
+                                runSpacing: runSpacing,
+                                children: children.map<Widget>((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                              );
+                            },
+                          )
+                        : Wrap(
+                            spacing: isMobile ? 8.0 : 16.0,
+                            runSpacing: isMobile ? 8.0 : 16.0,
+                            children: children,
+                          ),
+                  ),
+                if (expandableChildren != null && expandableChildren.isNotEmpty) ...[
+                  if (children.isNotEmpty)
+                    const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                  Material(
+                    color: Colors.transparent,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        tilePadding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 12 : 24,
+                          vertical: isMobile ? 2 : 6,
+                        ),
+                        childrenPadding: EdgeInsets.fromLTRB(
+                          isMobile ? 10 : 24,
+                          0,
+                          isMobile ? 10 : 24,
+                          isMobile ? 12 : 24,
+                        ),
+                        title: Row(
+                          children: [
+                            Text(
+                              expandableTitle ?? "Other Fields",
+                              style: TextStyle(
+                                fontSize: isMobile ? 13 : 15,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF475569),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: const Color(0xFFCBD5E1)),
+                              ),
+                              child: Text(
+                                '${expandableChildren.length}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        children: [
+                          isGrid
+                              ? LayoutBuilder(
+                                  builder: (context, innerConstraints) {
+                                    int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
+                                    double spacing = isMobile ? 8.0 : 20.0;
+                                    double runSpacing = isMobile ? 10.0 : 24.0;
+                                    double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+
+                                    return Wrap(
+                                      spacing: spacing,
+                                      runSpacing: runSpacing,
+                                      children: expandableChildren.map<Widget>((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                                    );
+                                  },
+                                )
+                              : Wrap(
+                                  spacing: isMobile ? 8.0 : 16.0,
+                                  runSpacing: isMobile ? 8.0 : 16.0,
+                                  children: expandableChildren,
+                                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         );
       },
