@@ -868,10 +868,6 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                 _FormFieldSpec(controller: cycleController, widget: AnimatedInputField(label: "CYCLE", controller: cycleController, icon: Icons.pedal_bike_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('cycle', val))),
                                 _FormFieldSpec(controller: pcaController, widget: AnimatedInputField(label: "PCA", controller: pcaController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pca', val))),
                                 _FormFieldSpec(controller: otController, widget: AnimatedInputField(label: "OT", controller: otController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ot', val))),
-                                _FormFieldSpec(controller: daext1Controller, widget: AnimatedInputField(label: "EXTRA 1", controller: daext1Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext1', val))),
-                                _FormFieldSpec(controller: daext2Controller, widget: AnimatedInputField(label: "EXTRA 2", controller: daext2Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext2', val))),
-                                _FormFieldSpec(controller: daext3Controller, widget: AnimatedInputField(label: "EXTRA 3", controller: daext3Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext3', val))),
-                                _FormFieldSpec(controller: daext4Controller, widget: AnimatedInputField(label: "EXTRA 4", controller: daext4Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext4', val))),
                               ];
 
                               final List<Widget> activeAllowanceWidgets = [];
@@ -1011,10 +1007,6 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                     onFieldChanged: (val) => _onAutoCalculatedFieldChanged('esi', val),
                                   ),
                                 ),
-                                _FormFieldSpec(controller: ddext1Controller, widget: AnimatedInputField(label: "EXTRA DED 1", controller: ddext1Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext1', val))),
-                                _FormFieldSpec(controller: ddext2Controller, widget: AnimatedInputField(label: "EXTRA DED 2", controller: ddext2Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext2', val))),
-                                _FormFieldSpec(controller: ddext3Controller, widget: AnimatedInputField(label: "EXTRA DED 3", controller: ddext3Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext3', val))),
-                                _FormFieldSpec(controller: ddext4Controller, widget: AnimatedInputField(label: "EXTRA DED 4", controller: ddext4Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext4', val))),
                               ];
 
                               final List<Widget> activeDeductionWidgets = [];
@@ -1034,7 +1026,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   "Details of Deduction",
                                   Icons.money_off_rounded,
                                   activeDeductionWidgets,
-                                  expandableTitle: "Other Fields",
+                                  expandableTitle: "Other Deductions",
                                   expandableChildren: zeroDeductionWidgets,
                                 ),
                               );
