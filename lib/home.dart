@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
         {
           "key": "ARREAR_DEDUCTION",
-          "label": _selectedArrearDeductionOption == 'ARREAR' ? "ARREAR" : "DEDUCTION",
+          "label": "ARREAR AND DEDUCTION",
           "subtitle": _selectedArrearDeductionOption == 'ARREAR' ? "Pending clearings" : "Tax deductions",
           "icon": _selectedArrearDeductionOption == 'ARREAR'
               ? Icons.account_balance_wallet_rounded
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
         {
           "key": "TDS_COMBINED",
-          "label": _selectedTdsOption == 'TDS - 0' ? "TDS - 0" : "TDS",
+          "label": "TDS AND TDS-0",
           "subtitle": _selectedTdsOption == 'TDS - 0' ? "Zero rate standard" : "Standard deduction",
           "icon": _selectedTdsOption == 'TDS - 0'
               ? Icons.receipt_rounded
