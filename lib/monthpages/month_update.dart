@@ -19,6 +19,12 @@ class MonthDataPage extends StatefulWidget {
   State<MonthDataPage> createState() => _MonthDataPageState();
 }
 
+class _FormFieldSpec {
+  final TextEditingController controller;
+  final Widget widget;
+  _FormFieldSpec({required this.controller, required this.widget});
+}
+
 class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProviderStateMixin {
   final TextEditingController biometricidController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -354,7 +360,22 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildSectionCard(String title, IconData icon, List<Widget> children, {bool isGrid = true, int? forceCrossAxisCount}) {
+  bool _isFieldZero(TextEditingController controller) {
+    final text = controller.text.trim();
+    if (text.isEmpty) return true;
+    final val = double.tryParse(text);
+    return val == null || val == 0;
+  }
+
+  Widget _buildSectionCard(
+    String title,
+    IconData icon,
+    List<Widget> children, {
+    bool isGrid = true,
+    int? forceCrossAxisCount,
+    String? expandableTitle,
+    List<Widget>? expandableChildren,
+  }) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
@@ -415,29 +436,100 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                   ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(isMobile ? 10 : 24),
-                child: isGrid
-                    ? LayoutBuilder(
-                  builder: (context, innerConstraints) {
-                    int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
-                    double spacing = isMobile ? 8.0 : 20.0;
-                    double runSpacing = isMobile ? 10.0 : 24.0;
-                    double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+              if (children.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.all(isMobile ? 10 : 24),
+                  child: isGrid
+                      ? LayoutBuilder(
+                          builder: (context, innerConstraints) {
+                            int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
+                            double spacing = isMobile ? 8.0 : 20.0;
+                            double runSpacing = isMobile ? 10.0 : 24.0;
+                            double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
 
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: runSpacing,
-                      children: children.map((child) => SizedBox(width: itemWidth, child: child)).toList(),
-                    );
-                  },
-                )
-                    : Wrap(
-                  spacing: isMobile ? 8.0 : 16.0,
-                  runSpacing: isMobile ? 8.0 : 16.0,
-                  children: children,
+                            return Wrap(
+                              spacing: spacing,
+                              runSpacing: runSpacing,
+                              children: children.map<Widget>((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                            );
+                          },
+                        )
+                      : Wrap(
+                          spacing: isMobile ? 8.0 : 16.0,
+                          runSpacing: isMobile ? 8.0 : 16.0,
+                          children: children,
+                        ),
                 ),
-              ),
+              if (expandableChildren != null && expandableChildren.isNotEmpty) ...[
+                if (children.isNotEmpty)
+                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    tilePadding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 12 : 24,
+                      vertical: isMobile ? 2 : 6,
+                    ),
+                    childrenPadding: EdgeInsets.fromLTRB(
+                      isMobile ? 10 : 24,
+                      0,
+                      isMobile ? 10 : 24,
+                      isMobile ? 12 : 24,
+                    ),
+                    title: Row(
+                      children: [
+                        Text(
+                          expandableTitle ?? "Other Fields",
+                          style: TextStyle(
+                            fontSize: isMobile ? 13 : 15,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF475569),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFCBD5E1)),
+                          ),
+                          child: Text(
+                            '${expandableChildren.length}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    children: [
+                      isGrid
+                          ? LayoutBuilder(
+                              builder: (context, innerConstraints) {
+                                int crossAxisCount = forceCrossAxisCount ?? (innerConstraints.maxWidth > 800 ? 3 : 2);
+                                double spacing = isMobile ? 8.0 : 20.0;
+                                double runSpacing = isMobile ? 10.0 : 24.0;
+                                double itemWidth = (innerConstraints.maxWidth - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+
+                                return Wrap(
+                                  spacing: spacing,
+                                  runSpacing: runSpacing,
+                                  children: expandableChildren.map<Widget>((child) => SizedBox(width: itemWidth, child: child)).toList(),
+                                );
+                              },
+                            )
+                          : Wrap(
+                              spacing: isMobile ? 8.0 : 16.0,
+                              runSpacing: isMobile ? 8.0 : 16.0,
+                              children: expandableChildren,
+                            ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         );
@@ -745,35 +837,58 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                             ),
                           ),
                           const SizedBox(height: 24),
-                          _buildAnimatedSection(
-                            2,
-                            _buildSectionCard(
-                              "Details of Allowance",
-                              Icons.account_balance_wallet_rounded,
-                              [
-                                AnimatedInputField(label: "BP", controller: bpController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('bp', val); isBpChanged = true; }),
-                                AnimatedInputField(label: "DA", controller: daController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('da', val)),
-                                AnimatedInputField(label: "HRA", controller: hraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('hra', val)),
-                                AnimatedInputField(label: "NPA", controller: npaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('npa', val)),
-                                AnimatedInputField(label: "SPECIAL PAY", controller: splpayController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('splpay', val)),
-                                AnimatedInputField(label: "CONVEYANCE", controller: convController, icon: Icons.directions_car_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('conv', val)),
-                                AnimatedInputField(label: "PG", controller: pgController, icon: Icons.school_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pg', val)),
-                                AnimatedInputField(label: "ANNUAL", controller: annualController, icon: Icons.event_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('annual', val)),
-                                AnimatedInputField(label: "UNIFORM", controller: uniformController, icon: Icons.checkroom_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('uniform', val)),
-                                AnimatedInputField(label: "NURSING", controller: nursingController, icon: Icons.local_hospital_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('nursing', val)),
-                                AnimatedInputField(label: "TA", controller: taController, icon: Icons.flight_takeoff_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('ta', val); isTaChanged = true; }),
-                                AnimatedInputField(label: "DA ON TA", controller: daontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('daonta', val)),
-                                AnimatedInputField(label: "MEDICAL", controller: medicalController, icon: Icons.medical_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('medical', val)),
-                                AnimatedInputField(label: "DIRT", controller: dirtController, icon: Icons.cleaning_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('dirt', val)),
-                                AnimatedInputField(label: "WASHING", controller: washingController, icon: Icons.local_laundry_service_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('washing', val)),
-                                AnimatedInputField(label: "TB", controller: tbController, icon: Icons.sick_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('tb', val)),
-                                AnimatedInputField(label: "NIGHT", controller: nightController, icon: Icons.nights_stay_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('night', val)),
-                                AnimatedInputField(label: "CONTINGENCY", controller: driveController, icon: Icons.warning_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('drive', val)),
-                                AnimatedInputField(label: "CYCLE", controller: cycleController, icon: Icons.pedal_bike_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('cycle', val)),
-                                AnimatedInputField(label: "PCA", controller: pcaController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pca', val)),
-                                AnimatedInputField(label: "OT", controller: otController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ot', val)),
-                              ],
-                            ),
+                          Builder(
+                            builder: (context) {
+                              final allowanceSpecs = [
+                                _FormFieldSpec(controller: bpController, widget: AnimatedInputField(label: "BP", controller: bpController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('bp', val); isBpChanged = true; })),
+                                _FormFieldSpec(controller: daController, widget: AnimatedInputField(label: "DA", controller: daController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('da', val))),
+                                _FormFieldSpec(controller: hraController, widget: AnimatedInputField(label: "HRA", controller: hraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('hra', val))),
+                                _FormFieldSpec(controller: npaController, widget: AnimatedInputField(label: "NPA", controller: npaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('npa', val))),
+                                _FormFieldSpec(controller: splpayController, widget: AnimatedInputField(label: "SPECIAL PAY", controller: splpayController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('splpay', val))),
+                                _FormFieldSpec(controller: convController, widget: AnimatedInputField(label: "CONVEYANCE", controller: convController, icon: Icons.directions_car_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('conv', val))),
+                                _FormFieldSpec(controller: pgController, widget: AnimatedInputField(label: "PG", controller: pgController, icon: Icons.school_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pg', val))),
+                                _FormFieldSpec(controller: annualController, widget: AnimatedInputField(label: "ANNUAL", controller: annualController, icon: Icons.event_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('annual', val))),
+                                _FormFieldSpec(controller: uniformController, widget: AnimatedInputField(label: "UNIFORM", controller: uniformController, icon: Icons.checkroom_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('uniform', val))),
+                                _FormFieldSpec(controller: nursingController, widget: AnimatedInputField(label: "NURSING", controller: nursingController, icon: Icons.local_hospital_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('nursing', val))),
+                                _FormFieldSpec(controller: taController, widget: AnimatedInputField(label: "TA", controller: taController, icon: Icons.flight_takeoff_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('ta', val); isTaChanged = true; })),
+                                _FormFieldSpec(controller: daontaController, widget: AnimatedInputField(label: "DA ON TA", controller: daontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('daonta', val))),
+                                _FormFieldSpec(controller: medicalController, widget: AnimatedInputField(label: "MEDICAL", controller: medicalController, icon: Icons.medical_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('medical', val))),
+                                _FormFieldSpec(controller: dirtController, widget: AnimatedInputField(label: "DIRT", controller: dirtController, icon: Icons.cleaning_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('dirt', val))),
+                                _FormFieldSpec(controller: washingController, widget: AnimatedInputField(label: "WASHING", controller: washingController, icon: Icons.local_laundry_service_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('washing', val))),
+                                _FormFieldSpec(controller: tbController, widget: AnimatedInputField(label: "TB", controller: tbController, icon: Icons.sick_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('tb', val))),
+                                _FormFieldSpec(controller: nightController, widget: AnimatedInputField(label: "NIGHT", controller: nightController, icon: Icons.nights_stay_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('night', val))),
+                                _FormFieldSpec(controller: driveController, widget: AnimatedInputField(label: "CONTINGENCY", controller: driveController, icon: Icons.warning_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('drive', val))),
+                                _FormFieldSpec(controller: cycleController, widget: AnimatedInputField(label: "CYCLE", controller: cycleController, icon: Icons.pedal_bike_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('cycle', val))),
+                                _FormFieldSpec(controller: pcaController, widget: AnimatedInputField(label: "PCA", controller: pcaController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pca', val))),
+                                _FormFieldSpec(controller: otController, widget: AnimatedInputField(label: "OT", controller: otController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ot', val))),
+                                _FormFieldSpec(controller: daext1Controller, widget: AnimatedInputField(label: "EXTRA 1", controller: daext1Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext1', val))),
+                                _FormFieldSpec(controller: daext2Controller, widget: AnimatedInputField(label: "EXTRA 2", controller: daext2Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext2', val))),
+                                _FormFieldSpec(controller: daext3Controller, widget: AnimatedInputField(label: "EXTRA 3", controller: daext3Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext3', val))),
+                                _FormFieldSpec(controller: daext4Controller, widget: AnimatedInputField(label: "EXTRA 4", controller: daext4Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('daext4', val))),
+                              ];
+
+                              final List<Widget> activeAllowanceWidgets = [];
+                              final List<Widget> zeroAllowanceWidgets = [];
+
+                              for (var spec in allowanceSpecs) {
+                                if (_isFieldZero(spec.controller)) {
+                                  zeroAllowanceWidgets.add(spec.widget);
+                                } else {
+                                  activeAllowanceWidgets.add(spec.widget);
+                                }
+                              }
+
+                              return _buildAnimatedSection(
+                                2,
+                                _buildSectionCard(
+                                  "Details of Allowance",
+                                  Icons.account_balance_wallet_rounded,
+                                  activeAllowanceWidgets,
+                                  expandableTitle: "Other Allowances",
+                                  expandableChildren: zeroAllowanceWidgets,
+                                ),
+                              );
+                            },
                           ),
                           const SizedBox(height: 24),
                           _buildAnimatedSection(
@@ -793,95 +908,130 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                             ),
                           ),
                           const SizedBox(height: 24),
-                          _buildAnimatedSection(
-                            4,
-                            _buildSectionCard(
-                              "Details of Deduction",
-                              Icons.money_off_rounded,
-                              [
-                                AnimatedInputField(label: "INCOME TAX", controller: incometaxController, icon: Icons.request_quote_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('incometax', val)),
-                                AnimatedInputField(label: "GIS", controller: gisController, icon: Icons.security_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('gis', val)),
-                                AnimatedInputField(label: "SLF", controller: slfController, icon: Icons.savings_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('slf', val)),
-                                AnimatedInputField(label: "SOCIETY", controller: societyController, icon: Icons.groups_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('society', val)),
-                                AnimatedInputField(label: "RECOVERY", controller: recoveryController, icon: Icons.restore_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('recovery', val)),
-                                AnimatedInputField(label: "WIDOW WELFARE FUND", controller: wfController, icon: Icons.volunteer_activism_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('wf', val)),
-                                AnimatedInputField(label: "MCD-EHS", controller: medController, icon: Icons.health_and_safety_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('med', val)),
-                                AnimatedInputField(label: "WATER CHARGES", controller: waterController, icon: Icons.water_drop_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('water', val)),
-                                AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('other', val)),
-                                _buildCheckboxInputField(
-                                  label: "GPF",
+                          Builder(
+                            builder: (context) {
+                              final deductionSpecs = [
+                                _FormFieldSpec(controller: incometaxController, widget: AnimatedInputField(label: "INCOME TAX", controller: incometaxController, icon: Icons.request_quote_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('incometax', val))),
+                                _FormFieldSpec(controller: gisController, widget: AnimatedInputField(label: "GIS", controller: gisController, icon: Icons.security_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('gis', val))),
+                                _FormFieldSpec(controller: slfController, widget: AnimatedInputField(label: "SLF", controller: slfController, icon: Icons.savings_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('slf', val))),
+                                _FormFieldSpec(controller: societyController, widget: AnimatedInputField(label: "SOCIETY", controller: societyController, icon: Icons.groups_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('society', val))),
+                                _FormFieldSpec(controller: recoveryController, widget: AnimatedInputField(label: "RECOVERY", controller: recoveryController, icon: Icons.restore_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('recovery', val))),
+                                _FormFieldSpec(controller: wfController, widget: AnimatedInputField(label: "WIDOW WELFARE FUND", controller: wfController, icon: Icons.volunteer_activism_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('wf', val))),
+                                _FormFieldSpec(controller: medController, widget: AnimatedInputField(label: "MCD-EHS", controller: medController, icon: Icons.health_and_safety_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('med', val))),
+                                _FormFieldSpec(controller: waterController, widget: AnimatedInputField(label: "WATER CHARGES", controller: waterController, icon: Icons.water_drop_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('water', val))),
+                                _FormFieldSpec(controller: otherController, widget: AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('other', val))),
+                                _FormFieldSpec(
                                   controller: gpfController,
-                                  icon: Icons.savings_rounded,
-                                  isChecked: gpfchk,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      gpfchk = val!;
-                                      isGpfChecked = val;
-                                      gpfController.text = val ? monthData['gpf'] ?? '0' : '0';
-                                      monthData['gpfchk'] = val ? '1' : '0';
-                                    });
-                                  },
-                                  onFieldChanged: (val) => _onFieldChanged('gpf', val),
+                                  widget: _buildCheckboxInputField(
+                                    label: "GPF",
+                                    controller: gpfController,
+                                    icon: Icons.savings_rounded,
+                                    isChecked: gpfchk,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        gpfchk = val!;
+                                        isGpfChecked = val;
+                                        gpfController.text = val ? monthData['gpf'] ?? '0' : '0';
+                                        monthData['gpfchk'] = val ? '1' : '0';
+                                      });
+                                    },
+                                    onFieldChanged: (val) => _onFieldChanged('gpf', val),
+                                  ),
                                 ),
-                                _buildCheckboxInputField(
-                                  label: "NPS",
+                                _FormFieldSpec(
                                   controller: npsController,
-                                  icon: Icons.account_balance_rounded,
-                                  isChecked: npschk,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      npschk = val!;
-                                      isNpsChecked = val;
-                                      npsController.text = val ? monthData['nps'] ?? '0' : '0';
-                                      monthData['npschk'] = val ? '1' : '0';
-                                      if (!val) {
-                                        manualOverrides.remove('nps');
-                                        dirtyManualFields.remove('nps');
-                                      }
-                                    });
-                                  },
-                                  onFieldChanged: (val) => _onAutoCalculatedFieldChanged('nps', val),
+                                  widget: _buildCheckboxInputField(
+                                    label: "NPS",
+                                    controller: npsController,
+                                    icon: Icons.account_balance_rounded,
+                                    isChecked: npschk,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        npschk = val!;
+                                        isNpsChecked = val;
+                                        npsController.text = val ? monthData['nps'] ?? '0' : '0';
+                                        monthData['npschk'] = val ? '1' : '0';
+                                        if (!val) {
+                                          manualOverrides.remove('nps');
+                                          dirtyManualFields.remove('nps');
+                                        }
+                                      });
+                                    },
+                                    onFieldChanged: (val) => _onAutoCalculatedFieldChanged('nps', val),
+                                  ),
                                 ),
-                                _buildCheckboxInputField(
-                                  label: "EPF",
+                                _FormFieldSpec(
                                   controller: epfController,
-                                  icon: Icons.account_balance_wallet_rounded,
-                                  isChecked: epfchk,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      epfchk = val!;
-                                      isEpfChecked = val;
-                                      epfController.text = val ? monthData['epf'] ?? '0' : '0';
-                                      monthData['epfchk'] = val ? '1' : '0';
-                                      if (!val) {
-                                        manualOverrides.remove('epf');
-                                        dirtyManualFields.remove('epf');
-                                      }
-                                    });
-                                  },
-                                  onFieldChanged: (val) => _onAutoCalculatedFieldChanged('epf', val),
+                                  widget: _buildCheckboxInputField(
+                                    label: "EPF",
+                                    controller: epfController,
+                                    icon: Icons.account_balance_wallet_rounded,
+                                    isChecked: epfchk,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        epfchk = val!;
+                                        isEpfChecked = val;
+                                        epfController.text = val ? monthData['epf'] ?? '0' : '0';
+                                        monthData['epfchk'] = val ? '1' : '0';
+                                        if (!val) {
+                                          manualOverrides.remove('epf');
+                                          dirtyManualFields.remove('epf');
+                                        }
+                                      });
+                                    },
+                                    onFieldChanged: (val) => _onAutoCalculatedFieldChanged('epf', val),
+                                  ),
                                 ),
-                                _buildCheckboxInputField(
-                                  label: "ESI",
+                                _FormFieldSpec(
                                   controller: esiController,
-                                  icon: Icons.medical_information_rounded,
-                                  isChecked: esichk,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      esichk = val!;
-                                      isEsiChecked = val;
-                                      esiController.text = val ? monthData['esi'] ?? '0' : '0';
-                                      monthData['esichk'] = val ? '1' : '0';
-                                      if (!val) {
-                                        manualOverrides.remove('esi');
-                                        dirtyManualFields.remove('esi');
-                                      }
-                                    });
-                                  },
-                                  onFieldChanged: (val) => _onAutoCalculatedFieldChanged('esi', val),
+                                  widget: _buildCheckboxInputField(
+                                    label: "ESI",
+                                    controller: esiController,
+                                    icon: Icons.medical_information_rounded,
+                                    isChecked: esichk,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        esichk = val!;
+                                        isEsiChecked = val;
+                                        esiController.text = val ? monthData['esi'] ?? '0' : '0';
+                                        monthData['esichk'] = val ? '1' : '0';
+                                        if (!val) {
+                                          manualOverrides.remove('esi');
+                                          dirtyManualFields.remove('esi');
+                                        }
+                                      });
+                                    },
+                                    onFieldChanged: (val) => _onAutoCalculatedFieldChanged('esi', val),
+                                  ),
                                 ),
-                              ],
-                            ),
+                                _FormFieldSpec(controller: ddext1Controller, widget: AnimatedInputField(label: "EXTRA DED 1", controller: ddext1Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext1', val))),
+                                _FormFieldSpec(controller: ddext2Controller, widget: AnimatedInputField(label: "EXTRA DED 2", controller: ddext2Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext2', val))),
+                                _FormFieldSpec(controller: ddext3Controller, widget: AnimatedInputField(label: "EXTRA DED 3", controller: ddext3Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext3', val))),
+                                _FormFieldSpec(controller: ddext4Controller, widget: AnimatedInputField(label: "EXTRA DED 4", controller: ddext4Controller, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ddext4', val))),
+                              ];
+
+                              final List<Widget> activeDeductionWidgets = [];
+                              final List<Widget> zeroDeductionWidgets = [];
+
+                              for (var spec in deductionSpecs) {
+                                if (_isFieldZero(spec.controller)) {
+                                  zeroDeductionWidgets.add(spec.widget);
+                                } else {
+                                  activeDeductionWidgets.add(spec.widget);
+                                }
+                              }
+
+                              return _buildAnimatedSection(
+                                4,
+                                _buildSectionCard(
+                                  "Details of Deduction",
+                                  Icons.money_off_rounded,
+                                  activeDeductionWidgets,
+                                  expandableTitle: "Other Fields",
+                                  expandableChildren: zeroDeductionWidgets,
+                                ),
+                              );
+                            },
                           ),
                           const SizedBox(height: 24),
                           _buildAnimatedSection(
