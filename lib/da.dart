@@ -440,11 +440,14 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(isMobile ? 14 : 20),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        border: Border.all(
+          color: isMobile ? const Color(0xFFCBD5E1) : const Color(0xFFE2E8F0),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF64748B).withValues(alpha: 0.04),
-            blurRadius: 12,
+            color: const Color(0xFF64748B).withValues(alpha: isMobile ? 0.06 : 0.04),
+            blurRadius: isMobile ? 8 : 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -455,12 +458,17 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: isMobile ? 6 : 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: isMobile ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(isMobile ? 12 : 18),
                 topRight: Radius.circular(isMobile ? 12 : 18),
               ),
-              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+              border: Border(
+                bottom: BorderSide(
+                  color: isMobile ? const Color(0xFFBFDBFE) : const Color(0xFFE2E8F0),
+                  width: 1.5,
+                ),
+              ),
             ),
             child: Text(
               month,
@@ -468,7 +476,7 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
               style: TextStyle(
                 fontSize: isMobile ? 12 : 15,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF334155),
+                color: isMobile ? const Color(0xFF1E40AF) : const Color(0xFF334155),
                 letterSpacing: isMobile ? 1.0 : 1.5,
               ),
             ),
@@ -496,6 +504,38 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
   }
 
   Widget _buildPercentField(String key, String label, bool isMobile) {
+    Color labelColor = const Color(0xFF64748B);
+    Color fillColor = Colors.white;
+    Color borderColor = const Color(0xFFE2E8F0);
+    Color textColor = const Color(0xFF0F172A);
+    Color suffixColor = const Color(0xFF94A3B8);
+    Color focusColor = const Color(0xFF2563EB);
+
+    if (isMobile) {
+      if (label == "DA%") {
+        labelColor = const Color(0xFF047857);
+        fillColor = const Color(0xFFECFDF5);
+        borderColor = const Color(0xFFA7F3D0);
+        textColor = const Color(0xFF065F46);
+        suffixColor = const Color(0xFF059669);
+        focusColor = const Color(0xFF059669);
+      } else if (label == "HRA%") {
+        labelColor = const Color(0xFF6D28D9);
+        fillColor = const Color(0xFFF5F3FF);
+        borderColor = const Color(0xFFDDD6FE);
+        textColor = const Color(0xFF5B21B6);
+        suffixColor = const Color(0xFF7C3AED);
+        focusColor = const Color(0xFF7C3AED);
+      } else if (label == "NPA%") {
+        labelColor = const Color(0xFFBE123C);
+        fillColor = const Color(0xFFFFF1F2);
+        borderColor = const Color(0xFFFECDD3);
+        textColor = const Color(0xFF9F1239);
+        suffixColor = const Color(0xFFE11D48);
+        focusColor = const Color(0xFFE11D48);
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -504,8 +544,8 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
           label,
           style: TextStyle(
             fontSize: isMobile ? 10 : 12,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF64748B),
+            fontWeight: FontWeight.w800,
+            color: labelColor,
           ),
         ),
         SizedBox(height: isMobile ? 2 : 6),
@@ -514,7 +554,7 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFE2E8F0).withValues(alpha: 0.5),
+                color: borderColor.withValues(alpha: 0.5),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -526,12 +566,12 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 13 : 16,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF0F172A),
+              fontWeight: FontWeight.w900,
+              color: textColor,
             ),
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white,
+              fillColor: fillColor,
               isDense: true,
               contentPadding: EdgeInsets.symmetric(
                 vertical: isMobile ? 6 : 12,
@@ -539,21 +579,21 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
               ),
               suffixText: "%",
               suffixStyle: TextStyle(
-                color: const Color(0xFF94A3B8),
-                fontWeight: FontWeight.w700,
+                color: suffixColor,
+                fontWeight: FontWeight.w800,
                 fontSize: isMobile ? 11 : 14,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                borderSide: BorderSide(color: focusColor, width: 2),
               ),
             ),
           ),
