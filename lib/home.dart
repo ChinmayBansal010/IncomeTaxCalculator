@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
         {
           "key": "ARREAR_DEDUCTION",
-          "label": "ARREAR AND DEDUCTION",
+          "label": "Arrear and Deduction",
           "subtitle": _selectedArrearDeductionOption == 'ARREAR' ? "Pending clearings" : "Tax deductions",
           "icon": _selectedArrearDeductionOption == 'ARREAR'
               ? Icons.account_balance_wallet_rounded
@@ -60,8 +60,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           "hasDropdown": true,
           "currentValue": _selectedArrearDeductionOption,
           "dropdownOptions": [
-            {"value": "ARREAR", "label": "ARREAR", "subtitle": "Pending clearings"},
-            {"value": "DEDUCTION", "label": "DEDUCTION", "subtitle": "Tax deductions"},
+            {"value": "ARREAR", "label": "Arrear", "subtitle": "Pending clearings"},
+            {"value": "DEDUCTION", "label": "Deduction", "subtitle": "Tax deductions"},
           ],
           "onOptionChanged": (String val) {
             setState(() {
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
         {
           "key": "TDS_COMBINED",
-          "label": "TDS AND TDS-0",
+          "label": "TDS and TDS-0",
           "subtitle": _selectedTdsOption == 'TDS - 0' ? "Zero rate standard" : "Standard deduction",
           "icon": _selectedTdsOption == 'TDS - 0'
               ? Icons.receipt_rounded
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           "hasDropdown": true,
           "currentValue": _selectedTdsOption,
           "dropdownOptions": [
-            {"value": "TDS - 0", "label": "TDS - 0", "subtitle": "Zero rate standard"},
+            {"value": "TDS - 0", "label": "TDS-0", "subtitle": "Zero rate standard"},
             {"value": "TDS", "label": "TDS", "subtitle": "Standard deduction"},
           ],
           "onOptionChanged": (String val) {
