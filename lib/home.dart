@@ -29,20 +29,104 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   int _totalEmployeeRecords = 0;
   bool _isFetchingRecords = true;
 
-  final List<Map<String, dynamic>> _menuItems = [
-    {"label": "MAIN", "subtitle": "Core tax entries", "icon": Icons.dashboard_customize_rounded, "color": const Color(0xFF2563EB)},
-    {"label": "DA%", "subtitle": "Dearness allowance", "icon": Icons.percent_rounded, "color": const Color(0xFF059669)},
-    {"label": "MONTH", "subtitle": "Monthly salary", "icon": Icons.calendar_month_rounded, "color": const Color(0xFFD97706)},
-    {"label": "ARREAR", "subtitle": "Pending clearings", "icon": Icons.account_balance_wallet_rounded, "color": const Color(0xFF7C3AED)},
-    {"label": "DEDUCTION", "subtitle": "Tax deductions", "icon": Icons.remove_circle_outline_rounded, "color": const Color(0xFFDC2626)},
-    {"label": "ITAX FORM", "subtitle": "Official generation", "icon": Icons.description_rounded, "color": const Color(0xFF2563EB)},
-    {"label": "TAX EXPORT", "subtitle": "Download current", "icon": Icons.file_download_rounded, "color": const Color(0xFF0891B2)},
-    {"label": "ARREAR - CALC", "subtitle": "Arrear calculation", "icon": Icons.calculate_rounded, "color": const Color(0xFF4F46E5)},
-    {"label": "EXPORT ALL", "subtitle": "Complete backup", "icon": Icons.archive_rounded, "color": const Color(0xFF0D9488)},
-    {"label": "TDS", "subtitle": "Standard deduction", "icon": Icons.receipt_long_rounded, "color": const Color(0xFFEA580C)},
-    {"label": "TDS - 0", "subtitle": "Zero rate standard", "icon": Icons.receipt_rounded, "color": const Color(0xFFCA8A04)},
-    {"label": "LOGOUT", "subtitle": "End session securely", "icon": Icons.logout_rounded, "color": const Color(0xFFE11D48)},
-  ];
+  String _selectedArrearDeductionOption = 'ARREAR';
+  String _selectedTdsOption = 'TDS - 0';
+
+  List<Map<String, dynamic>> get _menuItems => [
+        {
+          "key": "MAIN",
+          "label": "MAIN",
+          "subtitle": "Core tax entries",
+          "icon": Icons.dashboard_customize_rounded,
+          "color": const Color(0xFF2563EB),
+        },
+        {
+          "key": "MONTH",
+          "label": "MONTH",
+          "subtitle": "Monthly salary",
+          "icon": Icons.calendar_month_rounded,
+          "color": const Color(0xFFD97706),
+        },
+        {
+          "key": "ARREAR_DEDUCTION",
+          "label": _selectedArrearDeductionOption == 'ARREAR' ? "ARREAR" : "DEDUCTION",
+          "subtitle": _selectedArrearDeductionOption == 'ARREAR' ? "Pending clearings" : "Tax deductions",
+          "icon": _selectedArrearDeductionOption == 'ARREAR'
+              ? Icons.account_balance_wallet_rounded
+              : Icons.remove_circle_outline_rounded,
+          "color": _selectedArrearDeductionOption == 'ARREAR'
+              ? const Color(0xFF7C3AED)
+              : const Color(0xFFDC2626),
+          "hasDropdown": true,
+          "currentValue": _selectedArrearDeductionOption,
+          "dropdownOptions": [
+            {"value": "ARREAR", "label": "ARREAR", "subtitle": "Pending clearings"},
+            {"value": "DEDUCTION", "label": "DEDUCTION", "subtitle": "Tax deductions"},
+          ],
+          "onOptionChanged": (String val) {
+            setState(() {
+              _selectedArrearDeductionOption = val;
+            });
+          },
+        },
+        {
+          "key": "ITAX FORM",
+          "label": "ITAX FORM",
+          "subtitle": "Official generation",
+          "icon": Icons.description_rounded,
+          "color": const Color(0xFF2563EB),
+        },
+        {
+          "key": "TAX EXPORT",
+          "label": "TAX EXPORT",
+          "subtitle": "Download current",
+          "icon": Icons.file_download_rounded,
+          "color": const Color(0xFF0891B2),
+        },
+        {
+          "key": "ARREAR - CALC",
+          "label": "ARREAR - CALC",
+          "subtitle": "Arrear calculation",
+          "icon": Icons.calculate_rounded,
+          "color": const Color(0xFF4F46E5),
+        },
+        {
+          "key": "EXPORT ALL",
+          "label": "EXPORT ALL",
+          "subtitle": "Complete backup",
+          "icon": Icons.archive_rounded,
+          "color": const Color(0xFF0D9488),
+        },
+        {
+          "key": "TDS_COMBINED",
+          "label": _selectedTdsOption == 'TDS - 0' ? "TDS - 0" : "TDS",
+          "subtitle": _selectedTdsOption == 'TDS - 0' ? "Zero rate standard" : "Standard deduction",
+          "icon": _selectedTdsOption == 'TDS - 0'
+              ? Icons.receipt_rounded
+              : Icons.receipt_long_rounded,
+          "color": _selectedTdsOption == 'TDS - 0'
+              ? const Color(0xFFCA8A04)
+              : const Color(0xFFEA580C),
+          "hasDropdown": true,
+          "currentValue": _selectedTdsOption,
+          "dropdownOptions": [
+            {"value": "TDS - 0", "label": "TDS - 0", "subtitle": "Zero rate standard"},
+            {"value": "TDS", "label": "TDS", "subtitle": "Standard deduction"},
+          ],
+          "onOptionChanged": (String val) {
+            setState(() {
+              _selectedTdsOption = val;
+            });
+          },
+        },
+        {
+          "key": "DA%",
+          "label": "DA%",
+          "subtitle": "Dearness allowance",
+          "icon": Icons.percent_rounded,
+          "color": const Color(0xFF059669),
+        },
+      ];
 
   @override
   void initState() {
@@ -76,6 +160,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         setState(() {
           _isFetchingRecords = false;
         });
+      }
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    final nav = Navigator.of(context);
+    final confirmLogout = await _showConfirmDialog(
+      "Confirm Logout",
+      "Are you sure you want to end your current session?",
+      Icons.logout_rounded,
+      isDestructive: true,
+    );
+    if (confirmLogout == true && mounted) {
+      if (sharedData.isAdmin) {
+        nav.pushReplacement(MaterialPageRoute(builder: (context) => const AdminDashboardPage()));
+      } else {
+        nav.pushReplacement(MaterialPageRoute(builder: (context) => const LoginPage()));
       }
     }
   }
@@ -259,6 +360,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ],
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          onPressed: _handleLogout,
+                          icon: const Icon(Icons.logout_rounded, size: 14),
+                          label: const Text('Logout', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFEF2F2),
+                            foregroundColor: const Color(0xFFE11D48),
+                            elevation: 0,
+                            side: const BorderSide(color: Color(0xFFFECDD3), width: 1.5),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -426,6 +543,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ],
                           ),
                         ),
+                        ElevatedButton.icon(
+                          onPressed: _handleLogout,
+                          icon: const Icon(Icons.logout_rounded, size: 16),
+                          label: const Text('Logout', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFEF2F2),
+                            foregroundColor: const Color(0xFFE11D48),
+                            elevation: 0,
+                            side: const BorderSide(color: Color(0xFFFECDD3), width: 1.5),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -486,7 +616,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     subtitle: item["subtitle"],
                     icon: item["icon"],
                     color: item["color"],
-                    onPressed: () => _handleMenuAction(item["label"], context),
+                    hasDropdown: item["hasDropdown"] ?? false,
+                    dropdownOptions: item["dropdownOptions"] != null
+                        ? List<Map<String, String>>.from(item["dropdownOptions"])
+                        : null,
+                    currentValue: item["currentValue"],
+                    onOptionChanged: item["onOptionChanged"],
+                    onPressed: () => _handleMenuAction(item, context),
                   ),
                 ),
               );
@@ -547,24 +683,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Future<void> _handleMenuAction(String label, BuildContext context) async {
+  Future<void> _handleMenuAction(Map<String, dynamic> item, BuildContext context) async {
     final nav = Navigator.of(context);
+    String key = item["key"] ?? item["label"];
     Widget? page;
-    switch (label) {
+
+    switch (key) {
       case "MAIN":
         page = const MainDataPage();
-        break;
-      case "DA%":
-        page = const DaPage();
         break;
       case "MONTH":
         page = const MonthDataPage();
         break;
-      case "ARREAR":
-        page = const ArrearPage();
-        break;
-      case "DEDUCTION":
-        page = const DeductionPage();
+      case "ARREAR_DEDUCTION":
+        if (_selectedArrearDeductionOption == 'ARREAR') {
+          page = const ArrearPage();
+        } else {
+          page = const DeductionPage();
+        }
         break;
       case "ITAX FORM":
         page = const ItaxPage();
@@ -592,42 +728,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           _executeExport(exportAll);
         }
         return;
-      case "TDS":
-        final confirmTDS = await _showConfirmDialog(
-          "Export TDS",
-          "Are you sure you want to export the standard TDS data?",
-          Icons.receipt_long_rounded,
-        );
-        if (confirmTDS == true) {
-          _executeExport(() => exportExcel(false));
-        }
-        return;
-      case "TDS - 0":
-        final confirmTDSZero = await _showConfirmDialog(
-          "Export TDS (0%)",
-          "Are you sure you want to export TDS data with a 0% rate?",
-          Icons.receipt_rounded,
-        );
-        if (confirmTDSZero == true) {
-          _executeExport(() => exportExcel(true));
-        }
-        return;
-      case "LOGOUT":
-        final nav = Navigator.of(context);
-        final confirmLogout = await _showConfirmDialog(
-          "Confirm Logout",
-          "Are you sure you want to end your current session?",
-          Icons.logout_rounded,
-          isDestructive: true,
-        );
-        if (confirmLogout == true && mounted) {
-          if (sharedData.isAdmin) {
-            nav.pushReplacement(MaterialPageRoute(builder: (context) => const AdminDashboardPage()));
-          } else {
-            nav.pushReplacement(MaterialPageRoute(builder: (context) => const LoginPage()));
+      case "TDS_COMBINED":
+        if (_selectedTdsOption == 'TDS - 0') {
+          final confirmTDSZero = await _showConfirmDialog(
+            "Export TDS (0%)",
+            "Are you sure you want to export TDS data with a 0% rate?",
+            Icons.receipt_rounded,
+          );
+          if (confirmTDSZero == true) {
+            _executeExport(() => exportExcel(true));
+          }
+        } else {
+          final confirmTDS = await _showConfirmDialog(
+            "Export TDS",
+            "Are you sure you want to export the standard TDS data?",
+            Icons.receipt_long_rounded,
+          );
+          if (confirmTDS == true) {
+            _executeExport(() => exportExcel(false));
           }
         }
         return;
+      case "DA%":
+        page = const DaPage();
+        break;
     }
 
     if (page != null) {
@@ -834,6 +958,10 @@ class DashboardActionTile extends StatefulWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onPressed;
+  final bool hasDropdown;
+  final List<Map<String, String>>? dropdownOptions;
+  final String? currentValue;
+  final ValueChanged<String>? onOptionChanged;
 
   const DashboardActionTile({
     required this.label,
@@ -841,6 +969,10 @@ class DashboardActionTile extends StatefulWidget {
     required this.icon,
     required this.color,
     required this.onPressed,
+    this.hasDropdown = false,
+    this.dropdownOptions,
+    this.currentValue,
+    this.onOptionChanged,
     super.key,
   });
 
@@ -967,6 +1099,86 @@ class _DashboardActionTileState extends State<DashboardActionTile> with SingleTi
                           ],
                         ),
                       ),
+                      if (widget.hasDropdown && widget.dropdownOptions != null) ...[
+                        PopupMenuButton<String>(
+                          tooltip: 'Switch Mode',
+                          padding: EdgeInsets.zero,
+                          icon: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 6 : 8,
+                              vertical: isMobile ? 3 : 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: widget.color.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: widget.color.withValues(alpha: 0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.unfold_more_rounded,
+                                  color: widget.color,
+                                  size: isMobile ? 16 : 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          color: Colors.white,
+                          elevation: 8,
+                          onSelected: (val) {
+                            if (widget.onOptionChanged != null) {
+                              widget.onOptionChanged!(val);
+                            }
+                          },
+                          itemBuilder: (context) => widget.dropdownOptions!.map((opt) {
+                            bool isSelected = opt["value"] == widget.currentValue;
+                            return PopupMenuItem<String>(
+                              value: opt["value"]!,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isSelected
+                                        ? Icons.check_circle_rounded
+                                        : Icons.radio_button_unchecked_rounded,
+                                    color: isSelected ? widget.color : const Color(0xFF94A3B8),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        opt["label"]!,
+                                        style: TextStyle(
+                                          fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                                          color: isSelected
+                                              ? const Color(0xFF0F172A)
+                                              : const Color(0xFF475569),
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Text(
+                                        opt["subtitle"]!,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        SizedBox(width: isMobile ? 4 : 6),
+                      ],
                       SizedBox(width: isMobile ? 6 : 8),
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
