@@ -213,7 +213,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                   "Monthly Statements",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                   ),

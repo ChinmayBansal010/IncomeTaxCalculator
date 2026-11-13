@@ -203,7 +203,7 @@ class _ArrearPageState extends State<ArrearPage> with SingleTickerProviderStateM
                   "Arrears Management",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                   ),

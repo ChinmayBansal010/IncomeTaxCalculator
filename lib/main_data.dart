@@ -229,7 +229,7 @@ class _MainDataPageState extends State<MainDataPage> with SingleTickerProviderSt
                   "Employee Directory",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                   ),
