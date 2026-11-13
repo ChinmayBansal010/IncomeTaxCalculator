@@ -235,18 +235,20 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color(0xFF1E3A8A),
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "Allowance Rates Formulation",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w800,
-            fontSize: 20,
+            fontSize: isMobile ? 16 : 20,
             letterSpacing: -0.5,
           ),
         ),
@@ -258,7 +260,7 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
       body: Stack(
         children: [
           Container(
-            height: 160,
+            height: isMobile ? 110 : 160,
             width: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -272,20 +274,22 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+                  padding: isMobile
+                      ? const EdgeInsets.fromLTRB(12, 10, 12, 16)
+                      : const EdgeInsets.fromLTRB(24, 20, 24, 32),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(isMobile ? 8 : 12),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
                           border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                         ),
-                        child: const Icon(Icons.percent_rounded, color: Colors.white, size: 28),
+                        child: Icon(Icons.percent_rounded, color: Colors.white, size: isMobile ? 20 : 28),
                       ),
-                      const SizedBox(width: 20),
-                      const Expanded(
+                      SizedBox(width: isMobile ? 12 : 20),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -293,17 +297,17 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
                               "DA, HRA & NPA Rates",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 26,
+                                fontSize: isMobile ? 18 : 26,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -0.5,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 2),
                             Text(
                               "Configure monthly percentages for accurate calculations",
                               style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 14,
+                                fontSize: isMobile ? 11 : 14,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -318,13 +322,15 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1200),
                       child: GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+                        padding: isMobile
+                            ? const EdgeInsets.fromLTRB(10, 0, 10, 80)
+                            : const EdgeInsets.fromLTRB(24, 0, 24, 120),
                         physics: const BouncingScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 380,
-                          mainAxisExtent: 160,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 20,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: isMobile ? 600 : 380,
+                          mainAxisExtent: isMobile ? 105 : 160,
+                          crossAxisSpacing: isMobile ? 8 : 20,
+                          mainAxisSpacing: isMobile ? 8 : 20,
                         ),
                         itemCount: months.length,
                         itemBuilder: (context, index) {
@@ -338,7 +344,7 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
                             position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
                             child: FadeTransition(
                               opacity: animation,
-                              child: _buildMonthCard(months[index]),
+                              child: _buildMonthCard(months[index], isMobile),
                             ),
                           );
                         },
@@ -365,7 +371,9 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
                 ],
                 border: const Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+              padding: isMobile
+                  ? const EdgeInsets.symmetric(vertical: 10, horizontal: 12)
+                  : const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 800),
@@ -377,19 +385,23 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
                           onPressed: resetFields,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFFDC2626),
-                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 18),
                             side: const BorderSide(color: Color(0xFFFECACA), width: 2),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 12 : 16)),
                             backgroundColor: const Color(0xFFFEF2F2),
                           ),
-                          icon: const Icon(Icons.refresh_rounded, size: 20),
-                          label: const Text(
-                            "RESET ALL",
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                          icon: Icon(Icons.refresh_rounded, size: isMobile ? 16 : 20),
+                          label: Text(
+                            isMobile ? "RESET" : "RESET ALL",
+                            style: TextStyle(
+                              fontSize: isMobile ? 12 : 15,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: isMobile ? 10 : 16),
                       Expanded(
                         flex: 2,
                         child: ElevatedButton.icon(
@@ -397,14 +409,18 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2563EB),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 18),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 12 : 16)),
                             elevation: 0,
                           ),
-                          icon: const Icon(Icons.save_rounded, size: 20),
-                          label: const Text(
-                            "SAVE CONFIGURATION",
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                          icon: Icon(Icons.save_rounded, size: isMobile ? 16 : 20),
+                          label: Text(
+                            isMobile ? "SAVE RATES" : "SAVE CONFIGURATION",
+                            style: TextStyle(
+                              fontSize: isMobile ? 12 : 15,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),
@@ -419,11 +435,11 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMonthCard(String month) {
+  Widget _buildMonthCard(String month, bool isMobile) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(isMobile ? 14 : 20),
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -437,36 +453,39 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
+            padding: EdgeInsets.symmetric(vertical: isMobile ? 6 : 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(18),
-                topRight: Radius.circular(18),
+                topLeft: Radius.circular(isMobile ? 12 : 18),
+                topRight: Radius.circular(isMobile ? 12 : 18),
               ),
-              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
+              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
             ),
             child: Text(
               month,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 15,
+              style: TextStyle(
+                fontSize: isMobile ? 12 : 15,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF334155),
-                letterSpacing: 1.5,
+                color: const Color(0xFF334155),
+                letterSpacing: isMobile ? 1.0 : 1.5,
               ),
             ),
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 8 : 16,
+                vertical: isMobile ? 6 : 12,
+              ),
               child: Row(
                 children: [
-                  Expanded(child: _buildPercentField("$month-DA", "DA%")),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildPercentField("$month-HRA", "HRA%")),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildPercentField("$month-NPA", "NPA%")),
+                  Expanded(child: _buildPercentField("$month-DA", "DA%", isMobile)),
+                  SizedBox(width: isMobile ? 6 : 12),
+                  Expanded(child: _buildPercentField("$month-HRA", "HRA%", isMobile)),
+                  SizedBox(width: isMobile ? 6 : 12),
+                  Expanded(child: _buildPercentField("$month-NPA", "NPA%", isMobile)),
                 ],
               ),
             ),
@@ -476,23 +495,23 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPercentField(String key, String label) {
+  Widget _buildPercentField(String key, String label, bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
+          style: TextStyle(
+            fontSize: isMobile ? 10 : 12,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF64748B),
+            color: const Color(0xFF64748B),
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: isMobile ? 2 : 6),
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFFE2E8F0).withValues(alpha: 0.5),
@@ -505,31 +524,35 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
             controller: _controllers[key],
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: isMobile ? 13 : 16,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF0F172A),
+              color: const Color(0xFF0F172A),
             ),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(
+                vertical: isMobile ? 6 : 12,
+                horizontal: isMobile ? 4 : 8,
+              ),
               suffixText: "%",
-              suffixStyle: const TextStyle(
-                color: Color(0xFF94A3B8),
+              suffixStyle: TextStyle(
+                color: const Color(0xFF94A3B8),
                 fontWeight: FontWeight.w700,
-                fontSize: 14,
+                fontSize: isMobile ? 11 : 14,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
                 borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
                 borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
                 borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
               ),
             ),
@@ -538,4 +561,5 @@ class _DaPageState extends State<DaPage> with TickerProviderStateMixin {
       ],
     );
   }
+}
 }
