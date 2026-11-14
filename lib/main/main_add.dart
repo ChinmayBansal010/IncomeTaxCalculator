@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:incometax/date_utils.dart';
 import 'package:incometax/shared.dart';
 
 class MainAddPage extends StatefulWidget {
@@ -182,6 +183,36 @@ class _MainAddPageState extends State<MainAddPage> with SingleTickerProviderStat
         ),
       );
       return;
+    }
+
+    final dateCheckMap = {
+      'Date of Birth': dobController.text,
+      'Date of Death': dodController.text,
+      'Date of Appointment': doaController.text,
+      'Date of Retirement': dortController.text,
+      'Date of Joining Office': dojoController.text,
+      'Date of Resignation': dornController.text,
+      'Date of Transfer': dotController.text,
+    };
+
+    for (var entry in dateCheckMap.entries) {
+      final text = entry.value.trim();
+      if (text.isNotEmpty && !isValidDateDDMMYYYY(text)) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Invalid Date"),
+            content: Text("${entry.key} ($text) is invalid. Please enter a valid date in DD-MM-YYYY format."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
     }
     if (gpfNoController.text != '0' && npsNoController.text != '0') {
       showDialog(
@@ -930,6 +961,7 @@ class AnimatedInputField extends StatefulWidget {
   final TextInputType keyboardType;
   final List<TextInputFormatter> inputFormatters;
   final ValueChanged<String>? onChanged;
+  final bool? isDatePicker;
 
   const AnimatedInputField({
     super.key,
@@ -939,6 +971,7 @@ class AnimatedInputField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.inputFormatters = const [],
     this.onChanged,
+    this.isDatePicker,
   });
 
   @override
@@ -947,6 +980,17 @@ class AnimatedInputField extends StatefulWidget {
 
 class _AnimatedInputFieldState extends State<AnimatedInputField> {
   bool _isHovered = false;
+
+  bool get _isDateField =>
+      widget.isDatePicker == true ||
+      widget.label.toUpperCase().contains('DATE') ||
+      widget.label.toUpperCase().contains('DOB') ||
+      widget.label.toUpperCase().contains('DOA') ||
+      widget.label.toUpperCase().contains('DORT') ||
+      widget.label.toUpperCase().contains('DOJO') ||
+      widget.label.toUpperCase().contains('DORN') ||
+      widget.label.toUpperCase().contains('DOT') ||
+      widget.label.toUpperCase().contains('DOD');
 
   @override
   Widget build(BuildContext context) {
@@ -990,7 +1034,7 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
               child: TextField(
                 keyboardType: widget.keyboardType,
                 inputFormatters: [
-                  UpperCaseTextFormatter(),
+                  if (!_isDateField) UpperCaseTextFormatter(),
                   ...widget.inputFormatters,
                 ],
                 controller: widget.controller,
@@ -998,6 +1042,14 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                   if (widget.keyboardType == TextInputType.number &&
                       widget.controller.text == '0') {
                     widget.controller.text = '';
+                  }
+                },
+                onEditingComplete: () {
+                  if (_isDateField && widget.controller.text.isNotEmpty) {
+                    widget.controller.text = formatToDDMMYYYY(widget.controller.text);
+                    if (widget.onChanged != null) {
+                      widget.onChanged!(widget.controller.text);
+                    }
                   }
                 },
                 style: TextStyle(
@@ -1015,6 +1067,23 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                   ),
                   prefixIconConstraints: isMobile
                       ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                      : null,
+                  suffixIcon: _isDateField
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.calendar_month_rounded,
+                            color: _isHovered ? const Color(0xFF2563EB) : const Color(0xFF64748B),
+                            size: isMobile ? 18 : 22,
+                          ),
+                          tooltip: "Select Date",
+                          onPressed: () {
+                            selectDateDDMMYYYY(
+                              context,
+                              widget.controller,
+                              onChanged: widget.onChanged,
+                            );
+                          },
+                        )
                       : null,
                   contentPadding: EdgeInsets.symmetric(
                     vertical: isMobile ? 10 : 18,
@@ -1307,28 +1376,7 @@ class UpperCaseTextFormatter extends TextInputFormatter {
       TextEditingValue oldValue, TextEditingValue newValue) {
     return newValue.copyWith(
       text: newValue.text.toUpperCase(),
-      selection: TextSelection.collapsed(offset: newValue.selection.end),
-    );
-  }
-}
-
-class DateInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    String newText = newValue.text;
-    newText = newText.replaceAll(RegExp(r'[^0-9]'), '');
-    if (newText.length >= 3) {
-      newText = '${newText.substring(0, 2)}-${newText.substring(2)}';
-    }
-    if (newText.length >= 6) {
-      newText = '${newText.substring(0, 5)}-${newText.substring(5)}';
-    }
-    if (newText.length > 10) {
-      newText = newText.substring(0, 10);
-    }
-    return newValue.copyWith(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
+      selection: newValue.selection,
     );
   }
 }
