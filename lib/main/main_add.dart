@@ -1039,7 +1039,8 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                 ],
                 controller: widget.controller,
                 onTap: () {
-                  if (widget.keyboardType == TextInputType.number &&
+                  if (!_isDateField &&
+                      widget.keyboardType == TextInputType.number &&
                       widget.controller.text == '0') {
                     widget.controller.text = '';
                   }
@@ -1111,7 +1112,8 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                 ),
                 onChanged: (value) {
                   String newValue = value;
-                  if (widget.keyboardType == TextInputType.number &&
+                  if (!_isDateField &&
+                      widget.keyboardType == TextInputType.number &&
                       newValue.length > 1 &&
                       newValue.startsWith('0')) {
                     newValue = newValue.replaceFirst(RegExp(r'^0+'), '');
