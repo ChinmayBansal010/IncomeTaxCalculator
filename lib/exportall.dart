@@ -67,8 +67,8 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "dod": "Date of Death",
       "education": "Educational",
       "bname": "Bank Name",
-      "ext3": "Extra Field 3",
-      "ext4": "Extra Field 4",
+      //"ext3": "Extra Field 3",
+      //"ext4": "Extra Field 4",
     };
 
     final mappedData = <String, Map<String, dynamic>>{};
@@ -113,7 +113,7 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
       final orderedKeys = [
         "biometricid", "name", "designation", "bp", "da", "hra", "npa", "splpay", "conv", "pg", "annual",
         "uniform", "nursing", "ta", "daonta", "medical", "dirt", "washing", "tb", "night", "drive", "cycle",
-        "pca", "gross", "incometax", "gis", "gpf", "nps", "epf", "esi", "slf",
+        "pca", "ot","gross", "incometax", "gis", "gpf", "nps", "epf", "esi", "slf",
         "society", "recovery", "wf", "other", "totalded", "netsalary",
         "dap", "hrap", "tap", "npap", "gpfchk", "npschk", "epfchk", "esichk"
       ];
@@ -135,13 +135,14 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
         "ta": "TA",
         "daonta": "DA on TA",
         "medical": "Medical",
-        "dirt": "Contigency",
+        "dirt": "Dirt",
         "washing": "Washing",
         "tb": "TB",
         "night": "Night",
-        "drive": "Drive",
+        "drive": "Contigency",
         "cycle": "Cycle",
         "pca": "PCA",
+        "ot": "OT",
         "gross": "Gross Salary",
         "incometax": "Income Tax",
         "gis": "GIS",
@@ -524,24 +525,34 @@ Future<void> exportAll() async {
   setColumns(dedSheet, dedcolumns);
   setColumns(itaxnewSheet, itaxnewcolumns);
 
-  setDataValue(mainSheet, maindata);
-  setDataValue(marSheet, mardata);
-  setDataValue(aprSheet, aprdata);
-  setDataValue(maySheet, maydata);
-  setDataValue(junSheet, jundata);
-  setDataValue(julSheet, juldata);
-  setDataValue(augSheet, augdata);
-  setDataValue(septSheet, septdata);
-  setDataValue(octSheet, octdata);
-  setDataValue(novSheet, novdata);
-  setDataValue(decSheet, decdata);
-  setDataValue(janSheet, jandata);
-  setDataValue(febSheet, febdata);
-  setDataValue(arrSheet, arrdata);
-  setDataValue(dedSheet, deddata);
-  setDataValue(itaxnewSheet, itaxnewdata);
+  setDataValue(mainSheet, maindata, addTotalRow: false);
+  setDataValue(marSheet, mardata, addTotalRow: true);
+  setDataValue(aprSheet, aprdata, addTotalRow: true);
+  setDataValue(maySheet, maydata, addTotalRow: true);
+  setDataValue(junSheet, jundata, addTotalRow: true);
+  setDataValue(julSheet, juldata, addTotalRow: true);
+  setDataValue(augSheet, augdata, addTotalRow: true);
+  setDataValue(septSheet, septdata, addTotalRow: true);
+  setDataValue(octSheet, octdata, addTotalRow: true);
+  setDataValue(novSheet, novdata, addTotalRow: true);
+  setDataValue(decSheet, decdata, addTotalRow: true);
+  setDataValue(janSheet, jandata, addTotalRow: true);
+  setDataValue(febSheet, febdata, addTotalRow: true);
+  setDataValue(arrSheet, arrdata, addTotalRow: true);
+  setDataValue(dedSheet, deddata, addTotalRow: true);
+  setDataValue(itaxnewSheet, itaxnewdata, addTotalRow: true);
 
-  writeDaDataToExcel(dadata,daSheet);
+  writeDaDataToExcel(dadata, daSheet);
+
+  final allSheets = [
+    mainSheet, marSheet, aprSheet, maySheet, junSheet, julSheet,
+    augSheet, septSheet, octSheet, novSheet, decSheet, janSheet,
+    febSheet, arrSheet, dedSheet, itaxnewSheet, daSheet,
+  ];
+
+  for (final s in allSheets) {
+    s.getRangeByIndex(2, 2).freezePanes();
+  }
 
   final List<int> bytes = workbook.saveAsStream();
   workbook.dispose();
@@ -573,7 +584,7 @@ void setColumns(xlsio.Worksheet sheet, List<dynamic> columns) {
   }
 }
 
-void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data) {
+void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data, {bool addTotalRow = false}) {
   if (data.isEmpty) return;
   final firstRow = data.values.first;
   if (firstRow is! Map) return;
@@ -596,6 +607,70 @@ void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data) {
       rowIndex++;
     }
   }
+
+  if (addTotalRow) {
+    final totalRowIndex = rowIndex;
+    final nonNumericHeaders = {
+      'Biometric ID', 'Name', 'Designation', 'Employee Type', 'Place of Duty',
+      'Father/Husband Name', 'Date of Birth', 'Date of Appointment', 'Date of Retirement',
+      'Group', 'Category', 'Gender', 'Address', 'Aadhaar No.', 'Mobile No.',
+      'Bank Account No.', 'Bank Branch', 'MICR No.', 'IFSC Code', 'PAN No.', 'PAN Number',
+      'Pay Scale', 'Pay Level', 'GPF No.', 'NPS No.', 'EPF No.', 'ESI No.', 'Email ID',
+      'Vehicle No.', 'Voter ID', 'Date of Joining Office', 'Blood Group', 'Emergency No.',
+      'NIC Email ID', 'Date of Resignation', 'Date of Transfer', 'Place of Transfer',
+      'Date of Death', 'Educational', 'Bank Name', 'O Name', 'O PAN', 'Post Office',
+      'DA CHK', 'HRA CHK', 'TA CHK', 'NPA CHK', 'GPF CHK', 'NPS CHK', 'EPF CHK', 'ESI CHK',
+      'dap', 'hrap', 'tap', 'npap', 'gpfchk', 'npschk', 'epfchk', 'esichk',
+    };
+
+    for (var colIndex = 0; colIndex < columnHeaders.length; colIndex++) {
+      final colHeader = columnHeaders[colIndex];
+      final cell = sheet.getRangeByIndex(totalRowIndex, colIndex + 1);
+      cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+      cell.cellStyle.vAlign = xlsio.VAlignType.center;
+      cell.cellStyle.bold = true;
+
+      if (colIndex == 0) {
+        cell.setText("TOTAL");
+        cell.cellStyle.hAlign = xlsio.HAlignType.left;
+      } else if (nonNumericHeaders.contains(colHeader)) {
+        cell.setText("");
+        cell.cellStyle.hAlign = xlsio.HAlignType.left;
+      } else {
+        double colSum = 0;
+        bool hasValidNumber = false;
+        for (var entry in data.entries) {
+          var rowData = entry.value;
+          if (rowData is Map) {
+            var rawVal = rowData[colHeader];
+            if (rawVal != null) {
+              var strVal = rawVal.toString().trim();
+              if (strVal.isNotEmpty && strVal != 'null') {
+                var parsed = double.tryParse(strVal);
+                if (parsed != null) {
+                  colSum += parsed;
+                  hasValidNumber = true;
+                }
+              }
+            }
+          }
+        }
+
+        if (hasValidNumber) {
+          if (colSum == colSum.roundToDouble()) {
+            cell.setValue(colSum.round());
+          } else {
+            cell.setValue(colSum);
+          }
+        } else {
+          cell.setText("");
+        }
+        cell.cellStyle.hAlign = xlsio.HAlignType.left;
+      }
+    }
+    rowIndex++;
+  }
+
   sheet.getRangeByIndex(1, 1, rowIndex - 1, columnHeaders.length).autoFit();
 }
 
