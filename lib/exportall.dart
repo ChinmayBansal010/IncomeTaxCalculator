@@ -20,29 +20,31 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
     final mainMap = Map<String, dynamic>.from(mainSnap.snapshot.value as Map);
 
     final orderedKeys = [
-      "biometricid", "name", "fhname", "designation", "emptype", "place", "dob", "doa", "dort", "group", "category",
-      "sex", "address", "aadhaarno", "mobileno", "accountno", "branch", "micrno",
-      "ifsc", "panno", "payscale", "level", "gpfno", "npsno", "epfno", "esino", "emailid", "cycleno",
+      "biometricid", "name", "fhname", "group", "sex", "designation", "emptype", "place",
+      "dob", "doa", "dort", "category", "address", "aadhaarno", "mobileno",
+      "bname", "accountno", "branch", "micrno", "ifsc",
+      "panno", "payscale", "level", "gpfno", "npsno", "epfno", "esino", "emailid", "cycleno",
       "voterid", "dojo", "bloodgrp", "emergencyno", "nicemailid", "dorn", "dot", "pot", "dod",
-      "education", "bname", "ext3", "ext4"
+      "education"
     ];
 
     final Map<String, String> labelMap = {
       "biometricid": "Biometric ID",
       "name": "Name",
       "fhname": "Father/Husband Name",
+      "group": "Group",
+      "sex": "Gender",
       "designation": "Designation",
       "emptype": "Employee Type",
       "place": "Place of Duty",
       "dob": "Date of Birth",
       "doa": "Date of Appointment",
       "dort": "Date of Retirement",
-      "group": "Group",
       "category": "Category",
-      "sex": "Gender",
       "address": "Address",
       "aadhaarno": "Aadhaar No.",
       "mobileno": "Mobile No.",
+      "bname": "Bank Name",
       "accountno": "Bank Account No.",
       "branch": "Bank Branch",
       "micrno": "MICR No.",
@@ -66,9 +68,6 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "pot": "Place of Transfer",
       "dod": "Date of Death",
       "education": "Educational",
-      "bname": "Bank Name",
-      //"ext3": "Extra Field 3",
-      //"ext4": "Extra Field 4",
     };
 
     final mappedData = <String, Map<String, dynamic>>{};
