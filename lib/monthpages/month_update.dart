@@ -20,12 +20,42 @@ class MonthDataPage extends StatefulWidget {
 }
 
 class _FormFieldSpec {
+  final String fieldKey;
   final TextEditingController controller;
   final Widget widget;
-  _FormFieldSpec({required this.controller, required this.widget});
+  _FormFieldSpec({required this.fieldKey, required this.controller, required this.widget});
 }
 
 class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProviderStateMixin {
+  final Map<String, FocusNode> _focusNodes = {};
+  final Set<String> _zeroSectionFieldKeys = {};
+
+  FocusNode _getFocusNode(String key) {
+    return _focusNodes.putIfAbsent(key, () {
+      final node = FocusNode();
+      node.addListener(() {
+        if (!node.hasFocus && mounted) {
+          setState(() {});
+        }
+      });
+      return node;
+    });
+  }
+
+  bool _shouldBeInZeroSection(String key, TextEditingController controller) {
+    final focusNode = _getFocusNode(key);
+    if (focusNode.hasFocus) {
+      return _zeroSectionFieldKeys.contains(key);
+    }
+    bool isZero = _isFieldZero(controller);
+    if (isZero) {
+      _zeroSectionFieldKeys.add(key);
+    } else {
+      _zeroSectionFieldKeys.remove(key);
+    }
+    return isZero;
+  }
+
   final TextEditingController biometricidController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController designationController = TextEditingController();
@@ -209,10 +239,14 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     isNpsChecked = monthData['npschk']?.toString() == '1';
     isEpfChecked = monthData['epfchk']?.toString() == '1';
     isEsiChecked = monthData['esichk']?.toString() == '1';
+    _zeroSectionFieldKeys.clear();
   }
 
   @override
   void dispose() {
+    _focusNodes.forEach((_, node) => node.dispose());
+    _focusNodes.clear();
+    _zeroSectionFieldKeys.clear();
     _entranceController.dispose();
     biometricidController.dispose();
     nameController.dispose();
@@ -606,6 +640,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     required bool isChecked,
     required ValueChanged<bool?> onChanged,
     required ValueChanged<String> onFieldChanged,
+    FocusNode? focusNode,
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -646,6 +681,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                 keyboardType: TextInputType.number,
                 enabled: isChecked,
                 onChanged: onFieldChanged,
+                focusNode: focusNode,
               ),
             ),
           ],
@@ -847,34 +883,34 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                           Builder(
                             builder: (context) {
                               final allowanceSpecs = [
-                                _FormFieldSpec(controller: bpController, widget: AnimatedInputField(label: "BP", controller: bpController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('bp', val); isBpChanged = true; })),
-                                _FormFieldSpec(controller: daController, widget: AnimatedInputField(label: "DA", controller: daController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('da', val))),
-                                _FormFieldSpec(controller: hraController, widget: AnimatedInputField(label: "HRA", controller: hraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('hra', val))),
-                                _FormFieldSpec(controller: npaController, widget: AnimatedInputField(label: "NPA", controller: npaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('npa', val))),
-                                _FormFieldSpec(controller: splpayController, widget: AnimatedInputField(label: "SPECIAL PAY", controller: splpayController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('splpay', val))),
-                                _FormFieldSpec(controller: convController, widget: AnimatedInputField(label: "CONVEYANCE", controller: convController, icon: Icons.directions_car_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('conv', val))),
-                                _FormFieldSpec(controller: pgController, widget: AnimatedInputField(label: "PG", controller: pgController, icon: Icons.school_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pg', val))),
-                                _FormFieldSpec(controller: annualController, widget: AnimatedInputField(label: "ANNUAL", controller: annualController, icon: Icons.event_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('annual', val))),
-                                _FormFieldSpec(controller: uniformController, widget: AnimatedInputField(label: "UNIFORM", controller: uniformController, icon: Icons.checkroom_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('uniform', val))),
-                                _FormFieldSpec(controller: nursingController, widget: AnimatedInputField(label: "NURSING", controller: nursingController, icon: Icons.local_hospital_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('nursing', val))),
-                                _FormFieldSpec(controller: taController, widget: AnimatedInputField(label: "TA", controller: taController, icon: Icons.flight_takeoff_rounded, keyboardType: TextInputType.number, onChanged: (val) { _onFieldChanged('ta', val); isTaChanged = true; })),
-                                _FormFieldSpec(controller: daontaController, widget: AnimatedInputField(label: "DA ON TA", controller: daontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onAutoCalculatedFieldChanged('daonta', val))),
-                                _FormFieldSpec(controller: medicalController, widget: AnimatedInputField(label: "MEDICAL", controller: medicalController, icon: Icons.medical_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('medical', val))),
-                                _FormFieldSpec(controller: dirtController, widget: AnimatedInputField(label: "DIRT", controller: dirtController, icon: Icons.cleaning_services_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('dirt', val))),
-                                _FormFieldSpec(controller: washingController, widget: AnimatedInputField(label: "WASHING", controller: washingController, icon: Icons.local_laundry_service_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('washing', val))),
-                                _FormFieldSpec(controller: tbController, widget: AnimatedInputField(label: "TB", controller: tbController, icon: Icons.sick_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('tb', val))),
-                                _FormFieldSpec(controller: nightController, widget: AnimatedInputField(label: "NIGHT", controller: nightController, icon: Icons.nights_stay_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('night', val))),
-                                _FormFieldSpec(controller: driveController, widget: AnimatedInputField(label: "CONTINGENCY", controller: driveController, icon: Icons.warning_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('drive', val))),
-                                _FormFieldSpec(controller: cycleController, widget: AnimatedInputField(label: "CYCLE", controller: cycleController, icon: Icons.pedal_bike_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('cycle', val))),
-                                _FormFieldSpec(controller: pcaController, widget: AnimatedInputField(label: "PCA", controller: pcaController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('pca', val))),
-                                _FormFieldSpec(controller: otController, widget: AnimatedInputField(label: "OT", controller: otController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('ot', val))),
+                                _FormFieldSpec(fieldKey: 'bp', controller: bpController, widget: AnimatedInputField(label: "BP", controller: bpController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('bp'), onChanged: (val) { _onFieldChanged('bp', val); isBpChanged = true; })),
+                                _FormFieldSpec(fieldKey: 'da', controller: daController, widget: AnimatedInputField(label: "DA", controller: daController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('da'), onChanged: (val) => _onAutoCalculatedFieldChanged('da', val))),
+                                _FormFieldSpec(fieldKey: 'hra', controller: hraController, widget: AnimatedInputField(label: "HRA", controller: hraController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('hra'), onChanged: (val) => _onAutoCalculatedFieldChanged('hra', val))),
+                                _FormFieldSpec(fieldKey: 'npa', controller: npaController, widget: AnimatedInputField(label: "NPA", controller: npaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('npa'), onChanged: (val) => _onAutoCalculatedFieldChanged('npa', val))),
+                                _FormFieldSpec(fieldKey: 'splpay', controller: splpayController, widget: AnimatedInputField(label: "SPECIAL PAY", controller: splpayController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('splpay'), onChanged: (val) => _onFieldChanged('splpay', val))),
+                                _FormFieldSpec(fieldKey: 'conv', controller: convController, widget: AnimatedInputField(label: "CONVEYANCE", controller: convController, icon: Icons.directions_car_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('conv'), onChanged: (val) => _onFieldChanged('conv', val))),
+                                _FormFieldSpec(fieldKey: 'pg', controller: pgController, widget: AnimatedInputField(label: "PG", controller: pgController, icon: Icons.school_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('pg'), onChanged: (val) => _onFieldChanged('pg', val))),
+                                _FormFieldSpec(fieldKey: 'annual', controller: annualController, widget: AnimatedInputField(label: "ANNUAL", controller: annualController, icon: Icons.event_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('annual'), onChanged: (val) => _onFieldChanged('annual', val))),
+                                _FormFieldSpec(fieldKey: 'uniform', controller: uniformController, widget: AnimatedInputField(label: "UNIFORM", controller: uniformController, icon: Icons.checkroom_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('uniform'), onChanged: (val) => _onFieldChanged('uniform', val))),
+                                _FormFieldSpec(fieldKey: 'nursing', controller: nursingController, widget: AnimatedInputField(label: "NURSING", controller: nursingController, icon: Icons.local_hospital_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('nursing'), onChanged: (val) => _onFieldChanged('nursing', val))),
+                                _FormFieldSpec(fieldKey: 'ta', controller: taController, widget: AnimatedInputField(label: "TA", controller: taController, icon: Icons.flight_takeoff_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('ta'), onChanged: (val) { _onFieldChanged('ta', val); isTaChanged = true; })),
+                                _FormFieldSpec(fieldKey: 'daonta', controller: daontaController, widget: AnimatedInputField(label: "DA ON TA", controller: daontaController, icon: Icons.currency_rupee_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('daonta'), onChanged: (val) => _onAutoCalculatedFieldChanged('daonta', val))),
+                                _FormFieldSpec(fieldKey: 'medical', controller: medicalController, widget: AnimatedInputField(label: "MEDICAL", controller: medicalController, icon: Icons.medical_services_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('medical'), onChanged: (val) => _onFieldChanged('medical', val))),
+                                _FormFieldSpec(fieldKey: 'dirt', controller: dirtController, widget: AnimatedInputField(label: "DIRT", controller: dirtController, icon: Icons.cleaning_services_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('dirt'), onChanged: (val) => _onFieldChanged('dirt', val))),
+                                _FormFieldSpec(fieldKey: 'washing', controller: washingController, widget: AnimatedInputField(label: "WASHING", controller: washingController, icon: Icons.local_laundry_service_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('washing'), onChanged: (val) => _onFieldChanged('washing', val))),
+                                _FormFieldSpec(fieldKey: 'tb', controller: tbController, widget: AnimatedInputField(label: "TB", controller: tbController, icon: Icons.sick_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('tb'), onChanged: (val) => _onFieldChanged('tb', val))),
+                                _FormFieldSpec(fieldKey: 'night', controller: nightController, widget: AnimatedInputField(label: "NIGHT", controller: nightController, icon: Icons.nights_stay_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('night'), onChanged: (val) => _onFieldChanged('night', val))),
+                                _FormFieldSpec(fieldKey: 'drive', controller: driveController, widget: AnimatedInputField(label: "CONTINGENCY", controller: driveController, icon: Icons.warning_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('drive'), onChanged: (val) => _onFieldChanged('drive', val))),
+                                _FormFieldSpec(fieldKey: 'cycle', controller: cycleController, widget: AnimatedInputField(label: "CYCLE", controller: cycleController, icon: Icons.pedal_bike_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('cycle'), onChanged: (val) => _onFieldChanged('cycle', val))),
+                                _FormFieldSpec(fieldKey: 'pca', controller: pcaController, widget: AnimatedInputField(label: "PCA", controller: pcaController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('pca'), onChanged: (val) => _onFieldChanged('pca', val))),
+                                _FormFieldSpec(fieldKey: 'ot', controller: otController, widget: AnimatedInputField(label: "OT", controller: otController, icon: Icons.computer_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('ot'), onChanged: (val) => _onFieldChanged('ot', val))),
                               ];
 
                               final List<Widget> activeAllowanceWidgets = [];
                               final List<Widget> zeroAllowanceWidgets = [];
 
                               for (var spec in allowanceSpecs) {
-                                if (_isFieldZero(spec.controller)) {
+                                if (_shouldBeInZeroSection(spec.fieldKey, spec.controller)) {
                                   zeroAllowanceWidgets.add(spec.widget);
                                 } else {
                                   activeAllowanceWidgets.add(spec.widget);
@@ -914,22 +950,24 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                           Builder(
                             builder: (context) {
                               final deductionSpecs = [
-                                _FormFieldSpec(controller: incometaxController, widget: AnimatedInputField(label: "INCOME TAX", controller: incometaxController, icon: Icons.request_quote_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('incometax', val))),
-                                _FormFieldSpec(controller: gisController, widget: AnimatedInputField(label: "GIS", controller: gisController, icon: Icons.security_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('gis', val))),
-                                _FormFieldSpec(controller: slfController, widget: AnimatedInputField(label: "SLF", controller: slfController, icon: Icons.savings_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('slf', val))),
-                                _FormFieldSpec(controller: societyController, widget: AnimatedInputField(label: "SOCIETY", controller: societyController, icon: Icons.groups_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('society', val))),
-                                _FormFieldSpec(controller: recoveryController, widget: AnimatedInputField(label: "RECOVERY", controller: recoveryController, icon: Icons.restore_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('recovery', val))),
-                                _FormFieldSpec(controller: wfController, widget: AnimatedInputField(label: "WIDOW WELFARE FUND", controller: wfController, icon: Icons.volunteer_activism_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('wf', val))),
-                                _FormFieldSpec(controller: medController, widget: AnimatedInputField(label: "MCD-EHS", controller: medController, icon: Icons.health_and_safety_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('med', val))),
-                                _FormFieldSpec(controller: waterController, widget: AnimatedInputField(label: "WATER CHARGES", controller: waterController, icon: Icons.water_drop_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('water', val))),
-                                _FormFieldSpec(controller: otherController, widget: AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, onChanged: (val) => _onFieldChanged('other', val))),
+                                _FormFieldSpec(fieldKey: 'incometax', controller: incometaxController, widget: AnimatedInputField(label: "INCOME TAX", controller: incometaxController, icon: Icons.request_quote_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('incometax'), onChanged: (val) => _onFieldChanged('incometax', val))),
+                                _FormFieldSpec(fieldKey: 'gis', controller: gisController, widget: AnimatedInputField(label: "GIS", controller: gisController, icon: Icons.security_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('gis'), onChanged: (val) => _onFieldChanged('gis', val))),
+                                _FormFieldSpec(fieldKey: 'slf', controller: slfController, widget: AnimatedInputField(label: "SLF", controller: slfController, icon: Icons.savings_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('slf'), onChanged: (val) => _onFieldChanged('slf', val))),
+                                _FormFieldSpec(fieldKey: 'society', controller: societyController, widget: AnimatedInputField(label: "SOCIETY", controller: societyController, icon: Icons.groups_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('society'), onChanged: (val) => _onFieldChanged('society', val))),
+                                _FormFieldSpec(fieldKey: 'recovery', controller: recoveryController, widget: AnimatedInputField(label: "RECOVERY", controller: recoveryController, icon: Icons.restore_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('recovery'), onChanged: (val) => _onFieldChanged('recovery', val))),
+                                _FormFieldSpec(fieldKey: 'wf', controller: wfController, widget: AnimatedInputField(label: "WIDOW WELFARE FUND", controller: wfController, icon: Icons.volunteer_activism_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('wf'), onChanged: (val) => _onFieldChanged('wf', val))),
+                                _FormFieldSpec(fieldKey: 'med', controller: medController, widget: AnimatedInputField(label: "MCD-EHS", controller: medController, icon: Icons.health_and_safety_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('med'), onChanged: (val) => _onFieldChanged('med', val))),
+                                _FormFieldSpec(fieldKey: 'water', controller: waterController, widget: AnimatedInputField(label: "WATER CHARGES", controller: waterController, icon: Icons.water_drop_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('water'), onChanged: (val) => _onFieldChanged('water', val))),
+                                _FormFieldSpec(fieldKey: 'other', controller: otherController, widget: AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('other'), onChanged: (val) => _onFieldChanged('other', val))),
                                 _FormFieldSpec(
+                                  fieldKey: 'gpf',
                                   controller: gpfController,
                                   widget: _buildCheckboxInputField(
                                     label: "GPF",
                                     controller: gpfController,
                                     icon: Icons.savings_rounded,
                                     isChecked: gpfchk,
+                                    focusNode: _getFocusNode('gpf'),
                                     onChanged: (val) {
                                       setState(() {
                                         gpfchk = val!;
@@ -942,12 +980,14 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   ),
                                 ),
                                 _FormFieldSpec(
+                                  fieldKey: 'nps',
                                   controller: npsController,
                                   widget: _buildCheckboxInputField(
                                     label: "NPS",
                                     controller: npsController,
                                     icon: Icons.account_balance_rounded,
                                     isChecked: npschk,
+                                    focusNode: _getFocusNode('nps'),
                                     onChanged: (val) {
                                       setState(() {
                                         npschk = val!;
@@ -964,12 +1004,14 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   ),
                                 ),
                                 _FormFieldSpec(
+                                  fieldKey: 'epf',
                                   controller: epfController,
                                   widget: _buildCheckboxInputField(
                                     label: "EPF",
                                     controller: epfController,
                                     icon: Icons.account_balance_wallet_rounded,
                                     isChecked: epfchk,
+                                    focusNode: _getFocusNode('epf'),
                                     onChanged: (val) {
                                       setState(() {
                                         epfchk = val!;
@@ -986,12 +1028,14 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   ),
                                 ),
                                 _FormFieldSpec(
+                                  fieldKey: 'esi',
                                   controller: esiController,
                                   widget: _buildCheckboxInputField(
                                     label: "ESI",
                                     controller: esiController,
                                     icon: Icons.medical_information_rounded,
                                     isChecked: esichk,
+                                    focusNode: _getFocusNode('esi'),
                                     onChanged: (val) {
                                       setState(() {
                                         esichk = val!;
@@ -1013,7 +1057,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                               final List<Widget> zeroDeductionWidgets = [];
 
                               for (var spec in deductionSpecs) {
-                                if (_isFieldZero(spec.controller)) {
+                                if (_shouldBeInZeroSection(spec.fieldKey, spec.controller)) {
                                   zeroDeductionWidgets.add(spec.widget);
                                 } else {
                                   activeDeductionWidgets.add(spec.widget);
@@ -1026,7 +1070,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                   "Details of Deduction",
                                   Icons.money_off_rounded,
                                   activeDeductionWidgets,
-                                  expandableTitle: "Other Deductions",
+                                  expandableTitle: "Other Fields",
                                   expandableChildren: zeroDeductionWidgets,
                                 ),
                               );
@@ -1590,6 +1634,7 @@ class AnimatedInputField extends StatefulWidget {
   final bool readOnly;
   final bool enabled;
   final ValueChanged<String>? onChanged;
+  final FocusNode? focusNode;
 
   const AnimatedInputField({
     super.key,
@@ -1601,6 +1646,7 @@ class AnimatedInputField extends StatefulWidget {
     this.readOnly = false,
     this.enabled = true,
     this.onChanged,
+    this.focusNode,
   });
 
   @override
@@ -1649,6 +1695,7 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                 ],
               ),
               child: TextField(
+                focusNode: widget.focusNode,
                 readOnly: isEffectivelyReadOnly,
                 enabled: widget.enabled,
                 keyboardType: widget.keyboardType,
