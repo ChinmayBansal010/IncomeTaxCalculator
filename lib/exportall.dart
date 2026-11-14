@@ -113,7 +113,7 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
       final orderedKeys = [
         "biometricid", "name", "designation", "bp", "da", "hra", "npa", "splpay", "conv", "pg", "annual",
         "uniform", "nursing", "ta", "daonta", "medical", "dirt", "washing", "tb", "night", "drive", "cycle",
-        "pca", "ot","gross", "incometax", "gis", "gpf", "nps", "epf", "esi", "slf",
+        "pca", "ot", "gross", "incometax", "gis", "gpf", "nps", "epf", "esi", "slf",
         "society", "recovery", "wf", "other", "totalded", "netsalary",
         "dap", "hrap", "tap", "npap", "gpfchk", "npschk", "epfchk", "esichk"
       ];
@@ -551,7 +551,7 @@ Future<void> exportAll() async {
   ];
 
   for (final s in allSheets) {
-    s.getRangeByIndex(2, 2).freezePanes();
+    s.getRangeByIndex(2, 3).freezePanes();
   }
 
   final List<int> bytes = workbook.saveAsStream();
@@ -573,14 +573,63 @@ Future<void> exportAll() async {
 
 }
 
+final Set<String> _dateHeaders = {
+  'Date of Birth', 'Date of Appointment', 'Date of Retirement',
+  'Date of Joining Office', 'Date of Resignation', 'Date of Transfer',
+  'Date of Death', 'dob', 'doa', 'dort', 'dojo', 'dorn', 'dot', 'dod'
+};
+
+final Set<String> _codeCenterHeaders = {
+  'Biometric ID', 'Gender', 'Group', 'Category', 'Pay Level', 'Aadhaar No.',
+  'Mobile No.', 'Bank Account No.', 'MICR No.', 'IFSC Code', 'PAN No.',
+  'PAN Number', 'GPF No.', 'NPS No.', 'EPF No.', 'ESI No.', 'Vehicle No.',
+  'Voter ID', 'Blood Group', 'Emergency No.', 'DA CHK', 'HRA CHK', 'TA CHK',
+  'NPA CHK', 'GPF CHK', 'NPS CHK', 'EPF CHK', 'ESI CHK', 'dap', 'hrap',
+  'tap', 'npap', 'gpfchk', 'npschk', 'epfchk', 'esichk'
+};
+
+final Set<String> _nonNumericHeaders = {
+  'Biometric ID', 'Name', 'Designation', 'Employee Type', 'Place of Duty',
+  'Father/Husband Name', 'Date of Birth', 'Date of Appointment', 'Date of Retirement',
+  'Group', 'Category', 'Gender', 'Address', 'Aadhaar No.', 'Mobile No.',
+  'Bank Account No.', 'Bank Branch', 'MICR No.', 'IFSC Code', 'PAN No.', 'PAN Number',
+  'Pay Scale', 'Pay Level', 'GPF No.', 'NPS No.', 'EPF No.', 'ESI No.', 'Email ID',
+  'Vehicle No.', 'Voter ID', 'Date of Joining Office', 'Blood Group', 'Emergency No.',
+  'NIC Email ID', 'Date of Resignation', 'Date of Transfer', 'Place of Transfer',
+  'Date of Death', 'Educational', 'Bank Name', 'O Name', 'O PAN', 'Post Office',
+  'DA CHK', 'HRA CHK', 'TA CHK', 'NPA CHK', 'GPF CHK', 'NPS CHK', 'EPF CHK', 'ESI CHK',
+  'dap', 'hrap', 'tap', 'npap', 'gpfchk', 'npschk', 'epfchk', 'esichk',
+};
+
+xlsio.HAlignType _getColumnHAlign(String colHeader) {
+  if (_dateHeaders.contains(colHeader) || _codeCenterHeaders.contains(colHeader)) {
+    return xlsio.HAlignType.center;
+  }
+  if (_nonNumericHeaders.contains(colHeader)) {
+    return xlsio.HAlignType.left;
+  }
+  return xlsio.HAlignType.right;
+}
+
+bool _isNumericColumn(String colHeader) {
+  return !_nonNumericHeaders.contains(colHeader);
+}
+
 void setColumns(xlsio.Worksheet sheet, List<dynamic> columns) {
+  sheet.getRangeByIndex(1, 1).rowHeight = 26;
   for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-    sheet.getRangeByIndex(1 , colIndex + 1).setText(columns[colIndex]);
-    sheet.getRangeByIndex(1 , colIndex + 1).columnWidth = 15;
-    sheet.getRangeByIndex(1 , colIndex + 1).cellStyle.hAlign = xlsio.HAlignType.left;
-    sheet.getRangeByIndex(1 , colIndex + 1).cellStyle.vAlign = xlsio.VAlignType.center;
-    sheet.getRangeByIndex(1 , colIndex + 1).cellStyle.bold = true;
-    sheet.getRangeByIndex(1 , colIndex + 1).cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+    final colName = columns[colIndex].toString();
+    final cell = sheet.getRangeByIndex(1, colIndex + 1);
+    cell.setText(colName);
+    cell.cellStyle.backColor = '#1E3A8A';
+    cell.cellStyle.fontColor = '#FFFFFF';
+    cell.cellStyle.bold = true;
+    cell.cellStyle.fontSize = 11;
+    cell.cellStyle.fontName = 'Segoe UI';
+    cell.cellStyle.hAlign = _getColumnHAlign(colName);
+    cell.cellStyle.vAlign = xlsio.VAlignType.center;
+    cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+    cell.cellStyle.borders.all.color = '#1E40AF';
   }
 }
 
@@ -594,15 +643,41 @@ void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data, {bool addTot
   for (var entry in data.entries) {
     var rowData = entry.value;
     if (rowData is Map) {
+      sheet.getRangeByIndex(rowIndex, 1).rowHeight = 20;
+      final isEvenRow = (rowIndex % 2 == 0);
+      final rowBgColor = isEvenRow ? '#FFFFFF' : '#F8FAFC';
+
       for (var colIndex = 0; colIndex < columnHeaders.length; colIndex++) {
         final colHeader = columnHeaders[colIndex];
-        final val = rowData[colHeader] ?? '';
+        final rawVal = rowData[colHeader] ?? '';
         final cell = sheet.getRangeByIndex(rowIndex, colIndex + 1);
-        cell.setValue(val);
-        cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
-        cell.cellStyle.hAlign = xlsio.HAlignType.left;
+        final isNum = _isNumericColumn(colHeader);
+
+        cell.cellStyle.backColor = rowBgColor;
+        cell.cellStyle.fontSize = 10;
+        cell.cellStyle.fontName = 'Segoe UI';
+        cell.cellStyle.fontColor = '#0F172A';
         cell.cellStyle.vAlign = xlsio.VAlignType.center;
-        cell.cellStyle.wrapText = true;
+        cell.cellStyle.hAlign = _getColumnHAlign(colHeader);
+        cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+        cell.cellStyle.borders.all.color = '#E2E8F0';
+
+        if (isNum && rawVal != null && rawVal.toString().trim().isNotEmpty && rawVal.toString().trim() != 'null') {
+          final strVal = rawVal.toString().trim();
+          final numVal = double.tryParse(strVal);
+          if (numVal != null) {
+            if (numVal == numVal.roundToDouble()) {
+              cell.setValue(numVal.round());
+            } else {
+              cell.setValue(numVal);
+            }
+            cell.cellStyle.numberFormat = '#,##0';
+          } else {
+            cell.setValue(rawVal);
+          }
+        } else {
+          cell.setValue(rawVal);
+        }
       }
       rowIndex++;
     }
@@ -610,32 +685,28 @@ void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data, {bool addTot
 
   if (addTotalRow) {
     final totalRowIndex = rowIndex;
-    final nonNumericHeaders = {
-      'Biometric ID', 'Name', 'Designation', 'Employee Type', 'Place of Duty',
-      'Father/Husband Name', 'Date of Birth', 'Date of Appointment', 'Date of Retirement',
-      'Group', 'Category', 'Gender', 'Address', 'Aadhaar No.', 'Mobile No.',
-      'Bank Account No.', 'Bank Branch', 'MICR No.', 'IFSC Code', 'PAN No.', 'PAN Number',
-      'Pay Scale', 'Pay Level', 'GPF No.', 'NPS No.', 'EPF No.', 'ESI No.', 'Email ID',
-      'Vehicle No.', 'Voter ID', 'Date of Joining Office', 'Blood Group', 'Emergency No.',
-      'NIC Email ID', 'Date of Resignation', 'Date of Transfer', 'Place of Transfer',
-      'Date of Death', 'Educational', 'Bank Name', 'O Name', 'O PAN', 'Post Office',
-      'DA CHK', 'HRA CHK', 'TA CHK', 'NPA CHK', 'GPF CHK', 'NPS CHK', 'EPF CHK', 'ESI CHK',
-      'dap', 'hrap', 'tap', 'npap', 'gpfchk', 'npschk', 'epfchk', 'esichk',
-    };
+    sheet.getRangeByIndex(totalRowIndex, 1).rowHeight = 22;
 
     for (var colIndex = 0; colIndex < columnHeaders.length; colIndex++) {
       final colHeader = columnHeaders[colIndex];
       final cell = sheet.getRangeByIndex(totalRowIndex, colIndex + 1);
-      cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
-      cell.cellStyle.vAlign = xlsio.VAlignType.center;
+      final isNum = _isNumericColumn(colHeader);
+
+      cell.cellStyle.backColor = '#E0F2FE';
       cell.cellStyle.bold = true;
+      cell.cellStyle.fontSize = 11;
+      cell.cellStyle.fontName = 'Segoe UI';
+      cell.cellStyle.fontColor = '#1E3A8A';
+      cell.cellStyle.vAlign = xlsio.VAlignType.center;
+      cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+      cell.cellStyle.borders.all.color = '#94A3B8';
 
       if (colIndex == 0) {
         cell.setText("TOTAL");
         cell.cellStyle.hAlign = xlsio.HAlignType.left;
-      } else if (nonNumericHeaders.contains(colHeader)) {
+      } else if (!isNum) {
         cell.setText("");
-        cell.cellStyle.hAlign = xlsio.HAlignType.left;
+        cell.cellStyle.hAlign = xlsio.HAlignType.center;
       } else {
         double colSum = 0;
         bool hasValidNumber = false;
@@ -662,16 +733,24 @@ void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data, {bool addTot
           } else {
             cell.setValue(colSum);
           }
+          cell.cellStyle.numberFormat = '#,##0';
+          cell.cellStyle.hAlign = xlsio.HAlignType.right;
         } else {
           cell.setText("");
+          cell.cellStyle.hAlign = xlsio.HAlignType.center;
         }
-        cell.cellStyle.hAlign = xlsio.HAlignType.left;
       }
     }
     rowIndex++;
   }
 
   sheet.getRangeByIndex(1, 1, rowIndex - 1, columnHeaders.length).autoFit();
+  for (var colIndex = 0; colIndex < columnHeaders.length; colIndex++) {
+    final range = sheet.getRangeByIndex(1, colIndex + 1);
+    if (range.columnWidth < 14) {
+      range.columnWidth = 14;
+    }
+  }
 }
 
 void writeDaDataToExcel(Map<String, dynamic> data, xlsio.Worksheet sheet) {
@@ -680,6 +759,20 @@ void writeDaDataToExcel(Map<String, dynamic> data, xlsio.Worksheet sheet) {
   sheet.getRangeByName('C1').setText('HRA');
   sheet.getRangeByName('D1').setText('NPA');
 
+  sheet.getRangeByIndex(1, 1).rowHeight = 26;
+  for (int col = 1; col <= 4; col++) {
+    final cell = sheet.getRangeByIndex(1, col);
+    cell.cellStyle.backColor = '#1E3A8A';
+    cell.cellStyle.fontColor = '#FFFFFF';
+    cell.cellStyle.bold = true;
+    cell.cellStyle.fontSize = 11;
+    cell.cellStyle.fontName = 'Segoe UI';
+    cell.cellStyle.hAlign = col == 1 ? xlsio.HAlignType.center : xlsio.HAlignType.right;
+    cell.cellStyle.vAlign = xlsio.VAlignType.center;
+    cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+    cell.cellStyle.borders.all.color = '#1E40AF';
+  }
+
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -687,6 +780,10 @@ void writeDaDataToExcel(Map<String, dynamic> data, xlsio.Worksheet sheet) {
 
   int row = 2;
   for (var month in months) {
+    sheet.getRangeByIndex(row, 1).rowHeight = 20;
+    final isEvenRow = (row % 2 == 0);
+    final rowBgColor = isEvenRow ? '#FFFFFF' : '#F8FAFC';
+
     sheet.getRangeByIndex(row, 1).setText(month);
     sheet.getRangeByIndex(row, 2).setValue(data['$month DA'] ?? '');
     sheet.getRangeByIndex(row, 3).setValue(data['$month HRA'] ?? '');
@@ -694,8 +791,13 @@ void writeDaDataToExcel(Map<String, dynamic> data, xlsio.Worksheet sheet) {
 
     for (int col = 1; col <= 4; col++) {
       final cell = sheet.getRangeByIndex(row, col);
+      cell.cellStyle.backColor = rowBgColor;
+      cell.cellStyle.fontSize = 10;
+      cell.cellStyle.fontName = 'Segoe UI';
+      cell.cellStyle.fontColor = '#0F172A';
       cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
-      cell.cellStyle.hAlign = xlsio.HAlignType.left;
+      cell.cellStyle.borders.all.color = '#E2E8F0';
+      cell.cellStyle.hAlign = col == 1 ? xlsio.HAlignType.center : xlsio.HAlignType.right;
       cell.cellStyle.vAlign = xlsio.VAlignType.center;
     }
 
@@ -703,5 +805,11 @@ void writeDaDataToExcel(Map<String, dynamic> data, xlsio.Worksheet sheet) {
   }
 
   sheet.getRangeByIndex(1, 1, row - 1, 4).autoFit();
+  for (int col = 1; col <= 4; col++) {
+    final range = sheet.getRangeByIndex(1, col);
+    if (range.columnWidth < 14) {
+      range.columnWidth = 14;
+    }
+  }
 }
 
