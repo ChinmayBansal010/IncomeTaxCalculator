@@ -20,11 +20,11 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
     final mainMap = Map<String, dynamic>.from(mainSnap.snapshot.value as Map);
 
     final orderedKeys = [
-      "biometricid","name", "fhname", "designation", "dob", "doa", "dort", "group", "category",
+      "biometricid", "name", "fhname", "designation", "emptype", "place", "dob", "doa", "dort", "group", "category",
       "sex", "address", "aadhaarno", "mobileno", "accountno", "branch", "micrno",
-      "ifsc", "panno", "payscale", "level", "gpfno", "npsno","epfno", "esino", "emailid", "cycleno",
-      "voterid", "dojo", "place", "bloodgrp", "emergencyno", "nicemailid", "dorn", "dot", "pot", "dod",
-      "education", "emptype", "bname", "ext3", "ext4"
+      "ifsc", "panno", "payscale", "level", "gpfno", "npsno", "epfno", "esino", "emailid", "cycleno",
+      "voterid", "dojo", "bloodgrp", "emergencyno", "nicemailid", "dorn", "dot", "pot", "dod",
+      "education", "bname", "ext3", "ext4"
     ];
 
     final Map<String, String> labelMap = {
@@ -32,6 +32,8 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "name": "Name",
       "fhname": "Father/Husband Name",
       "designation": "Designation",
+      "emptype": "Employee Type",
+      "place": "Place of Duty",
       "dob": "Date of Birth",
       "doa": "Date of Appointment",
       "dort": "Date of Retirement",
@@ -56,7 +58,6 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "cycleno": "Vehicle No.",
       "voterid": "Voter ID",
       "dojo": "Date of Joining Office",
-      "place": "Place",
       "bloodgrp": "Blood Group",
       "emergencyno": "Emergency No.",
       "nicemailid": "NIC Email ID",
@@ -65,7 +66,6 @@ Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
       "pot": "Place of Transfer",
       "dod": "Date of Death",
       "education": "Educational",
-      "emptype": "Employment Type",
       "bname": "Bank Name",
       "ext3": "Extra Field 3",
       "ext4": "Extra Field 4",
@@ -113,8 +113,8 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
       final orderedKeys = [
         "biometricid", "name", "designation", "bp", "da", "hra", "npa", "splpay", "conv", "pg", "annual",
         "uniform", "nursing", "ta", "daonta", "medical", "dirt", "washing", "tb", "night", "drive", "cycle",
-        "pca", "daext1", "daext2", "daext3", "daext4", "gross", "incometax", "gis", "gpf", "nps", "epf", "esi", "slf",
-        "society", "recovery", "wf", "other", "ddext1", "ddext2", "ddext3", "ddext4", "totalded", "netsalary",
+        "pca", "gross", "incometax", "gis", "gpf", "nps", "epf", "esi", "slf",
+        "society", "recovery", "wf", "other", "totalded", "netsalary",
         "dap", "hrap", "tap", "npap", "gpfchk", "npschk", "epfchk", "esichk"
       ];
 
@@ -142,10 +142,6 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
         "drive": "Drive",
         "cycle": "Cycle",
         "pca": "PCA",
-        "daext1": "Extra 1",
-        "daext2": "Extra 2",
-        "daext3": "Extra 3",
-        "daext4": "Extra 4",
         "gross": "Gross Salary",
         "incometax": "Income Tax",
         "gis": "GIS",
@@ -158,10 +154,6 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
         "recovery": "Recovery",
         "wf": "W/F Fund",
         "other": "Other",
-        "ddext1": "Extra 1",
-        "ddext2": "Extra 2",
-        "ddext3": "Extra 3",
-        "ddext4": "Extra 4",
         "totalded": "Total Deduction",
         "netsalary": "Net Salary",
         "dap": "DA CHK",
@@ -500,54 +492,20 @@ Future<void> exportAll() async {
   itaxnewSheet.name = 'ItaxNew';
   daSheet.name = 'DA%';
 
-  var columns = <String>{};
-
-  for (var record in maindata.values) {
-    if (record is Map) {
-      columns.addAll(record.keys.cast<String>());
+  List<String> getSheetColumns(Map<String, dynamic> dataMap) {
+    if (dataMap.isEmpty) return [];
+    final first = dataMap.values.first;
+    if (first is Map) {
+      return first.keys.cast<String>().toList();
     }
+    return [];
   }
-  final maincolumns = columns.toList();
 
-  columns = <String>{};
-
-  for (var record in mardata.values) {
-    if (record is Map) {
-      columns.addAll(record.keys.cast<String>());
-    }
-  }
-  final monthcolumns = columns.toList();
-
-
-  columns = <String>{};
-
-  for (var record in arrdata.values) {
-    if (record is Map) {
-      columns.addAll(record.keys.cast<String>());
-    }
-  }
-  final arrcolumns = columns.toList();
-
-  columns = <String>{};
-
-  for (var record in deddata.values) {
-    if (record is Map) {
-      columns.addAll(record.keys.cast<String>());
-    }
-  }
-  final dedcolumns = columns.toList();
-
-  columns = <String>{};
-
-  for (var record in itaxnewdata.values) {
-    if (record is Map) {
-      columns.addAll(record.keys.cast<String>());
-    }
-  }
-  final itaxnewcolumns = columns.toList();
-
-
-
+  final maincolumns = getSheetColumns(maindata);
+  final monthcolumns = getSheetColumns(mardata);
+  final arrcolumns = getSheetColumns(arrdata);
+  final dedcolumns = getSheetColumns(deddata);
+  final itaxnewcolumns = getSheetColumns(itaxnewdata);
 
   setColumns(mainSheet, maincolumns);
   setColumns(marSheet, monthcolumns);
@@ -585,8 +543,6 @@ Future<void> exportAll() async {
 
   writeDaDataToExcel(dadata,daSheet);
 
-
-
   final List<int> bytes = workbook.saveAsStream();
   workbook.dispose();
 
@@ -617,23 +573,30 @@ void setColumns(xlsio.Worksheet sheet, List<dynamic> columns) {
   }
 }
 
-
 void setDataValue(xlsio.Worksheet sheet, Map<String, dynamic> data) {
+  if (data.isEmpty) return;
+  final firstRow = data.values.first;
+  if (firstRow is! Map) return;
+  final columnHeaders = firstRow.keys.toList().cast<String>();
+
   var rowIndex = 2;
-  for (var entry in data.entries){
-    var columnIndex=1;
+  for (var entry in data.entries) {
     var rowData = entry.value;
-    for(dynamic values in rowData.values){
-      sheet.getRangeByIndex(rowIndex, columnIndex).setValue(values);
-      sheet.getRangeByIndex(rowIndex, columnIndex).cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
-      sheet.getRangeByIndex(rowIndex, columnIndex).cellStyle.hAlign = xlsio.HAlignType.left;
-      sheet.getRangeByIndex(rowIndex, columnIndex).cellStyle.vAlign = xlsio.VAlignType.center;
-      sheet.getRangeByIndex(rowIndex, columnIndex).cellStyle.wrapText = true;
-      columnIndex++;
+    if (rowData is Map) {
+      for (var colIndex = 0; colIndex < columnHeaders.length; colIndex++) {
+        final colHeader = columnHeaders[colIndex];
+        final val = rowData[colHeader] ?? '';
+        final cell = sheet.getRangeByIndex(rowIndex, colIndex + 1);
+        cell.setValue(val);
+        cell.cellStyle.borders.all.lineStyle = xlsio.LineStyle.thin;
+        cell.cellStyle.hAlign = xlsio.HAlignType.left;
+        cell.cellStyle.vAlign = xlsio.VAlignType.center;
+        cell.cellStyle.wrapText = true;
+      }
+      rowIndex++;
     }
-    rowIndex++;
   }
-  sheet.getRangeByIndex(1, 1, rowIndex - 1, data.values.first.length).autoFit();
+  sheet.getRangeByIndex(1, 1, rowIndex - 1, columnHeaders.length).autoFit();
 }
 
 void writeDaDataToExcel(Map<String, dynamic> data, xlsio.Worksheet sheet) {

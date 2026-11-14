@@ -518,7 +518,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                         title: Row(
                           children: [
                             Text(
-                              expandableTitle ?? "Other Fields",
+                              expandableTitle ?? "Other Deductions",
                               style: TextStyle(
                                 fontSize: isMobile ? 13 : 15,
                                 fontWeight: FontWeight.w800,
