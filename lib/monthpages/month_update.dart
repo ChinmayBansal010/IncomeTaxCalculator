@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:incometax/date_utils.dart';
 import 'package:incometax/shared.dart';
 
 class MonthDataPage extends StatefulWidget {
@@ -1524,15 +1525,12 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
         DateTime? fyStartDate;
 
         if (dRetierment.isNotEmpty) {
-          List<String> parts = dRetierment.split("-");
-          int day = int.parse(parts[0]);
-          int month = int.parse(parts[1]);
-          int year = int.parse(parts[2]);
-          retirementDate = DateTime(year, month, day);
-
-          List<String> years = sharedData.ccurrentYear.split("-");
-          int startYear = int.parse(years[0]);
-          fyStartDate = DateTime(startYear, 3, 1);
+          retirementDate = parseDateDDMMYYYY(dRetierment);
+          if (retirementDate != null) {
+            List<String> years = sharedData.ccurrentYear.split("-");
+            int startYear = int.parse(years[0]);
+            fyStartDate = DateTime(startYear, 3, 1);
+          }
         }
 
         for (int i = targetIndex; i < months.length; i++) {

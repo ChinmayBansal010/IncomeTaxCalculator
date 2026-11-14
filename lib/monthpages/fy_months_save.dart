@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:incometax/date_utils.dart';
 import '../shared.dart';
 
 class FyMonthInfo {
@@ -441,13 +442,8 @@ class _FyMonthsSavePageState extends State<FyMonthsSavePage> {
 
     if (dRetierment.isNotEmpty) {
       try {
-        List<String> parts = dRetierment.split("-");
-        if (parts.length == 3) {
-          int day = int.parse(parts[0]);
-          int month = int.parse(parts[1]);
-          int year = int.parse(parts[2]);
-          retirementDate = DateTime(year, month, day);
-
+        retirementDate = parseDateDDMMYYYY(dRetierment);
+        if (retirementDate != null) {
           List<String> years = sharedData.ccurrentYear.split("-");
           int startYear = int.parse(years[0]);
           fyStartDate = DateTime(startYear, 3, 1);

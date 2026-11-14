@@ -200,6 +200,34 @@ bool isValidDateDDMMYYYY(String dateStr) {
   return day >= 1 && day <= maxDays;
 }
 
+DateTime? parseDateDDMMYYYY(String dateStr) {
+  final trimmed = dateStr.trim();
+  if (trimmed.isEmpty) return null;
+
+  final clean = trimmed.replaceAll('-', '/').replaceAll('.', '/');
+  final parts = clean.split('/');
+  if (parts.length != 3) return null;
+
+  final day = int.tryParse(parts[0]);
+  final month = int.tryParse(parts[1]);
+  final year = int.tryParse(parts[2]);
+
+  if (day == null || month == null || year == null) return null;
+  if (year < 1900 || year > 2100 || month < 1 || month > 12) return null;
+
+  int maxDays = 31;
+  if (month == 4 || month == 6 || month == 9 || month == 11) {
+    maxDays = 30;
+  } else if (month == 2) {
+    final isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    maxDays = isLeapYear ? 29 : 28;
+  }
+
+  if (day < 1 || day > maxDays) return null;
+
+  return DateTime(year, month, day);
+}
+
 String formatToDDMMYYYY(String dateStr) {
   final trimmed = dateStr.trim();
   if (trimmed.isEmpty) return '';

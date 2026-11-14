@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,6 +54,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Income Tax Calculator',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('en', 'GB'),
+      supportedLocales: const [
+        Locale('en', 'GB'),
+        Locale('en', 'IN'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2563EB),
