@@ -11,54 +11,53 @@ class DateInputFormatter extends TextInputFormatter {
     final oldText = oldValue.text;
     final newText = newValue.text;
 
-    // Deletion / Backspacing
+    if (newText.isEmpty) {
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
+    }
+
+    // Handle Deletion / Backspace
     if (newText.length < oldText.length) {
       int cursorPosition = newValue.selection.end;
 
-      // If user deleted a hyphen (e.g. at position 3 "12-" or position 6 "12-05-")
-      if ((oldText.length == 3 && oldText.endsWith('-') && newText.length == 2) ||
-          (oldText.length == 6 && oldText.endsWith('-') && newText.length == 5)) {
+      // If user deleted a '/' (e.g. at position 3 "01/" or position 6 "01/03/")
+      if ((oldText.length == 3 && oldText.endsWith('/') && !newText.contains('/')) ||
+          (oldText.length == 6 && oldText.endsWith('/') && newText.endsWith('/'))) {
         String digits = newText.replaceAll(RegExp(r'\D'), '');
         if (digits.isNotEmpty) {
           digits = digits.substring(0, digits.length - 1);
         }
-        final formatted = _formatDigits(digits);
+        final formatted = _formatDigitsOnly(digits);
         return TextEditingValue(
           text: formatted,
           selection: TextSelection.collapsed(offset: formatted.length),
         );
       }
 
-      String digits = newText.replaceAll(RegExp(r'\D'), '');
-      if (digits.length > 8) {
-        digits = digits.substring(0, 8);
-      }
-      final formatted = _formatDigits(digits);
-      int newSelection = cursorPosition.clamp(0, formatted.length);
-
+      final formatted = _formatDateInput(newText);
+      final newSelection = cursorPosition.clamp(0, formatted.length);
       return TextEditingValue(
         text: formatted,
         selection: TextSelection.collapsed(offset: newSelection),
       );
     }
 
-    // Typing / Addition
-    String digits = newText.replaceAll(RegExp(r'\D'), '');
-    if (digits.length > 8) {
-      digits = digits.substring(0, 8);
-    }
+    // Handle Typing
+    final formatted = _formatDateInput(newText);
 
-    final formatted = _formatDigits(digits);
-
+    // Calculate cursor position
     int selectionIndex = newValue.selection.end;
-    if (digits.length == 2 && formatted.length == 3 && formatted.endsWith('-')) {
+
+    if (formatted.length == 3 && !oldText.startsWith(formatted) && formatted.endsWith('/')) {
       selectionIndex = 3;
-    } else if (digits.length == 4 && formatted.length == 6 && formatted.endsWith('-')) {
+    } else if (formatted.length == 6 && !oldText.startsWith(formatted) && formatted.endsWith('/')) {
       selectionIndex = 6;
     } else {
       selectionIndex = selectionIndex.clamp(0, formatted.length);
       if (selectionIndex < formatted.length &&
-          formatted[selectionIndex - 1] == '-' &&
+          formatted[selectionIndex - 1] == '/' &&
           oldText.length < newText.length) {
         selectionIndex = (selectionIndex + 1).clamp(0, formatted.length);
       }
@@ -70,21 +69,108 @@ class DateInputFormatter extends TextInputFormatter {
     );
   }
 
-  static String _formatDigits(String digits) {
+  static String _formatDateInput(String text) {
+    String clean = text.replaceAll(RegExp(r'[^0-9/.-]'), '');
+    if (clean.isEmpty) return '';
+
+    clean = clean.replaceAll('-', '/').replaceAll('.', '/');
+
+    List<String> parts = clean.split('/');
+
+    String dayDigits = parts[0].replaceAll(RegExp(r'\D'), '');
+    String monthDigits = parts.length > 1 ? parts[1].replaceAll(RegExp(r'\D'), '') : '';
+    String yearDigits = parts.length > 2 ? parts[2].replaceAll(RegExp(r'\D'), '') : '';
+
+    // Day processing
+    if (parts.length > 1 && dayDigits.length == 1) {
+      dayDigits = '0$dayDigits';
+    } else if (dayDigits.length == 1) {
+      final d = int.tryParse(dayDigits) ?? 0;
+      if (d >= 4) { // 4..9 cannot start a 2-digit day <= 31
+        dayDigits = '0$dayDigits';
+      }
+    } else if (dayDigits.length > 2) {
+      final val2 = int.tryParse(dayDigits.substring(0, 2)) ?? 0;
+      if (val2 > 31) {
+        monthDigits = dayDigits.substring(1) + monthDigits;
+        dayDigits = '0${dayDigits[0]}';
+      } else {
+        monthDigits = dayDigits.substring(2) + monthDigits;
+        dayDigits = dayDigits.substring(0, 2);
+      }
+    } else if (dayDigits.length == 2) {
+      final val = int.tryParse(dayDigits) ?? 0;
+      if (val > 31) {
+        monthDigits = dayDigits[1] + monthDigits;
+        dayDigits = '0${dayDigits[0]}';
+      }
+    }
+
+    // Month processing
+    if (parts.length > 2 && monthDigits.length == 1) {
+      monthDigits = '0$monthDigits';
+    } else if (monthDigits.length == 1) {
+      final m = int.tryParse(monthDigits) ?? 0;
+      if (m >= 2) { // 2..9 cannot start a 2-digit month <= 12
+        monthDigits = '0$monthDigits';
+      }
+    } else if (monthDigits.length > 2) {
+      final val2 = int.tryParse(monthDigits.substring(0, 2)) ?? 0;
+      if (val2 > 12) {
+        yearDigits = monthDigits.substring(1) + yearDigits;
+        monthDigits = '0${monthDigits[0]}';
+      } else {
+        yearDigits = monthDigits.substring(2) + monthDigits;
+        monthDigits = monthDigits.substring(0, 2);
+      }
+    } else if (monthDigits.length == 2) {
+      final val = int.tryParse(monthDigits) ?? 0;
+      if (val > 12) {
+        yearDigits = monthDigits[1] + yearDigits;
+        monthDigits = '0${monthDigits[0]}';
+      }
+    }
+
+    // Year processing
+    if (yearDigits.length > 4) {
+      yearDigits = yearDigits.substring(0, 4);
+    }
+
+    // Assemble formatted DD/MM/YYYY string
+    StringBuffer sb = StringBuffer();
+    sb.write(dayDigits);
+
+    if (dayDigits.length == 2) {
+      sb.write('/');
+      if (monthDigits.isNotEmpty) {
+        sb.write(monthDigits);
+        if (monthDigits.length == 2) {
+          sb.write('/');
+          if (yearDigits.isNotEmpty) {
+            sb.write(yearDigits);
+          }
+        }
+      }
+    }
+
+    return sb.toString();
+  }
+
+  static String _formatDigitsOnly(String digits) {
     if (digits.isEmpty) return '';
     if (digits.length <= 2) return digits;
     if (digits.length <= 4) {
-      return '${digits.substring(0, 2)}-${digits.substring(2)}';
+      return '${digits.substring(0, 2)}/${digits.substring(2)}';
     }
-    return '${digits.substring(0, 2)}-${digits.substring(2, 4)}-${digits.substring(4)}';
+    return '${digits.substring(0, 2)}/${digits.substring(2, 4)}/${digits.substring(4)}';
   }
 }
 
 bool isValidDateDDMMYYYY(String dateStr) {
   final trimmed = dateStr.trim();
-  if (trimmed.isEmpty) return true; // Empty string is acceptable for optional fields
+  if (trimmed.isEmpty) return true; // Optional empty date
 
-  final parts = trimmed.split('-');
+  final parts = trimmed.contains('/') ? trimmed.split('/') : trimmed.split('-');
   if (parts.length != 3) return false;
 
   final dayStr = parts[0];
@@ -124,7 +210,7 @@ String formatToDDMMYYYY(String dateStr) {
     final day = match.group(1)!.padLeft(2, '0');
     final month = match.group(2)!.padLeft(2, '0');
     final year = match.group(3)!;
-    return '$day-$month-$year';
+    return '$day/$month/$year';
   }
   return trimmed;
 }
@@ -140,7 +226,7 @@ Future<void> selectDateDDMMYYYY(
   final currentText = controller.text.trim();
   if (isValidDateDDMMYYYY(currentText) && currentText.length == 10) {
     try {
-      final parts = currentText.split('-');
+      final parts = currentText.contains('/') ? currentText.split('/') : currentText.split('-');
       final d = int.parse(parts[0]);
       final m = int.parse(parts[1]);
       final y = int.parse(parts[2]);
@@ -156,7 +242,7 @@ Future<void> selectDateDDMMYYYY(
   );
 
   if (picked != null) {
-    final formatted = DateFormat('dd-MM-yyyy').format(picked);
+    final formatted = DateFormat('dd/MM/yyyy').format(picked);
     controller.text = formatted;
     if (onChanged != null) {
       onChanged(formatted);

@@ -2372,7 +2372,8 @@ _TaxSheetDetail _buildOldTaxSheetDetail(
   try {
     final dateFormat = DateFormat('dd-MM-yyyy');
     final referenceDate = dateFormat.parse('01-04-2024');
-    final givenDate = dateFormat.parse('${mainData['dob'] ?? ''}');
+    final dobStr = '${mainData['dob'] ?? ''}'.replaceAll('/', '-');
+    final givenDate = dateFormat.parse(dobStr);
     final dateDiff =
     DateTime(givenDate.year + 60, givenDate.month, givenDate.day);
     seniorCitizen = referenceDate.isAfter(dateDiff) ||

@@ -7564,10 +7564,14 @@ class _ItaxPageState extends State<ItaxPage>
       int varTt = 0;
       int varSur = 0;
 
-      final dateFormat = DateFormat("dd-MM-yyyy");
-      final referenceDateStr = '01-04-2024';
-      final givenDate = dateFormat.parse(mainpgData['dob']);
-      final referenceDate = dateFormat.parse(referenceDateStr);
+      DateTime givenDate;
+      try {
+        final dobStr = (mainpgData['dob'] ?? '').toString().replaceAll('/', '-');
+        givenDate = DateFormat("dd-MM-yyyy").parse(dobStr);
+      } catch (_) {
+        givenDate = DateTime(1970);
+      }
+      final referenceDate = DateFormat("dd-MM-yyyy").parse('01-04-2024');
 
       final dateDiff =
           DateTime(givenDate.year + 60, givenDate.month, givenDate.day);
