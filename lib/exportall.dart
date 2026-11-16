@@ -195,36 +195,109 @@ Future<Map<String, dynamic>> fetcharrearData() async {
       final arrData = Map<String, dynamic>.from(snapshot.value as Map);
 
       final orderedKeys = [
-        "biometricid","name",
-        "mmda","mmhra","mmdaonta","mmpca","mmnpa","mmtution","mmother","mmext1","mmext2","mmext3",
-        "jada","jahra","jadaonta","japca","janpa","jatution","jaother","jaext1","jaext2","jaext3",
-        "snda","snhra","sndaonta","snpca","snnpa","sntution","snother","snext1","snext2","snext3",
-        "dfda","dfhra","dfdaonta","dfpca","dfnpa","dftution","dfother","dfext1","dfext2","dfext3",
-        "bonus"
+        "biometricid", "name",
+
+        // Q1 (MM)
+        "mmda", "mmhra", "mmdaonta", "mmpca", "mmnpa", "mmtution",
+        "mmsplpay", "mmconv", "mmpg", "mmannual", "mmuniform", "mmnursing", "mmmedical",
+        "mmdirt", "mmtb", "mmnight", "mmdrive", "mmcycle", "mmot", "mmwashing",
+        "mmother", "mmext1",
+
+        // Q2 (JA)
+        "jada", "jahra", "jadaonta", "japca", "janpa", "jatution",
+        "jasplpay", "jaconv", "japg", "jaannual", "jauniform", "janursing", "jamedical",
+        "jadirt", "jatb", "janight", "jadrive", "jacycle", "jaot", "jawashing",
+        "jaother", "jaext1",
+
+        // Q3 (SN)
+        "snda", "snhra", "sndaonta", "snpca", "snnpa", "sntution",
+        "snsplpay", "snconv", "snpg", "snannual", "snuniform", "snnursing", "snmedical",
+        "sndirt", "sntb", "snight", "sndrive", "sncycle", "snot", "snwashing",
+        "snother", "snext1",
+
+        // Q4 (DF)
+        "dfda", "dfhra", "dfdaonta", "dfpca", "dfnpa", "dftution",
+        "dfsplpay", "dfconv", "dfpg", "dfannual", "dfuniform", "dfnursing", "dfmedical",
+        "dfdirt", "dftb", "dfnight", "dfdrive", "dfcycle", "dfot", "dfwashing",
+        "dfother", "dfext1",
+
+        // Adjustments
+        "bonus", "previnc", "prevtax"
       ];
 
       final labelMap = {
         "biometricid": "Biometric ID",
         "name": "Name",
-        "mmda": "MM DA", "mmhra": "MM HRA", "mmdaonta": "MM DA on TA", "mmpca": "MM PCA", "mmnpa": "MM NPA",
-        "mmtution": "MM Tuition", "mmother": "MM Other", "mmext1": "MM Extra 1", "mmext2": "MM Extra 2", "mmext3": "MM Extra 3",
-        "jada": "JA DA", "jahra": "JA HRA", "jadaonta": "JA DA on TA", "japca": "JA PCA", "janpa": "JA NPA",
-        "jatution": "JA Tuition", "jaother": "JA Other", "jaext1": "JA Extra 1", "jaext2": "JA Extra 2", "jaext3": "JA Extra 3",
-        "snda": "SN DA", "snhra": "SN HRA", "sndaonta": "SN DA on TA", "snpca": "SN PCA", "snnpa": "SN NPA",
-        "sntution": "SN Tuition", "snother": "SN Other", "snext1": "SN Extra 1", "snext2": "SN Extra 2", "snext3": "SN Extra 3",
-        "dfda": "DF DA", "dfhra": "DF HRA", "dfdaonta": "DF DA on TA", "dfpca": "DF PCA", "dfnpa": "DF NPA",
-        "dftution": "DF Tuition", "dfother": "DF Other", "dfext1": "DF Extra 1", "dfext2": "DF Extra 2", "dfext3": "DF Extra 3",
+
+        // Q1
+        "mmda": "Q1 DA", "mmhra": "Q1 HRA", "mmdaonta": "Q1 DA on TA", "mmpca": "Q1 PCA", "mmnpa": "Q1 NPA",
+        "mmtution": "Q1 Tuition", "mmsplpay": "Q1 Special Pay", "mmconv": "Q1 Conveyance", "mmpg": "Q1 PG",
+        "mmannual": "Q1 Annual", "mmuniform": "Q1 Uniform", "mmnursing": "Q1 Nursing", "mmmedical": "Q1 Medical",
+        "mmdirt": "Q1 Dirt", "mmtb": "Q1 TB", "mmnight": "Q1 Night", "mmdrive": "Q1 Contingency",
+        "mmcycle": "Q1 Cycle", "mmot": "Q1 OT", "mmwashing": "Q1 Washing", "mmother": "Q1 Other", "mmext1": "Q1 Tax",
+
+        // Q2
+        "jada": "Q2 DA", "jahra": "Q2 HRA", "jadaonta": "Q2 DA on TA", "japca": "Q2 PCA", "janpa": "Q2 NPA",
+        "jatution": "Q2 Tuition", "jasplpay": "Q2 Special Pay", "jaconv": "Q2 Conveyance", "japg": "Q2 PG",
+        "jaannual": "Q2 Annual", "jauniform": "Q2 Uniform", "janursing": "Q2 Nursing", "jamedical": "Q2 Medical",
+        "jadirt": "Q2 Dirt", "jatb": "Q2 TB", "janight": "Q2 Night", "jadrive": "Q2 Contingency",
+        "jacycle": "Q2 Cycle", "jaot": "Q2 OT", "jawashing": "Q2 Washing", "jaother": "Q2 Other", "jaext1": "Q2 Tax",
+
+        // Q3
+        "snda": "Q3 DA", "snhra": "Q3 HRA", "sndaonta": "Q3 DA on TA", "snpca": "Q3 PCA", "snnpa": "Q3 NPA",
+        "sntution": "Q3 Tuition", "snsplpay": "Q3 Special Pay", "snconv": "Q3 Conveyance", "snpg": "Q3 PG",
+        "snannual": "Q3 Annual", "snuniform": "Q3 Uniform", "snnursing": "Q3 Nursing", "snmedical": "Q3 Medical",
+        "sndirt": "Q3 Dirt", "sntb": "Q3 TB", "snight": "Q3 Night", "sndrive": "Q3 Contingency",
+        "sncycle": "Q3 Cycle", "snot": "Q3 OT", "snwashing": "Q3 Washing", "snother": "Q3 Other", "snext1": "Q3 Tax",
+
+        // Q4
+        "dfda": "Q4 DA", "dfhra": "Q4 HRA", "dfdaonta": "Q4 DA on TA", "dfpca": "Q4 PCA", "dfnpa": "Q4 NPA",
+        "dftution": "Q4 Tuition", "dfsplpay": "Q4 Special Pay", "dfconv": "Q4 Conveyance", "dfpg": "Q4 PG",
+        "dfannual": "Q4 Annual", "dfuniform": "Q4 Uniform", "dfnursing": "Q4 Nursing", "dfmedical": "Q4 Medical",
+        "dfdirt": "Q4 Dirt", "dftb": "Q4 TB", "dfnight": "Q4 Night", "dfdrive": "Q4 Contingency",
+        "dfcycle": "Q4 Cycle", "dfot": "Q4 OT", "dfwashing": "Q4 Washing", "dfother": "Q4 Other", "dfext1": "Q4 Tax",
+
+        // Additional Adjustments
         "bonus": "Bonus",
+        "previnc": "Previous Employer Income",
+        "prevtax": "Previous Employer Tax",
       };
+
+      String formatOtherVal(dynamic otherVal, dynamic customListRaw) {
+        final baseVal = (otherVal != null && otherVal.toString() != 'null') ? otherVal.toString() : '';
+        if (customListRaw is List && customListRaw.isNotEmpty) {
+          final customStrs = <String>[];
+          for (var c in customListRaw) {
+            if (c is Map && c['name'] != null && c['name'].toString().isNotEmpty) {
+              customStrs.add("${c['name']}: ${c['amount'] ?? 0}");
+            }
+          }
+          if (customStrs.isNotEmpty) {
+            return baseVal.isEmpty ? customStrs.join(', ') : "$baseVal (${customStrs.join(', ')})";
+          }
+        }
+        return baseVal;
+      }
 
       final mappedData = <String, Map<String, dynamic>>{};
       arrData.forEach((key, value) {
         if (value is Map) {
           final innerMap = Map<String, dynamic>.from(value);
-          final labeledMap = {
-            for (var k in orderedKeys)
-              labelMap[k] ?? k: (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : ''
-          };
+          final labeledMap = <String, dynamic>{};
+          for (var k in orderedKeys) {
+            final label = labelMap[k] ?? k;
+            if (k == 'mmother') {
+              labeledMap[label] = formatOtherVal(innerMap[k], innerMap['q1custom']);
+            } else if (k == 'jaother') {
+              labeledMap[label] = formatOtherVal(innerMap[k], innerMap['q2custom']);
+            } else if (k == 'snother') {
+              labeledMap[label] = formatOtherVal(innerMap[k], innerMap['q3custom']);
+            } else if (k == 'dfother') {
+              labeledMap[label] = formatOtherVal(innerMap[k], innerMap['q4custom']);
+            } else {
+              labeledMap[label] = (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : '';
+            }
+          }
           mappedData[key] = labeledMap;
         }
       });
