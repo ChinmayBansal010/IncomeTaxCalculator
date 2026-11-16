@@ -1830,7 +1830,6 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
 
   Future<void> _openArrearPage(_EcrPreviewData preview) async {
     final arrearData = preview.arrearData;
-    String value(String key) => arrearData[key]?.toString() ?? '0';
 
     final result = await Navigator.push(
       context,
@@ -1838,47 +1837,7 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
         builder: (context) => ArrearUpdatePage(
           biometricId: widget.biometricId,
           name: preview.mainData['name']?.toString() ?? '',
-          mmda: value('mmda'),
-          mmhra: value('mmhra'),
-          mmdaonta: value('mmdaonta'),
-          mmpca: value('mmpca'),
-          mmnpa: value('mmnpa'),
-          mmtution: value('mmtution'),
-          mmother: value('mmother'),
-          mmext1: value('mmext1'),
-          mmext2: value('mmext2'),
-          mmext3: value('mmext3'),
-          jada: value('jada'),
-          jahra: value('jahra'),
-          jadaonta: value('jadaonta'),
-          japca: value('japca'),
-          janpa: value('janpa'),
-          jatution: value('jatution'),
-          jaother: value('jaother'),
-          jaext1: value('jaext1'),
-          jaext2: value('jaext2'),
-          jaext3: value('jaext3'),
-          snda: value('snda'),
-          snhra: value('snhra'),
-          sndaonta: value('sndaonta'),
-          snpca: value('snpca'),
-          snnpa: value('snnpa'),
-          sntution: value('sntution'),
-          snother: value('snother'),
-          snext1: value('snext1'),
-          snext2: value('snext2'),
-          snext3: value('snext3'),
-          dfda: value('dfda'),
-          dfhra: value('dfhra'),
-          dfdaonta: value('dfdaonta'),
-          dfpca: value('dfpca'),
-          dfnpa: value('dfnpa'),
-          dftution: value('dftution'),
-          dfother: value('dfother'),
-          dfext1: value('dfext1'),
-          dfext2: value('dfext2'),
-          dfext3: value('dfext3'),
-          bonus: value('bonus'),
+          arrearDataMap: arrearData,
         ),
       ),
     );
@@ -1939,8 +1898,9 @@ _EcrPreviewData _buildPreviewData({
   final arrearQ4Row = _buildArrearRow('ARREAR Q4', arrearData, 3);
   final tutionRow = _buildTutionRow(arrearData);
   final bonusRow = _buildBonusRow(arrearData);
+  final prevEmpRow = _buildPrevEmployerRow(arrearData);
   final qtr4Row = _sumRows('QTR - 4 TOTAL',
-      [decRow, janRow, febRow, arrearQ4Row, tutionRow, bonusRow]);
+      [decRow, janRow, febRow, arrearQ4Row, tutionRow, bonusRow, prevEmpRow]);
 
   final grossTotalRow =
   _sumRows('GROSS TOTAL', [qtr1Row, qtr2Row, qtr3Row, qtr4Row]);
@@ -1974,6 +1934,7 @@ _EcrPreviewData _buildPreviewData({
       arrearQ4Row,
       tutionRow,
       bonusRow,
+      prevEmpRow,
       qtr4Row,
       grossTotalRow,
     ],
@@ -2090,6 +2051,20 @@ _EcrRow _buildBonusRow(Map<String, dynamic> arrearValues) {
   values['netsalary'] = bonus;
 
   return _EcrRow(label: 'BONUS', values: values);
+}
+
+_EcrRow _buildPrevEmployerRow(Map<String, dynamic> arrearValues) {
+  final values = _emptyValueMap();
+  final previnc = _toInt(arrearValues['previnc']);
+  final prevtax = _toInt(arrearValues['prevtax']);
+
+  values['otherEarning'] = previnc;
+  values['gross'] = previnc;
+  values['incometax'] = prevtax;
+  values['totalded'] = prevtax;
+  values['netsalary'] = previnc - prevtax;
+
+  return _EcrRow(label: 'PREV EMPLOYER', values: values);
 }
 
 _EcrRow _sumRows(String label, List<_EcrRow> rows) {
@@ -2901,23 +2876,23 @@ const Map<String, List<String?>> _earningArrearKeys = {
   'da': ['mmda', 'jada', 'snda', 'dfda'],
   'hra': ['mmhra', 'jahra', 'snhra', 'dfhra'],
   'npa': ['mmnpa', 'janpa', 'snnpa', 'dfnpa'],
-  'splpay': [null, null, null, null],
-  'conv': [null, null, null, null],
-  'pg': [null, null, null, null],
-  'annual': [null, null, null, null],
-  'uniform': [null, null, null, null],
-  'nursing': [null, null, null, null],
+  'splpay': ['mmsplpay', 'jasplpay', 'snsplpay', 'dfsplpay'],
+  'conv': ['mmconv', 'jaconv', 'snconv', 'dfconv'],
+  'pg': ['mmpg', 'japg', 'snpg', 'dfpg'],
+  'annual': ['mmannual', 'jaannual', 'snannual', 'dfannual'],
+  'uniform': ['mmuniform', 'jauniform', 'snuniform', 'dfuniform'],
+  'nursing': ['mmnursing', 'janursing', 'snnursing', 'dfnursing'],
   'ta': [null, null, null, null],
   'daonta': ['mmdaonta', 'jadaonta', 'sndaonta', 'dfdaonta'],
-  'medical': [null, null, null, null],
-  'dirt': [null, null, null, null],
-  'washing': [null, null, null, null],
-  'tb': [null, null, null, null],
-  'night': [null, null, null, null],
-  'drive': [null, null, null, null],
-  'cycle': [null, null, null, null],
+  'medical': ['mmmedical', 'jamedical', 'snmedical', 'dfmedical'],
+  'dirt': ['mmdirt', 'jadirt', 'sndirt', 'dfdirt'],
+  'washing': ['mmwashing', 'jawashing', 'snwashing', 'dfwashing'],
+  'tb': ['mmtb', 'jatb', 'sntb', 'dftb'],
+  'night': ['mmnight', 'janight', 'snight', 'dfnight'],
+  'drive': ['mmdrive', 'jadrive', 'sndrive', 'dfdrive'],
+  'cycle': ['mmcycle', 'jacycle', 'sncycle', 'dfcycle'],
   'pca': ['mmpca', 'japca', 'snpca', 'dfpca'],
-  'ot': [null, null, null, null],
+  'ot': ['mmot', 'jaot', 'snot', 'dfot'],
   'daext1': [null, null, null, null],
   'daext2': [null, null, null, null],
   'daext3': [null, null, null, null],

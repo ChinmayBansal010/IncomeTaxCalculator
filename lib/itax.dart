@@ -2107,22 +2107,35 @@ class _ItaxPageState extends State<ItaxPage>
           int.tryParse(arrearData['mmhra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr1 =
           int.tryParse(arrearData['mmnpa']?.toString() ?? '0') ?? 0;
-      int varSplpayarrearqtr1 = int.tryParse('0') ?? 0;
-      int varConvarrearqtr1 = int.tryParse('0') ?? 0;
-      int varPgarrearqtr1 = int.tryParse('0') ?? 0;
-      int varAnnualarrearqtr1 = int.tryParse('0') ?? 0;
-      int varUniformarrearqtr1 = int.tryParse('0') ?? 0;
-      int varNursingarrearqtr1 = int.tryParse('0') ?? 0;
+      int varSplpayarrearqtr1 =
+          int.tryParse(arrearData['mmsplpay']?.toString() ?? '0') ?? 0;
+      int varConvarrearqtr1 =
+          int.tryParse(arrearData['mmconv']?.toString() ?? '0') ?? 0;
+      int varPgarrearqtr1 =
+          int.tryParse(arrearData['mmpg']?.toString() ?? '0') ?? 0;
+      int varAnnualarrearqtr1 =
+          int.tryParse(arrearData['mmannual']?.toString() ?? '0') ?? 0;
+      int varUniformarrearqtr1 =
+          int.tryParse(arrearData['mmuniform']?.toString() ?? '0') ?? 0;
+      int varNursingarrearqtr1 =
+          int.tryParse(arrearData['mmnursing']?.toString() ?? '0') ?? 0;
       int varTaarrearqtr1 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr1 =
           int.tryParse(arrearData['mmdaonta']?.toString() ?? '0') ?? 0;
-      int varMedicalarrearqtr1 = int.tryParse('0') ?? 0;
-      int varDirtarrearqtr1 = int.tryParse('0') ?? 0;
-      int varWashingarrearqtr1 = int.tryParse('0') ?? 0;
-      int varTbarrearqtr1 = int.tryParse('0') ?? 0;
-      int varNightarrearqtr1 = int.tryParse('0') ?? 0;
-      int varDrivearrearqtr1 = int.tryParse('0') ?? 0;
-      int varCyclearrearqtr1 = int.tryParse('0') ?? 0;
+      int varMedicalarrearqtr1 =
+          int.tryParse(arrearData['mmmedical']?.toString() ?? '0') ?? 0;
+      int varDirtarrearqtr1 =
+          int.tryParse(arrearData['mmdirt']?.toString() ?? '0') ?? 0;
+      int varWashingarrearqtr1 =
+          int.tryParse(arrearData['mmwashing']?.toString() ?? '0') ?? 0;
+      int varTbarrearqtr1 =
+          int.tryParse(arrearData['mmtb']?.toString() ?? '0') ?? 0;
+      int varNightarrearqtr1 =
+          int.tryParse(arrearData['mmnight']?.toString() ?? '0') ?? 0;
+      int varDrivearrearqtr1 =
+          int.tryParse(arrearData['mmdrive']?.toString() ?? '0') ?? 0;
+      int varCyclearrearqtr1 =
+          int.tryParse(arrearData['mmcycle']?.toString() ?? '0') ?? 0;
       int varPcaarrearqtr1 =
           int.tryParse(arrearData['mmpca']?.toString() ?? '0') ?? 0;
       int varOtarrearqtr1 =
@@ -2774,22 +2787,35 @@ class _ItaxPageState extends State<ItaxPage>
           int.tryParse(arrearData['jahra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr2 =
           int.tryParse(arrearData['janpa']?.toString() ?? '0') ?? 0;
-      int varSplpayarrearqtr2 = int.tryParse('0') ?? 0;
-      int varConvarrearqtr2 = int.tryParse('0') ?? 0;
-      int varPgarrearqtr2 = int.tryParse('0') ?? 0;
-      int varAnnualarrearqtr2 = int.tryParse('0') ?? 0;
-      int varUniformarrearqtr2 = int.tryParse('0') ?? 0;
-      int varNursingarrearqtr2 = int.tryParse('0') ?? 0;
+      int varSplpayarrearqtr2 =
+          int.tryParse(arrearData['jasplpay']?.toString() ?? '0') ?? 0;
+      int varConvarrearqtr2 =
+          int.tryParse(arrearData['jaconv']?.toString() ?? '0') ?? 0;
+      int varPgarrearqtr2 =
+          int.tryParse(arrearData['japg']?.toString() ?? '0') ?? 0;
+      int varAnnualarrearqtr2 =
+          int.tryParse(arrearData['jaannual']?.toString() ?? '0') ?? 0;
+      int varUniformarrearqtr2 =
+          int.tryParse(arrearData['jauniform']?.toString() ?? '0') ?? 0;
+      int varNursingarrearqtr2 =
+          int.tryParse(arrearData['janursing']?.toString() ?? '0') ?? 0;
       int varTaarrearqtr2 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr2 =
           int.tryParse(arrearData['jadaonta']?.toString() ?? '0') ?? 0;
-      int varMedicalarrearqtr2 = int.tryParse('0') ?? 0;
-      int varDirtarrearqtr2 = int.tryParse('0') ?? 0;
-      int varWashingarrearqtr2 = int.tryParse('0') ?? 0;
-      int varTbarrearqtr2 = int.tryParse('0') ?? 0;
-      int varNightarrearqtr2 = int.tryParse('0') ?? 0;
-      int varDrivearrearqtr2 = int.tryParse('0') ?? 0;
-      int varCyclearrearqtr2 = int.tryParse('0') ?? 0;
+      int varMedicalarrearqtr2 =
+          int.tryParse(arrearData['jamedical']?.toString() ?? '0') ?? 0;
+      int varDirtarrearqtr2 =
+          int.tryParse(arrearData['jadirt']?.toString() ?? '0') ?? 0;
+      int varWashingarrearqtr2 =
+          int.tryParse(arrearData['jawashing']?.toString() ?? '0') ?? 0;
+      int varTbarrearqtr2 =
+          int.tryParse(arrearData['jatb']?.toString() ?? '0') ?? 0;
+      int varNightarrearqtr2 =
+          int.tryParse(arrearData['janight']?.toString() ?? '0') ?? 0;
+      int varDrivearrearqtr2 =
+          int.tryParse(arrearData['jadrive']?.toString() ?? '0') ?? 0;
+      int varCyclearrearqtr2 =
+          int.tryParse(arrearData['jacycle']?.toString() ?? '0') ?? 0;
       int varPcaarrearqtr2 =
           int.tryParse(arrearData['japca']?.toString() ?? '0') ?? 0;
       int varOtarrearqtr2 =
@@ -3445,22 +3471,35 @@ class _ItaxPageState extends State<ItaxPage>
           int.tryParse(arrearData['snhra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr3 =
           int.tryParse(arrearData['snnpa']?.toString() ?? '0') ?? 0;
-      int varSplpayarrearqtr3 = int.tryParse('0') ?? 0;
-      int varConvarrearqtr3 = int.tryParse('0') ?? 0;
-      int varPgarrearqtr3 = int.tryParse('0') ?? 0;
-      int varAnnualarrearqtr3 = int.tryParse('0') ?? 0;
-      int varUniformarrearqtr3 = int.tryParse('0') ?? 0;
-      int varNursingarrearqtr3 = int.tryParse('0') ?? 0;
+      int varSplpayarrearqtr3 =
+          int.tryParse(arrearData['snsplpay']?.toString() ?? '0') ?? 0;
+      int varConvarrearqtr3 =
+          int.tryParse(arrearData['snconv']?.toString() ?? '0') ?? 0;
+      int varPgarrearqtr3 =
+          int.tryParse(arrearData['snpg']?.toString() ?? '0') ?? 0;
+      int varAnnualarrearqtr3 =
+          int.tryParse(arrearData['snannual']?.toString() ?? '0') ?? 0;
+      int varUniformarrearqtr3 =
+          int.tryParse(arrearData['snuniform']?.toString() ?? '0') ?? 0;
+      int varNursingarrearqtr3 =
+          int.tryParse(arrearData['snnursing']?.toString() ?? '0') ?? 0;
       int varTaarrearqtr3 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr3 =
           int.tryParse(arrearData['sndaonta']?.toString() ?? '0') ?? 0;
-      int varMedicalarrearqtr3 = int.tryParse('0') ?? 0;
-      int varDirtarrearqtr3 = int.tryParse('0') ?? 0;
-      int varWashingarrearqtr3 = int.tryParse('0') ?? 0;
-      int varTbarrearqtr3 = int.tryParse('0') ?? 0;
-      int varNightarrearqtr3 = int.tryParse('0') ?? 0;
-      int varDrivearrearqtr3 = int.tryParse('0') ?? 0;
-      int varCyclearrearqtr3 = int.tryParse('0') ?? 0;
+      int varMedicalarrearqtr3 =
+          int.tryParse(arrearData['snmedical']?.toString() ?? '0') ?? 0;
+      int varDirtarrearqtr3 =
+          int.tryParse(arrearData['sndirt']?.toString() ?? '0') ?? 0;
+      int varWashingarrearqtr3 =
+          int.tryParse(arrearData['snwashing']?.toString() ?? '0') ?? 0;
+      int varTbarrearqtr3 =
+          int.tryParse(arrearData['sntb']?.toString() ?? '0') ?? 0;
+      int varNightarrearqtr3 =
+          int.tryParse(arrearData['snight']?.toString() ?? '0') ?? 0;
+      int varDrivearrearqtr3 =
+          int.tryParse(arrearData['sndrive']?.toString() ?? '0') ?? 0;
+      int varCyclearrearqtr3 =
+          int.tryParse(arrearData['sncycle']?.toString() ?? '0') ?? 0;
       int varPcaarrearqtr3 =
           int.tryParse(arrearData['snpca']?.toString() ?? '0') ?? 0;
       int varOtarrearqtr3 =
@@ -4115,26 +4154,39 @@ class _ItaxPageState extends State<ItaxPage>
           int.tryParse(arrearData['dfhra']?.toString() ?? '0') ?? 0;
       int varNpaarrearqtr4 =
           int.tryParse(arrearData['dfnpa']?.toString() ?? '0') ?? 0;
-      int varSplpayarrearqtr4 = int.tryParse('0') ?? 0;
-      int varConvarrearqtr4 = int.tryParse('0') ?? 0;
-      int varPgarrearqtr4 = int.tryParse('0') ?? 0;
-      int varAnnualarrearqtr4 = int.tryParse('0') ?? 0;
-      int varUniformarrearqtr4 = int.tryParse('0') ?? 0;
-      int varNursingarrearqtr4 = int.tryParse('0') ?? 0;
+      int varSplpayarrearqtr4 =
+          int.tryParse(arrearData['dfsplpay']?.toString() ?? '0') ?? 0;
+      int varConvarrearqtr4 =
+          int.tryParse(arrearData['dfconv']?.toString() ?? '0') ?? 0;
+      int varPgarrearqtr4 =
+          int.tryParse(arrearData['dfpg']?.toString() ?? '0') ?? 0;
+      int varAnnualarrearqtr4 =
+          int.tryParse(arrearData['dfannual']?.toString() ?? '0') ?? 0;
+      int varUniformarrearqtr4 =
+          int.tryParse(arrearData['dfuniform']?.toString() ?? '0') ?? 0;
+      int varNursingarrearqtr4 =
+          int.tryParse(arrearData['dfnursing']?.toString() ?? '0') ?? 0;
       int varTaarrearqtr4 = int.tryParse('0') ?? 0;
       int varDaontaarrearqtr4 =
           int.tryParse(arrearData['dfdaonta']?.toString() ?? '0') ?? 0;
-      int varMedicalarrearqtr4 = int.tryParse('0') ?? 0;
-      int varDirtarrearqtr4 = int.tryParse('0') ?? 0;
-      int varWashingarrearqtr4 = int.tryParse('0') ?? 0;
-      int varTbarrearqtr4 = int.tryParse('0') ?? 0;
-      int varNightarrearqtr4 = int.tryParse('0') ?? 0;
-      int varDrivearrearqtr4 = int.tryParse('0') ?? 0;
-      int varCyclearrearqtr4 = int.tryParse('0') ?? 0;
+      int varMedicalarrearqtr4 =
+          int.tryParse(arrearData['dfmedical']?.toString() ?? '0') ?? 0;
+      int varDirtarrearqtr4 =
+          int.tryParse(arrearData['dfdirt']?.toString() ?? '0') ?? 0;
+      int varWashingarrearqtr4 =
+          int.tryParse(arrearData['dfwashing']?.toString() ?? '0') ?? 0;
+      int varTbarrearqtr4 =
+          int.tryParse(arrearData['dftb']?.toString() ?? '0') ?? 0;
+      int varNightarrearqtr4 =
+          int.tryParse(arrearData['dfnight']?.toString() ?? '0') ?? 0;
+      int varDrivearrearqtr4 =
+          int.tryParse(arrearData['dfdrive']?.toString() ?? '0') ?? 0;
+      int varCyclearrearqtr4 =
+          int.tryParse(arrearData['dfcycle']?.toString() ?? '0') ?? 0;
       int varPcaarrearqtr4 =
           int.tryParse(arrearData['dfpca']?.toString() ?? '0') ?? 0;
       int varOtarrearqtr4 =
-          int.tryParse(arrearData['dfpca']?.toString() ?? '0') ?? 0;
+          int.tryParse(arrearData['dfot']?.toString() ?? '0') ?? 0;
       int varNpsemparrearqtr4 = int.tryParse('0') ?? 0;
       int varOtherarrearqtr4 =
           int.tryParse(arrearData['dfother']?.toString() ?? '0') ?? 0;
@@ -4220,6 +4272,8 @@ class _ItaxPageState extends State<ItaxPage>
       int varSalarytution = varTution;
       int varBonus = int.tryParse(arrearData['bonus']?.toString() ?? '0') ?? 0;
       int varSalarybonus = varBonus;
+      int varPrevinc = int.tryParse(arrearData['previnc']?.toString() ?? '0') ?? 0;
+      int varPrevtax = int.tryParse(arrearData['prevtax']?.toString() ?? '0') ?? 0;
 
       int varTotaldedtution = int.tryParse("0") ?? 0;
       int varTotaldedbonus = int.tryParse("0") ?? 0;
@@ -4552,7 +4606,8 @@ class _ItaxPageState extends State<ItaxPage>
         varOtherqtr1,
         varOtherqtr2,
         varOtherqtr3,
-        varOtherqtr4
+        varOtherqtr4,
+        varPrevinc
       ].fold(0, (sum, value) => sum + value);
       int varDaext1gross = [
         varDaext1qtr1,
@@ -4611,7 +4666,8 @@ class _ItaxPageState extends State<ItaxPage>
         varIncometaxqtr1,
         varIncometaxqtr2,
         varIncometaxqtr3,
-        varIncometaxqtr4
+        varIncometaxqtr4,
+        varPrevtax
       ].fold(0, (sum, value) => sum + value);
       int varGisgross = [varGisqtr1, varGisqtr2, varGisqtr3, varGisqtr4]
           .fold(0, (sum, value) => sum + value);
