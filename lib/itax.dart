@@ -4,15 +4,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:incometax/itax_ecr_preview.dart';
-import 'package:incometax/itax_pdf_generator.dart';
 import 'package:incometax/shared.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xls;
 import 'package:universal_html/html.dart' as uh show AnchorElement;
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 
 enum ExportAllMode { defaultId, pan, name }
@@ -947,12 +944,6 @@ class _ItaxPageState extends State<ItaxPage>
           }
           createExcel();
         }),
-        // _buildPdfBtn("Export Single PDF", Icons.picture_as_pdf_rounded, () {
-        //   if (!_hasSelectedBiometricId()) {
-        //     return;
-        //   }
-        //   createPdf();
-        // }),
         _buildSecondaryBtn("View ECR", Icons.grid_view_rounded, _previewEcr),
         PopupMenuButton<ExportAllMode>(
           onSelected: (mode) => exportAll(mode),
@@ -1083,22 +1074,6 @@ class _ItaxPageState extends State<ItaxPage>
     );
   }
 
-  Widget _buildPdfBtn(String label, IconData icon, VoidCallback onTap) {
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFDC2626),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 0,
-      ),
-      icon: Icon(icon, size: 20),
-      label: Text(label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-    );
-  }
-
   Widget _buildSecondaryBtn(String label, IconData icon, VoidCallback onTap) {
     return OutlinedButton.icon(
       onPressed: onTap,
@@ -1113,68 +1088,6 @@ class _ItaxPageState extends State<ItaxPage>
       label: Text(label,
           style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
     );
-  }
-
-  Future<void> createPdf({
-    String? biometricId,
-    ExportAllMode? exportMode,
-    bool? isExportAll = false,
-  }) async {
-    setState(() {
-      toLoad = true;
-    });
-
-    try {
-      final selectedId = (biometricId == null || biometricId.isEmpty)
-          ? biometricIdController.text.trim()
-          : biometricId;
-
-      final xls.Workbook workbook = await _buildWorkbookForBiometricId(selectedId);
-
-      final mode = exportMode ?? ExportAllMode.defaultId;
-      String name = selectedId.toString();
-      if (mode == ExportAllMode.pan) {
-        name = (mainpgData['panno'] != null &&
-                mainpgData['panno'].toString().trim().isNotEmpty)
-            ? mainpgData['panno'].toString().trim()
-            : selectedId.toString();
-      } else if (mode == ExportAllMode.name) {
-        name = (mainpgData['name'] != null &&
-                mainpgData['name'].toString().trim().isNotEmpty)
-            ? mainpgData['name'].toString().trim()
-            : selectedId.toString();
-      }
-
-      await ItaxPdfGenerator.generatePdf(
-        workbook: workbook,
-        fileName: name,
-        isExportAll: isExportAll ?? false,
-      );
-
-      workbook.dispose();
-    } catch (e) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text("Error"),
-            content: Text("Failed to generate PDF: \n$e"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          toLoad = false;
-        });
-      }
-    }
   }
 
   Widget _buildMainContent() {
@@ -1360,11 +1273,12 @@ class _ItaxPageState extends State<ItaxPage>
     commontextStyleBold.vAlign = xls.VAlignType.center;
     commontextStyleBold.borders.all.color = '#000000';
     commontextStyleBold.borders.all.lineStyle = xls.LineStyle.thin;
+    commontextStyleBold.wrapText = true;
 
     final xls.Style tableheadingStyle =
         workbook.styles.add('tableheadingStyle');
     tableheadingStyle.fontName = 'Calibri';
-    tableheadingStyle.fontSize = 11;
+    tableheadingStyle.fontSize = 10;
     tableheadingStyle.bold = true;
     tableheadingStyle.fontColor = '#000000';
     tableheadingStyle.backColor = '#EEECE1';
@@ -1376,7 +1290,7 @@ class _ItaxPageState extends State<ItaxPage>
 
     final xls.Style totalrowStyle = workbook.styles.add('totalrowStyle');
     totalrowStyle.fontName = 'Calibri';
-    totalrowStyle.fontSize = 11;
+    totalrowStyle.fontSize = 10;
     totalrowStyle.bold = true;
     totalrowStyle.fontColor = '#000000';
     totalrowStyle.backColor = '#FABF8F';
@@ -1400,7 +1314,7 @@ class _ItaxPageState extends State<ItaxPage>
 
     final xls.Style specialcolStyle = workbook.styles.add('specialcolStyle');
     specialcolStyle.fontName = 'Calibri';
-    specialcolStyle.fontSize = 11;
+    specialcolStyle.fontSize = 10;
     specialcolStyle.bold = true;
     specialcolStyle.fontColor = '#000000';
     specialcolStyle.backColor = '#B9ECE0';
@@ -1426,7 +1340,7 @@ class _ItaxPageState extends State<ItaxPage>
     final xls.Style specialtotalrowStyle =
         workbook.styles.add('specialtotalrowStyle');
     specialtotalrowStyle.fontName = 'Calibri';
-    specialtotalrowStyle.fontSize = 11;
+    specialtotalrowStyle.fontSize = 10;
     specialtotalrowStyle.bold = true;
     specialtotalrowStyle.fontColor = '#000000';
     specialtotalrowStyle.backColor = '#FABF8F';
@@ -1546,59 +1460,6 @@ class _ItaxPageState extends State<ItaxPage>
     setState(() {
       toLoad = false;
     });
-  }
-
-  Future<void> uploadExcelAndDownloadPDF(
-    List<int> bytes,
-    String name,
-    bool isExportAll,
-  ) async {
-    final uri = Uri.parse("http://192.168.1.36:5000/convert");
-
-    var request = http.MultipartRequest("POST", uri);
-    request.files.add(http.MultipartFile.fromBytes(
-      'file',
-      bytes,
-      filename: "$name.xlsx",
-      contentType: MediaType("application",
-          "vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-    ));
-
-    var response = await request.send();
-
-    if (response.statusCode == 200) {
-      final pdfBytes = await response.stream.toBytes();
-
-      if (kIsWeb) {
-        final base64Pdf = base64Encode(pdfBytes);
-        uh.AnchorElement(href: 'data:application/pdf;base64,$base64Pdf')
-          ..setAttribute('download', '$name.pdf')
-          ..click();
-      } else {
-        final path = (await getApplicationSupportDirectory()).path;
-        final filePath = '$path/$name.pdf';
-        final file = File(filePath);
-        await file.writeAsBytes(pdfBytes, flush: true);
-        if (!isExportAll) OpenFile.open(filePath);
-      }
-    } else {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text("Error"),
-            content: Text(
-                'Failed to convert Excel to PDF. Code: ${response.statusCode}'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("OK"),
-              ),
-            ],
-          ),
-        );
-      }
-    }
   }
 
   Future<void> _itaxformPage(
@@ -1758,6 +1619,7 @@ class _ItaxPageState extends State<ItaxPage>
         "ARREAR",
         "TUTION",
         "BONUS",
+        "PREVIOUS EMPLOYER INCOME",
         "QTR - 4 TOTAL"
       ];
 
@@ -1771,8 +1633,8 @@ class _ItaxPageState extends State<ItaxPage>
         }
       }
 
-      sheet.getRangeByName("A33").setValue("GROSS TOTAL");
-      sheet.getRangeByName("A33").cellStyle = formlastrowStyle!;
+      sheet.getRangeByName("A34").setValue("GROSS TOTAL");
+      sheet.getRangeByName("A34").cellStyle = formlastrowStyle!;
 
       // =============================== mar ===============================
       int varBpmar = int.tryParse(marData['bp']?.toString() ?? '0') ?? 0;
@@ -4270,7 +4132,7 @@ class _ItaxPageState extends State<ItaxPage>
       ].fold(0, (sum, value) => sum + value);
       int varNetsalaryarrearqtr4 = varSalaryarrearqtr4 - varTotaldedarrearqtr4;
 
-      //===========================tution & bonus===========================
+      //===========================tution bonus, prev ===========================
       int varTution = [
         int.tryParse(arrearData['mmtution']?.toString() ?? '0') ?? 0,
         int.tryParse(arrearData['jatution']?.toString() ?? '0') ?? 0,
@@ -4280,13 +4142,15 @@ class _ItaxPageState extends State<ItaxPage>
       int varSalarytution = varTution;
       int varBonus = int.tryParse(arrearData['bonus']?.toString() ?? '0') ?? 0;
       int varSalarybonus = varBonus;
-      int varPrevinc = int.tryParse(arrearData['previnc']?.toString() ?? '0') ?? 0;
-      int varPrevtax = int.tryParse(arrearData['prevtax']?.toString() ?? '0') ?? 0;
 
       int varTotaldedtution = int.tryParse("0") ?? 0;
       int varTotaldedbonus = int.tryParse("0") ?? 0;
       int varNetsalarytution = varSalarytution - varTotaldedtution;
       int varNetsalarybonus = varSalarybonus - varTotaldedbonus;
+
+      int varPrevinc = int.tryParse(arrearData['previnc']?.toString() ?? '0') ?? 0;
+      int varPrevtax = int.tryParse(arrearData['prevtax']?.toString() ?? '0') ?? 0;
+
 
       // =============================== qtr4 ===============================
       int varBpqtr4 = [varBpdec, varBpjan, varBpfeb, varBparrearqtr4]
@@ -4383,7 +4247,8 @@ class _ItaxPageState extends State<ItaxPage>
         varOtherfeb,
         varOtherarrearqtr4,
         varTution,
-        varBonus
+        varBonus,
+        varPrevinc
       ].fold(0, (sum, value) => sum + value);
       int varDaext1qtr4 = [
         varDaext1dec,
@@ -4442,7 +4307,8 @@ class _ItaxPageState extends State<ItaxPage>
         varIncometaxdec,
         varIncometaxjan,
         varIncometaxfeb,
-        varIncometaxarrearqtr4
+        varIncometaxarrearqtr4,
+        varPrevtax
       ].fold(0, (sum, value) => sum + value);
       int varGisqtr4 = [varGisdec, varGisjan, varGisfeb, varGisarrearqtr4]
           .fold(0, (sum, value) => sum + value);
@@ -4741,13 +4607,17 @@ class _ItaxPageState extends State<ItaxPage>
         varDdext4qtr3,
         varDdext4qtr4
       ].fold(0, (sum, value) => sum + value);
+      int varTotaldedprev = varPrevtax;
+      int varNetsalaryprev = varPrevinc;
+
       int varTotaldedgross = [
         varTotaldedqtr1,
         varTotaldedqtr2,
         varTotaldedqtr3,
         varTotaldedqtr4,
         varTotaldedtution,
-        varTotaldedbonus
+        varTotaldedbonus,
+        varTotaldedprev
       ].fold(0, (sum, value) => sum + value);
       int varNetsalarygross = [
         varNetsalaryqtr1,
@@ -4755,7 +4625,8 @@ class _ItaxPageState extends State<ItaxPage>
         varNetsalaryqtr3,
         varNetsalaryqtr4,
         varNetsalarytution,
-        varNetsalarybonus
+        varNetsalarybonus,
+        varNetsalaryprev
       ].fold(0, (sum, value) => sum + value);
 
       // ================================= Update Itax Form total value ==================================
@@ -4846,8 +4717,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varBparrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varBpqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varBpgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varBpqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varBpgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -4855,15 +4727,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -4893,8 +4765,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varDaarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varDaqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varDagross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varDaqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varDagross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -4902,15 +4775,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -4940,8 +4813,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varHraarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varHraqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varHragross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varHraqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varHragross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -4949,15 +4823,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -4987,8 +4861,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varNpaarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varNpaqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varNpagross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varNpaqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varNpagross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -4996,15 +4871,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5034,8 +4909,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varSplpayarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varSplpayqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varSplpaygross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varSplpayqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varSplpaygross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5043,15 +4919,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5081,8 +4957,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varConvarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varConvqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varConvgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varConvqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varConvgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5090,15 +4967,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5128,8 +5005,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varPgarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varPgqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varPggross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varPgqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varPggross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5137,15 +5015,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5175,8 +5053,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varAnnualarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varAnnualqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varAnnualgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varAnnualqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varAnnualgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5184,15 +5063,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5230,8 +5109,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varUniformarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varUniformqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varUniformgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varUniformqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varUniformgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5239,15 +5119,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5285,8 +5165,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varNursingarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varNursingqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varNursinggross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varNursingqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varNursinggross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5294,15 +5175,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5332,8 +5213,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varTaarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varTaqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varTagross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varTaqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varTagross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5341,15 +5223,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5379,8 +5261,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varDaontaarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varDaontaqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varDaontagross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varDaontaqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varDaontagross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5388,15 +5271,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5434,8 +5317,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varMedicalarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varMedicalqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varMedicalgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varMedicalqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varMedicalgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5443,15 +5327,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5481,8 +5365,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varDirtarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varDirtqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varDirtgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varDirtqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varDirtgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5490,15 +5375,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5536,8 +5421,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varWashingarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varWashingqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varWashinggross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varWashingqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varWashinggross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5545,15 +5431,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5583,8 +5469,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varTbarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varTbqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varTbgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varTbqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varTbgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5592,15 +5479,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5630,8 +5517,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varNightarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varNightqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varNightgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varNightqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varNightgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5639,15 +5527,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5677,8 +5565,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varDrivearrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varDriveqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varDrivegross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varDriveqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varDrivegross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5686,15 +5575,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5724,8 +5613,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varCyclearrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varCycleqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varCyclegross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varCycleqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varCyclegross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5733,15 +5623,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5771,8 +5661,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varPcaarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varPcaqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varPcagross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varPcaqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varPcagross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5780,15 +5671,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5818,8 +5709,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varOtarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varOtqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varOtgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varOtqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varOtgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5827,15 +5719,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5874,8 +5766,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varNpsemparrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varNpsempqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varNpsempgross);
+        sheet.getRangeByName("${columns[end]}32").setValue('0');
+        sheet.getRangeByName("${columns[end]}33").setValue(varNpsempqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varNpsempgross);
 
         sheet
             .getRangeByName("${columns[end]}11:${columns[end]}14")
@@ -5887,21 +5780,21 @@ class _ItaxPageState extends State<ItaxPage>
             .getRangeByName("${columns[end]}21:${columns[end]}24")
             .cellStyle = commontextStyle;
         sheet
-            .getRangeByName("${columns[end]}26:${columns[end]}31")
+            .getRangeByName("${columns[end]}26:${columns[end]}32")
             .cellStyle = commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle =
+        sheet.getRangeByName("${columns[end]}34").cellStyle =
             formlastrowStyle;
 
         end += 1;
       }
 
-      if ((varOthergross + varTution + varBonus) > 0) {
+      if ((varOthergross + varTution + varBonus + varPrevinc) > 0) {
         sheet.getRangeByName("${columns[end]}10").setValue("OTHER");
         sheet.getRangeByName("${columns[end]}10").cellStyle = tableheadingStyle;
 
@@ -5926,8 +5819,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varOtherarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue(varTution);
         sheet.getRangeByName("${columns[end]}31").setValue(varBonus);
-        sheet.getRangeByName("${columns[end]}32").setValue(varOtherqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varOthergross);
+        sheet.getRangeByName("${columns[end]}32").setValue(varPrevinc);
+        sheet.getRangeByName("${columns[end]}33").setValue(varOtherqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varOthergross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -5935,15 +5829,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -5974,8 +5868,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varSalaryarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue(varSalarytution);
         sheet.getRangeByName("${columns[end]}31").setValue(varSalarybonus);
-        sheet.getRangeByName("${columns[end]}32").setValue(varSalaryqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varSalarygross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varSalaryqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varSalarygross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             specialcolStyle!;
@@ -5983,15 +5878,15 @@ class _ItaxPageState extends State<ItaxPage>
             specialcolStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             specialcolStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             specialcolStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               specialtotalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle =
+        sheet.getRangeByName("${columns[end]}34").cellStyle =
             speciallastrowStyle!;
 
         end += 1;
@@ -6057,8 +5952,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varIncometaxarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varIncometaxqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varIncometaxgross);
+        sheet.getRangeByName("${columns[end]}32").setValue(varPrevtax);
+        sheet.getRangeByName("${columns[end]}33").setValue(varIncometaxqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varIncometaxgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6066,15 +5962,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6104,8 +6000,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varGisarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varGisqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varGisgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varGisqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varGisgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6113,15 +6010,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6151,8 +6048,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varGpfarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varGpfqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varGpfgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varGpfqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varGpfgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6160,15 +6058,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6198,8 +6096,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varNpsarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varNpsqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varNpsgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varNpsqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varNpsgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6207,15 +6106,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6245,8 +6144,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varSlfarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varSlfqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varSlfgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varSlfqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varSlfgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6254,15 +6154,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6300,8 +6200,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varSocietyarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varSocietyqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varSocietygross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varSocietyqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varSocietygross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6309,15 +6210,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6355,8 +6256,9 @@ class _ItaxPageState extends State<ItaxPage>
             .setValue(varRecoveryarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varRecoveryqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varRecoverygross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varRecoveryqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varRecoverygross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6364,15 +6266,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6402,8 +6304,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varWfarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varWfqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varWfgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varWfqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varWfgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6411,15 +6314,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6449,8 +6352,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varEpfarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varEpfqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varEpfgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varEpfqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varEpfgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6458,15 +6362,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6496,8 +6400,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varEsiarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varEsiqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varEsigross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varEsiqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varEsigross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6505,15 +6410,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6543,8 +6448,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varMedarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varMedqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varMedgross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varMedqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varMedgross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6552,15 +6458,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6590,8 +6496,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varWaterarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varWaterqtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varWatergross);
+        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}33").setValue(varWaterqtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varWatergross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6599,15 +6506,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6637,8 +6544,9 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varOther2arrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
-        sheet.getRangeByName("${columns[end]}32").setValue(varOther2qtr4);
-        sheet.getRangeByName("${columns[end]}33").setValue(varOther2gross);
+        sheet.getRangeByName("${columns[end]}32").setValue('0');
+        sheet.getRangeByName("${columns[end]}33").setValue(varOther2qtr4);
+        sheet.getRangeByName("${columns[end]}34").setValue(varOther2gross);
 
         sheet.getRangeByName("${columns[end]}11:${columns[end]}14").cellStyle =
             commontextStyle;
@@ -6646,15 +6554,15 @@ class _ItaxPageState extends State<ItaxPage>
             commontextStyle;
         sheet.getRangeByName("${columns[end]}21:${columns[end]}24").cellStyle =
             commontextStyle;
-        sheet.getRangeByName("${columns[end]}26:${columns[end]}31").cellStyle =
+        sheet.getRangeByName("${columns[end]}26:${columns[end]}32").cellStyle =
             commontextStyle;
 
-        List<String> qtrcolumns = ['15', '20', '25', '32'];
+        List<String> qtrcolumns = ['15', '20', '25', '33'];
         for (String cols in qtrcolumns) {
           sheet.getRangeByName("${columns[end]}$cols").cellStyle =
               totalrowStyle!;
         }
-        sheet.getRangeByName("${columns[end]}33").cellStyle = formlastrowStyle;
+        sheet.getRangeByName("${columns[end]}34").cellStyle = formlastrowStyle;
 
         end += 1;
       }
@@ -6694,8 +6602,9 @@ class _ItaxPageState extends State<ItaxPage>
               .setValue(varTotaldedarrearqtr4);
           sheet.getRangeByName("${columns[end]}30").setValue(varTotaldedtution);
           sheet.getRangeByName("${columns[end]}31").setValue(varTotaldedbonus);
-          sheet.getRangeByName("${columns[end]}32").setValue(varTotaldedqtr4);
-          sheet.getRangeByName("${columns[end]}33").setValue(varTotaldedgross);
+          sheet.getRangeByName("${columns[end]}32").setValue("0");
+          sheet.getRangeByName("${columns[end]}33").setValue(varTotaldedqtr4);
+          sheet.getRangeByName("${columns[end]}34").setValue(varTotaldedgross);
 
           sheet
               .getRangeByName("${columns[end]}11:${columns[end]}14")
@@ -6707,17 +6616,17 @@ class _ItaxPageState extends State<ItaxPage>
               .getRangeByName("${columns[end]}21:${columns[end]}24")
               .cellStyle = commontextStyle;
           sheet
-              .getRangeByName("${columns[end]}26:${columns[end]}31")
+              .getRangeByName("${columns[end]}26:${columns[end]}32")
               .cellStyle = commontextStyle;
 
-          List<String> qtrcolumns = ['15', '20', '25', '32'];
+          List<String> qtrcolumns = ['15', '20', '25', '33'];
           for (String cols in qtrcolumns) {
             sheet.getRangeByName("${columns[end]}$cols").cellStyle =
                 totalrowStyle!;
           }
-          sheet.getRangeByName("${columns[end]}33").cellStyle =
+          sheet.getRangeByName("${columns[end]}34").cellStyle =
               formlastrowStyle;
-          sheet.getRangeByName("${columns[end]}33").columnWidth = 11;
+          sheet.getRangeByName("${columns[end]}34").columnWidth = 11;
 
           end += 1;
         }
@@ -6758,8 +6667,9 @@ class _ItaxPageState extends State<ItaxPage>
               .getRangeByName("${columns[end]}30")
               .setValue(varNetsalarytution);
           sheet.getRangeByName("${columns[end]}31").setValue(varNetsalarybonus);
-          sheet.getRangeByName("${columns[end]}32").setValue(varNetsalaryqtr4);
-          sheet.getRangeByName("${columns[end]}33").setValue(varNetsalarygross);
+          sheet.getRangeByName("${columns[end]}32").setValue("0");
+          sheet.getRangeByName("${columns[end]}33").setValue(varNetsalaryqtr4);
+          sheet.getRangeByName("${columns[end]}34").setValue(varNetsalarygross);
 
           sheet
               .getRangeByName("${columns[end]}11:${columns[end]}14")
@@ -6771,17 +6681,17 @@ class _ItaxPageState extends State<ItaxPage>
               .getRangeByName("${columns[end]}21:${columns[end]}24")
               .cellStyle = commontextStyle;
           sheet
-              .getRangeByName("${columns[end]}26:${columns[end]}31")
+              .getRangeByName("${columns[end]}26:${columns[end]}32")
               .cellStyle = commontextStyle;
 
-          List<String> qtrcolumns = ['15', '20', '25', '32'];
+          List<String> qtrcolumns = ['15', '20', '25', '33'];
           for (String cols in qtrcolumns) {
             sheet.getRangeByName("${columns[end]}$cols").cellStyle =
                 totalrowStyle!;
           }
-          sheet.getRangeByName("${columns[end]}33").cellStyle =
+          sheet.getRangeByName("${columns[end]}34").cellStyle =
               formlastrowStyle;
-          sheet.getRangeByName("${columns[end]}33").columnWidth = 11;
+          sheet.getRangeByName("${columns[end]}34").columnWidth = 11;
 
           end += 1;
         }
