@@ -785,13 +785,20 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
 
   // ignore: unused_element
   Widget _buildTaxSnapshotCard(_EcrPreviewData preview) {
+    final prevInc = _toInt(preview.itaxNew['previnc']) != 0
+        ? _toInt(preview.itaxNew['previnc'])
+        : _toInt(preview.arrearData['previnc']);
+    final prevTax = _toInt(preview.itaxNew['prevtax']) != 0
+        ? _toInt(preview.itaxNew['prevtax'])
+        : _toInt(preview.arrearData['prevtax']);
+
     final metrics = [
       _InfoItem(
           'Taxable Gross', _formatCurrency(_toInt(preview.itaxNew['tg']))),
-      _InfoItem('Conv + Drive',
+      _InfoItem('Conv, Cont & Uniform Exemption',
           _formatCurrency(_toInt(preview.itaxNew['convdrive']))),
-      _InfoItem('Uniform Exemption',
-          _formatCurrency(_toInt(preview.itaxNew['uniform']))),
+      _InfoItem('Previous Employer Income',
+          _formatCurrency(prevInc)),
       _InfoItem('Gross Taxable Income',
           _formatCurrency(_toInt(preview.itaxNew['gti']))),
       _InfoItem('Employer NPS 80CCD(2)',
@@ -808,6 +815,8 @@ class _EcrPreviewPageState extends State<EcrPreviewPage> {
       _InfoItem('Tax Payable', _formatCurrency(_toInt(preview.itaxNew['ttp']))),
       _InfoItem('Already Deducted',
           _formatCurrency(_toInt(preview.itaxNew['deduct']))),
+      _InfoItem('Previous Employer Tax',
+          _formatCurrency(prevTax)),
       _InfoItem('Balance Before Relief',
           _formatCurrency(_toInt(preview.itaxNew['nitp']))),
       _InfoItem('Relief', _formatCurrency(_toInt(preview.itaxNew['relief']))),
@@ -1942,8 +1951,8 @@ _EcrPreviewData _buildPreviewData({
     totalDeduction: grossTotalRow.values['totalded'] ?? 0,
     netSalary: grossTotalRow.values['netsalary'] ?? 0,
     februaryEcrTax: februaryEcrTax,
-    newSheetDetail: _buildNewTaxSheetDetail(itaxNew, dedData),
-    oldSheetDetail: _buildOldTaxSheetDetail(mainData, itfData, dedData),
+    newSheetDetail: _buildNewTaxSheetDetail(itaxNew, dedData, arrearData),
+    oldSheetDetail: _buildOldTaxSheetDetail(mainData, itfData, dedData, arrearData),
   );
 }
 
@@ -2110,6 +2119,7 @@ String _detailAmount(int value) {
 _TaxSheetDetail _buildNewTaxSheetDetail(
     Map<String, dynamic> itaxNew,
     Map<String, dynamic> dedData,
+    Map<String, dynamic> arrearData,
     ) {
   final slabLabels = _newTaxSlabLabels();
   final slabValues = [
@@ -2149,6 +2159,13 @@ _TaxSheetDetail _buildNewTaxSheetDetail(
     ),
   );
 
+  final prevInc = _toInt(itaxNew['previnc']) != 0
+      ? _toInt(itaxNew['previnc'])
+      : _toInt(arrearData['previnc']);
+  final prevTax = _toInt(itaxNew['prevtax']) != 0
+      ? _toInt(itaxNew['prevtax'])
+      : _toInt(arrearData['prevtax']);
+
   return _TaxSheetDetail(
     title: 'New Income Tax Sheet',
     icon: Icons.auto_graph_rounded,
@@ -2164,13 +2181,13 @@ _TaxSheetDetail _buildNewTaxSheetDetail(
           ),
           _TaxSheetEntry(
             code: '2',
-            label: 'Conveyance & Contigency Exempted',
+            label: 'Conveyance, Contingency & Uniform Exempted',
             value: _detailAmount(_toInt(itaxNew['convdrive'])),
           ),
           _TaxSheetEntry(
             code: '3',
-            label: 'Uniform Exempted',
-            value: _detailAmount(_toInt(itaxNew['uniform'])),
+            label: 'Previous Employer Income',
+            value: _detailAmount(prevInc),
           ),
           _TaxSheetEntry(
             code: '4',
@@ -2248,6 +2265,11 @@ _TaxSheetDetail _buildNewTaxSheetDetail(
             value: _detailAmount(_toInt(itaxNew['deduct'])),
           ),
           _TaxSheetEntry(
+            code: '16(a)',
+            label: 'Previous Employer Tax',
+            value: _detailAmount(prevTax),
+          ),
+          _TaxSheetEntry(
             code: '17',
             label: 'Income Tax Payble',
             value: _detailAmount(_toInt(itaxNew['nitp'])),
@@ -2284,6 +2306,7 @@ _TaxSheetDetail _buildOldTaxSheetDetail(
     Map<String, dynamic> mainData,
     Map<String, dynamic> itfData,
     Map<String, dynamic> dedData,
+    Map<String, dynamic> arrearData,
     ) {
   final varTg = _toInt(itfData['tgross']);
   final varConvContUniform = _toInt(itfData['tconv']) +

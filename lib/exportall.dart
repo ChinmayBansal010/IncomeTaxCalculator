@@ -381,10 +381,10 @@ Future<Map<String, dynamic>> fetchitaxNewData([Map<String, dynamic>? mainDataMap
       final itfNewData = Map<String, dynamic>.from(snapshot.value as Map);
 
       final orderedKeys = [
-        'biometricid', 'name', 'panno', 'tg', 'convdrive', 'uniform', 'gti', 'atccd2',
+        'biometricid', 'name', 'panno', 'tg', 'convdrive', 'uniform', 'previnc', 'gti', 'atccd2',
         'ti', 'sd', 'other', 'tti', 't1', 't2', 't3', 't4',
         't5', 't6', 't7', 'tt', 'sur', 'tl', 'tre', 'ttl', 'ec',
-        'ttp', 'deduct', 'nitp', 'relief', 'nitpi', 'ep'
+        'ttp', 'deduct', 'prevtax', 'nitp', 'relief', 'nitpi', 'ep'
       ];
 
       final labelMap = {
@@ -392,8 +392,9 @@ Future<Map<String, dynamic>> fetchitaxNewData([Map<String, dynamic>? mainDataMap
         'name': 'Name',
         'panno': 'PAN Number',
         'tg': 'Total Gross',
-        'convdrive': 'Conv&Cont',
-        'uniform': 'Uniform',
+        'convdrive': 'Conv, Cont & Uniform',
+        'uniform': 'Previous Employer Income',
+        'previnc': 'Previous Employer Income',
         'gti': 'Gross Taxable Income',
         'atccd2': '80CCD(2)',
         'ti': 'Taxable Income',
@@ -415,6 +416,7 @@ Future<Map<String, dynamic>> fetchitaxNewData([Map<String, dynamic>? mainDataMap
         'ec': 'Cess',
         'ttp': 'Total Tax Payble',
         'deduct': 'Tax Already Paid',
+        'prevtax': 'Previous Employer Tax',
         'nitp': 'Tax Payble',
         'relief': 'tax Relief',
         'nitpi': 'Net Tax Payble',

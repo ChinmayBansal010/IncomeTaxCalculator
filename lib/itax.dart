@@ -568,7 +568,9 @@ class _ItaxPageState extends State<ItaxPage>
       int varNitp,
       int varRelief,
       int varNitpi,
-      int varEp) async {
+      int varEp,
+      {int varPrevinc = 0,
+      int varPrevtax = 0}) async {
     if (biometricId == null) {
       if (mounted) {
         showDialog(
@@ -593,6 +595,8 @@ class _ItaxPageState extends State<ItaxPage>
         'tg': varTg,
         'convdrive': varConvDrive,
         'uniform': varUniform,
+        'previnc': varPrevinc,
+        'prevtax': varPrevtax,
         'gti': varGti,
         'atccd2': varAtccd2,
         'ti': varTi,
@@ -680,7 +684,9 @@ class _ItaxPageState extends State<ItaxPage>
       int varNitp,
       int varRelief,
       int varNitpi,
-      int varEp) async {
+      int varEp,
+      {int varPrevinc = 0,
+      int varPrevtax = 0}) async {
     if (biometricId == null) {
       if (mounted) {
         showDialog(
@@ -704,6 +710,8 @@ class _ItaxPageState extends State<ItaxPage>
         'biometricid': biometricId,
         'tg': varTg,
         'convcontuniform': varConvContUniform,
+        'previnc': varPrevinc,
+        'prevtax': varPrevtax,
         'gti': varGti,
         'arp': varArp,
         'totali': varTotali,
@@ -4805,31 +4813,9 @@ class _ItaxPageState extends State<ItaxPage>
 
       //================================== excel formation =================================================
       List<String> columns = [
-        'B',
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'H',
-        'I',
-        'J',
-        'K',
-        'L',
-        'M',
-        'N',
-        'O',
-        'P',
-        'Q',
-        'R',
-        'S',
-        'T',
-        'U',
-        'V',
-        'W',
-        'X',
-        'Y',
-        'Z'
+        'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ',
+        'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ'
       ];
       int end = 0;
 
@@ -7408,7 +7394,7 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("C${i + 24}:F${i + 24}").merge();
       }
 
-      sheet.getRangeByName("C3").setValue("Total Gross Salary");
+      sheet.getRangeByName("C3").setValue("Total Gross Salary with Previous Employer Income");
       sheet.getRangeByName("C3").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C3").rowHeight = 17.40;
       sheet
@@ -7494,7 +7480,7 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C41").setValue("Total Tax Payble Rs.");
       sheet.getRangeByName("C41").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C41").rowHeight = 17.40;
-      sheet.getRangeByName("C42").setValue("Deduct :-Income Tax already Paid");
+      sheet.getRangeByName("C42").setValue("Deduct :-Income Tax already Paid with Previous Employer Tax");
       sheet.getRangeByName("C43").setValue("Income Tax Payble");
       sheet.getRangeByName("C43").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C44").setValue("Relief u/s 89(i)");
@@ -7512,6 +7498,10 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("G$i").cellStyle.backColor = "#EEECE1";
       }
 
+      int varPrevinc =
+          int.tryParse(arrearData['previnc']?.toString() ?? '0') ?? 0;
+      int varPrevtax =
+          int.tryParse(arrearData['prevtax']?.toString() ?? '0') ?? 0;
       int varTg = int.tryParse(itfData['tgross']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("G3").setValue(varTg);
 
@@ -7777,7 +7767,9 @@ class _ItaxPageState extends State<ItaxPage>
           varNitp,
           varRelief,
           varNitpi,
-          varEp);
+          varEp,
+          varPrevinc: varPrevinc,
+          varPrevtax: varPrevtax);
       List<int> excludedNumbers = [
         3,
         5,
@@ -7951,7 +7943,7 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("B12:B21").cellStyle = commontextStyle!;
       sheet.getRangeByName("B12:B21").cellStyle.hAlign = xls.HAlignType.center;
 
-      for (int i = 11; i <= 20; i++) {
+      for (int i = 11; i <= 21; i++) {
         sheet.getRangeByName("B${i + 11}").setValue(i);
         sheet.getRangeByName("B${i + 11}").cellStyle = commontextStyle;
         sheet.getRangeByName("B${i + 11}").cellStyle.hAlign =
@@ -7964,8 +7956,8 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C3").setValue("Total Gross Salary");
       sheet.getRangeByName("C3").cellStyle = commontextStyleBold!;
       sheet.getRangeByName("C3").rowHeight = 17.40;
-      sheet.getRangeByName("C4").setValue("Conveyance & Contigency Exempted");
-      sheet.getRangeByName("C5").setValue("Uniform Exempted");
+      sheet.getRangeByName("C4").setValue("Conveyance, Contingency & Uniform Exempted");
+      sheet.getRangeByName("C5").setValue("Previous Employer Income");
       sheet.getRangeByName("C6").setValue("Gross Total Income");
       sheet.getRangeByName("C7").setValue("U/S 80CCD (2)");
       sheet.getRangeByName("C8").setValue("Taxable Income");
@@ -8060,38 +8052,45 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C26").cellStyle = commontextStyleBold;
       sheet.getRangeByName("C26").rowHeight = 17.40;
       sheet.getRangeByName("C27").setValue("Deduct :-Income Tax already Paid");
-      sheet.getRangeByName("C28").setValue("Income Tax Payble");
-      sheet.getRangeByName("C28").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C29").setValue("Relief u/s 89(i)");
-      sheet.getRangeByName("C30").rowHeight = 19.80;
-      sheet.getRangeByName("C30").setValue("Net Income Tax Payble");
-      sheet.getRangeByName("C30").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C30").cellStyle.fontSize = 14;
-      sheet.getRangeByName("C30").cellStyle.backColor = "#FBD4B4";
-      sheet.getRangeByName("C31").setValue("Excess Paid");
+      sheet.getRangeByName("C28").setValue("Previous Employer Tax");
+      sheet.getRangeByName("C29").setValue("Income Tax Payble");
+      sheet.getRangeByName("C29").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C30").setValue("Relief u/s 89(i)");
+      sheet.getRangeByName("C31").rowHeight = 19.80;
+      sheet.getRangeByName("C31").setValue("Net Income Tax Payble");
       sheet.getRangeByName("C31").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("C31").rowHeight = 17.40;
+      sheet.getRangeByName("C31").cellStyle.fontSize = 14;
+      sheet.getRangeByName("C31").cellStyle.backColor = "#FBD4B4";
+      sheet.getRangeByName("C32").setValue("Excess Paid");
+      sheet.getRangeByName("C32").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("C32").rowHeight = 17.40;
 
-      for (int i = 3; i <= 31; i++) {
+      for (int i = 3; i <= 32; i++) {
         sheet.getRangeByName("G$i").cellStyle = commontextStyle;
         sheet.getRangeByName("G$i").cellStyle.backColor = "#EEECE1";
         sheet.getRangeByName("G$i").cellStyle.borders.right.lineStyle =
             xls.LineStyle.thick;
       }
 
+      int varPrevinc =
+          int.tryParse(arrearData['previnc']?.toString() ?? '0') ?? 0;
+      int varPrevtax =
+          int.tryParse(arrearData['prevtax']?.toString() ?? '0') ?? 0;
+
       int varTg = (int.tryParse(itfData['tgross']?.toString() ?? '0') ?? 0);
-      sheet.getRangeByName("G3").setValue(varTg);
+      int varTgCurrent = varTg - varPrevinc;
+      if (varTgCurrent < 0) varTgCurrent = 0;
+      sheet.getRangeByName("G3").setValue(varTgCurrent);
 
-      int varConvDrive =
+      int varConvContUniform =
           (int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0) +
-              (int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0);
-      sheet.getRangeByName("G4").setValue(varConvDrive);
+              (int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0) +
+              (int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0);
+      sheet.getRangeByName("G4").setValue(varConvContUniform);
 
-      int varUniform =
-          int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G5").setValue(varUniform);
+      sheet.getRangeByName("G5").setValue(varPrevinc);
 
-      int varGti = varTg - varConvDrive - varUniform;
+      int varGti = (varTgCurrent - varConvContUniform) + varPrevinc;
       sheet.getRangeByName("G6").setValue(varGti);
 
       int varAtccd2 = int.tryParse(itfData['tnpsemp']?.toString() ?? '0') ?? 0;
@@ -8271,20 +8270,26 @@ class _ItaxPageState extends State<ItaxPage>
       }
       sheet.getRangeByName("G26").setValue(varTtp);
 
-      int varDeduct =
+      int varIncometaxgross =
           int.tryParse(itfData['tincometax']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G27").setValue(varDeduct);
+      int varDeductCurrent = varIncometaxgross - varPrevtax;
+      if (varDeductCurrent < 0) varDeductCurrent = 0;
+      sheet.getRangeByName("G27").setValue(varDeductCurrent);
 
-      int varNitp = varTtp - varDeduct;
+      sheet.getRangeByName("G28").setValue(varPrevtax);
+
+      int varTotalTaxDeducted = varDeductCurrent + varPrevtax;
+
+      int varNitp = varTtp - varTotalTaxDeducted;
       if (varNitp < 0) {
         varNitp = 0;
       }
-      sheet.getRangeByName("G28").setValue(varNitp);
+      sheet.getRangeByName("G29").setValue(varNitp);
 
       int varRelief = int.tryParse(dedData['relief']?.toString() ?? '0') ?? 0;
-      sheet.getRangeByName("G29").setValue(varRelief);
+      sheet.getRangeByName("G30").setValue(varRelief);
 
-      int varNitpi = varTtp - varDeduct - varRelief;
+      int varNitpi = varTtp - varTotalTaxDeducted - varRelief;
 
       int varEp = 0;
       if (varNitpi < 0) {
@@ -8292,17 +8297,17 @@ class _ItaxPageState extends State<ItaxPage>
         varNitpi = 0;
       }
       globalNitpi = varNitpi;
-      sheet.getRangeByName("G30").rowHeight = 19.80;
-      sheet.getRangeByName("G30").setValue(varNitpi);
-      sheet.getRangeByName("G30").cellStyle.fontSize = 14;
+      sheet.getRangeByName("G31").rowHeight = 19.80;
+      sheet.getRangeByName("G31").setValue(varNitpi);
+      sheet.getRangeByName("G31").cellStyle.fontSize = 14;
 
-      sheet.getRangeByName("G31").setValue(varEp);
+      sheet.getRangeByName("G32").setValue(varEp);
 
       await updateItaxnew(
           biometricId,
-          varTg,
-          varConvDrive,
-          varUniform,
+          varTgCurrent,
+          varConvContUniform,
+          varPrevinc,
           varGti,
           varAtccd2,
           varTi,
@@ -8323,13 +8328,15 @@ class _ItaxPageState extends State<ItaxPage>
           varTtl,
           varEc,
           varTtp,
-          varDeduct,
+          varDeductCurrent,
           varNitp,
           varRelief,
           varNitpi,
-          varEp);
-      List<int> excludedNumbers = [3, 11, 20, 22, 24, 25, 26, 28, 30, 31];
-      for (int i = 3; i <= 31; i++) {
+          varEp,
+          varPrevinc: varPrevinc,
+          varPrevtax: varPrevtax);
+      List<int> excludedNumbers = [3, 11, 20, 22, 24, 25, 26, 29, 31, 32];
+      for (int i = 3; i <= 32; i++) {
         xls.Range rangeValue = sheet.getRangeByName("G$i");
         xls.Range rangeNum = sheet.getRangeByName("B$i");
         rangeValue.cellStyle = !(excludedNumbers.contains(i))
@@ -8348,101 +8355,101 @@ class _ItaxPageState extends State<ItaxPage>
         rangeNum.cellStyle.borders.bottom.lineStyle = xls.LineStyle.thin;
         rangeNum.cellStyle.borders.left.lineStyle = xls.LineStyle.thick;
       }
-      sheet.getRangeByName("B31:G31").cellStyle.borders.all.lineStyle =
+      sheet.getRangeByName("B32:G32").cellStyle.borders.all.lineStyle =
           xls.LineStyle.none;
-      sheet.getRangeByName("B31:G31").cellStyle.borders.top.lineStyle =
+      sheet.getRangeByName("B32:G32").cellStyle.borders.top.lineStyle =
           xls.LineStyle.thin;
-      sheet.getRangeByName("G31").cellStyle.borders.right.lineStyle =
+      sheet.getRangeByName("G32").cellStyle.borders.right.lineStyle =
           xls.LineStyle.thick;
-      sheet.getRangeByName("C31:F31").cellStyle.borders.right.lineStyle =
+      sheet.getRangeByName("C32:F32").cellStyle.borders.right.lineStyle =
           xls.LineStyle.thin;
-      sheet.getRangeByName("B31:G31").cellStyle.borders.bottom.lineStyle =
+      sheet.getRangeByName("B32:G32").cellStyle.borders.bottom.lineStyle =
           xls.LineStyle.thick;
-      sheet.getRangeByName("B31").cellStyle.borders.left.lineStyle =
+      sheet.getRangeByName("B32").cellStyle.borders.left.lineStyle =
           xls.LineStyle.thick;
-      sheet.getRangeByName("C31:F31").cellStyle.borders.left.lineStyle =
+      sheet.getRangeByName("C32:F32").cellStyle.borders.left.lineStyle =
           xls.LineStyle.thin;
-      sheet.getRangeByName("G30").cellStyle.fontSize = 14;
+      sheet.getRangeByName("G31").cellStyle.fontSize = 14;
 
-      sheet.getRangeByName("G33").setValue("A.O/A.A.O/D.D.O");
-      sheet.getRangeByName("G33").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("G33").cellStyle.hAlign = xls.HAlignType.right;
-      sheet.getRangeByName("G33").cellStyle.borders.all.lineStyle =
+      sheet.getRangeByName("G34").setValue("A.O/A.A.O/D.D.O");
+      sheet.getRangeByName("G34").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("G34").cellStyle.hAlign = xls.HAlignType.right;
+      sheet.getRangeByName("G34").cellStyle.borders.all.lineStyle =
           xls.LineStyle.none;
 
-      sheet.getRangeByName("B35:G35").merge();
-      sheet.getRangeByName("B35:G35").setValue(sharedData.zone.toUpperCase());
-      sheet.getRangeByName("B35:G35").cellStyle = commontextStyleBold;
-      sheet.getRangeByName("B35:G35").cellStyle.borders.all.lineStyle =
+      sheet.getRangeByName("B36:G36").merge();
+      sheet.getRangeByName("B36:G36").setValue(sharedData.zone.toUpperCase());
+      sheet.getRangeByName("B36:G36").cellStyle = commontextStyleBold;
+      sheet.getRangeByName("B36:G36").cellStyle.borders.all.lineStyle =
           xls.LineStyle.thick;
-      sheet.getRangeByName("B35:G35").cellStyle.hAlign = xls.HAlignType.center;
+      sheet.getRangeByName("B36:G36").cellStyle.hAlign = xls.HAlignType.center;
 
-      sheet.getRangeByName("B36:D36").merge();
-      sheet.getRangeByName("B36:D36").cellStyle = commontextStyle;
-      sheet.getRangeByName("B36").setValue(mainpgData["panno"]);
+      sheet.getRangeByName("B37:D37").merge();
+      sheet.getRangeByName("B37:D37").cellStyle = commontextStyle;
+      sheet.getRangeByName("B37").setValue(mainpgData["panno"]);
 
-      sheet.getRangeByName("E36:G36").merge();
-      sheet.getRangeByName("E36:G36").cellStyle = commontextStyle;
-      sheet.getRangeByName("E36").setValue(
+      sheet.getRangeByName("E37:G37").merge();
+      sheet.getRangeByName("E37:G37").cellStyle = commontextStyle;
+      sheet.getRangeByName("E37").setValue(
           "Sub: INCOME TAX FOR THE FINANCIAL YEAR ${sharedData.ccurrentYear}");
 
       var year =
           (int.tryParse(sharedData.ccurrentYear.substring(0, 4)) ?? 0) + 1;
-      sheet.getRangeByName("B37:G37").merge();
-      sheet.getRangeByName("B37:G37").cellStyle = commontextStyle;
-      sheet.getRangeByName("B37").setFormula(
-          '=CONCATENATE("This is to certify that a sum of ₹ ",\$G\$30, '
+      sheet.getRangeByName("B38:G38").merge();
+      sheet.getRangeByName("B38:G38").cellStyle = commontextStyle;
+      sheet.getRangeByName("B38").setFormula(
+          '=CONCATENATE("This is to certify that a sum of ₹ ",\$G\$31, '
           '" is to be recovered as Income Tax for the total income of ₹ ",\$G\$6, '
           '" from Sh./Smt./Ms ","${mainpgData['name']}",'
           '" working as ","${mainpgData['designation']}",'
           '" in ",\$B\$2, '
           '" on the basis of details of Income furninshed by him / her , GPF / NPS deduction for the month of Feb. $year")');
-      sheet.getRangeByName("B37:G37").rowHeight = 54.60;
-
-      sheet.getRangeByName("B39:D39").merge();
-      sheet.getRangeByName("B39:E39").cellStyle = commontextStyle;
-      sheet.getRangeByName("B39").setValue("Tax Due: ");
-      sheet.getRangeByName("E39").setFormula('=G20');
+      sheet.getRangeByName("B38:G38").rowHeight = 54.60;
 
       sheet.getRangeByName("B40:D40").merge();
       sheet.getRangeByName("B40:E40").cellStyle = commontextStyle;
-      sheet.getRangeByName("B40").setValue("Surcharge:");
-      sheet.getRangeByName("E40").setFormula('=G21');
+      sheet.getRangeByName("B40").setValue("Tax Due: ");
+      sheet.getRangeByName("E40").setFormula('=G20');
 
       sheet.getRangeByName("B41:D41").merge();
       sheet.getRangeByName("B41:E41").cellStyle = commontextStyle;
-      sheet.getRangeByName("B41").setValue("Sec. 87A ");
-      sheet.getRangeByName("E41").setFormula('=G23');
+      sheet.getRangeByName("B41").setValue("Surcharge:");
+      sheet.getRangeByName("E41").setFormula('=G21');
 
       sheet.getRangeByName("B42:D42").merge();
       sheet.getRangeByName("B42:E42").cellStyle = commontextStyle;
-      sheet.getRangeByName("B42").setValue("Education Cess:");
-      sheet.getRangeByName("E42").setFormula('=G25');
+      sheet.getRangeByName("B42").setValue("Sec. 87A ");
+      sheet.getRangeByName("E42").setFormula('=G23');
 
       sheet.getRangeByName("B43:D43").merge();
       sheet.getRangeByName("B43:E43").cellStyle = commontextStyle;
-      sheet.getRangeByName("B43").setValue("Total Tax Due:");
-      sheet.getRangeByName("E43").setFormula('=G26');
+      sheet.getRangeByName("B43").setValue("Education Cess:");
+      sheet.getRangeByName("E43").setFormula('=G25');
 
       sheet.getRangeByName("B44:D44").merge();
       sheet.getRangeByName("B44:E44").cellStyle = commontextStyle;
-      sheet.getRangeByName("B44").setValue("Relief U/S 89(i):");
-      sheet.getRangeByName("E44").setFormula('=G29');
+      sheet.getRangeByName("B44").setValue("Total Tax Due:");
+      sheet.getRangeByName("E44").setFormula('=G26');
 
       sheet.getRangeByName("B45:D45").merge();
       sheet.getRangeByName("B45:E45").cellStyle = commontextStyle;
-      sheet.getRangeByName("B45").setValue("Already Paid:");
-      sheet.getRangeByName("E45").setFormula('=G27');
+      sheet.getRangeByName("B45").setValue("Relief U/S 89(i):");
+      sheet.getRangeByName("E45").setFormula('=G30');
 
       sheet.getRangeByName("B46:D46").merge();
       sheet.getRangeByName("B46:E46").cellStyle = commontextStyle;
-      sheet.getRangeByName("B46").setValue("Balance:");
-      sheet.getRangeByName("E46").setFormula('=G30');
+      sheet.getRangeByName("B46").setValue("Already Paid:");
+      sheet.getRangeByName("E46").setFormula('=G27+G28');
 
-      sheet.getRangeByName("B47:G47").merge();
-      sheet.getRangeByName("B47:G47").cellStyle = commontextStyle;
-      sheet.getRangeByName("B47").setFormula(
-          r'=CONCATENATE("Income Tax",IF($G$31<>0,(" EXCESS PAID ₹ "&$G$31),(" TAX DUE ₹ "&$G$30)))');
+      sheet.getRangeByName("B47:D47").merge();
+      sheet.getRangeByName("B47:E47").cellStyle = commontextStyle;
+      sheet.getRangeByName("B47").setValue("Balance:");
+      sheet.getRangeByName("E47").setFormula('=G31');
+
+      sheet.getRangeByName("B48:G48").merge();
+      sheet.getRangeByName("B48:G48").cellStyle = commontextStyle;
+      sheet.getRangeByName("B48").setFormula(
+          r'=CONCATENATE("Income Tax",IF($G$32<>0,(" EXCESS PAID ₹ "&$G$32),(" TAX DUE ₹ "&$G$31)))');
 
       sheet.getRangeByName("G44").setValue("A.O/A.A.O/D.D.O");
       sheet.getRangeByName("G44").cellStyle = commontextStyleBold;
@@ -8450,13 +8457,15 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("G44").cellStyle.borders.all.lineStyle =
           xls.LineStyle.none;
 
-      sheet.getRangeByName("B36:G47").cellStyle.borders.all.lineStyle =
+      sheet.getRangeByName("B37:G48").cellStyle.borders.all.lineStyle =
           xls.LineStyle.none;
-      sheet.getRangeByName("B36:B47").cellStyle.borders.left.lineStyle =
+      sheet.getRangeByName("B36:B48").cellStyle.borders.left.lineStyle =
           xls.LineStyle.thick;
-      sheet.getRangeByName("B47:G47").cellStyle.borders.bottom.lineStyle =
+      sheet.getRangeByName("B36:G36").cellStyle.borders.left.lineStyle =
           xls.LineStyle.thick;
-      sheet.getRangeByName("G36:G47").cellStyle.borders.right.lineStyle =
+      sheet.getRangeByName("B48:G48").cellStyle.borders.bottom.lineStyle =
+          xls.LineStyle.thick;
+      sheet.getRangeByName("G36:G48").cellStyle.borders.right.lineStyle =
           xls.LineStyle.thick;
     } catch (error) {
       if (mounted) {
