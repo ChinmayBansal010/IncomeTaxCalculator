@@ -2475,7 +2475,7 @@ _TaxSheetDetail _buildOldTaxSheetDetail(
         entries: [
           _TaxSheetEntry(
               code: '1',
-              label: 'Total Gross Salary',
+              label: 'Total Gross Salary and Previous Employer Income',
               value: _detailAmount(varTg),
               highlight: true),
           _TaxSheetEntry(
@@ -2628,7 +2628,7 @@ _TaxSheetDetail _buildOldTaxSheetDetail(
               highlight: true),
           _TaxSheetEntry(
               code: '12(v)',
-              label: 'Deduct :-Income Tax already Paid',
+              label: 'Deduct :-Income Tax already Paid and Previous Employer Tax',
               value: _detailAmount(varDeduct)),
           _TaxSheetEntry(
               code: '12(vi)',
