@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         {
           "key": "ARREAR_DEDUCTION",
           "label": "ARREAR AND DEDUCTION",
-          "subtitle": _selectedArrearDeductionOption == 'ARREAR' ? "Pending clearings" : "Tax deductions",
+          "subtitle": _selectedArrearDeductionOption == 'ARREAR' ? "ARREARS" : "DEDUCTIONS",
           "icon": _selectedArrearDeductionOption == 'ARREAR'
               ? Icons.account_balance_wallet_rounded
               : Icons.remove_circle_outline_rounded,
@@ -60,8 +60,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           "hasDropdown": true,
           "currentValue": _selectedArrearDeductionOption,
           "dropdownOptions": [
-            {"value": "ARREAR", "label": "ARREAR", "subtitle": "Pending clearings"},
-            {"value": "DEDUCTION", "label": "DEDUCTION", "subtitle": "Tax deductions"},
+            {"value": "ARREAR", "label": "ARREAR", "subtitle": "ARREARS"},
+            {"value": "DEDUCTION", "label": "DEDUCTION", "subtitle": "DEDUCTIONS"},
           ],
           "onOptionChanged": (String val) {
             setState(() {
@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
         {
           "key": "ARREAR - CALC",
-          "label": "ARREAR - CALC",
+          "label": "ARREAR - CALCULATOR",
           "subtitle": "Arrear calculation",
           "icon": Icons.calculate_rounded,
           "color": const Color(0xFF4F46E5),
@@ -99,8 +99,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
         {
           "key": "TDS_COMBINED",
-          "label": "TDS AND TDS-0",
-          "subtitle": _selectedTdsOption == 'TDS - 0' ? "Zero rate standard" : "Standard deduction",
+          "label": "TDS-0 AND TDS",
+          "subtitle": _selectedTdsOption == 'TDS - 0' ? "DATA WITH ZERO TAX" : "DATA WITHOUT ZERO TAX",
           "icon": _selectedTdsOption == 'TDS - 0'
               ? Icons.receipt_rounded
               : Icons.receipt_long_rounded,
@@ -110,8 +110,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           "hasDropdown": true,
           "currentValue": _selectedTdsOption,
           "dropdownOptions": [
-            {"value": "TDS - 0", "label": "TDS - 0", "subtitle": "Zero rate standard"},
-            {"value": "TDS", "label": "TDS", "subtitle": "Standard deduction"},
+            {"value": "TDS - 0", "label": "TDS - 0", "subtitle": "DATA WITH ZERO TAX"},
+            {"value": "TDS", "label": "TDS", "subtitle": "DATA WITHOUT ZERO TAX"},
           ],
           "onOptionChanged": (String val) {
             setState(() {

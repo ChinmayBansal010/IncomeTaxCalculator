@@ -7969,7 +7969,7 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C6").setValue("Gross Total Income");
       sheet.getRangeByName("C7").setValue("U/S 80CCD (2)");
       sheet.getRangeByName("C8").setValue("Taxable Income");
-      sheet.getRangeByName("C9").setValue("Standard deducion");
+      sheet.getRangeByName("C9").setValue("Standard deduction");
       sheet.getRangeByName("C10").setValue("Other");
       sheet.getRangeByName("C11").setValue("Total Taxable Income (Round off)");
       sheet.getRangeByName("C11").cellStyle = commontextStyleBold;
