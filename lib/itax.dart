@@ -4007,14 +4007,15 @@ class _ItaxPageState extends State<ItaxPage>
           int.tryParse(febData['ddext3']?.toString() ?? '0') ?? 0;
       int varDdext4feb =
           int.tryParse(febData['ddext4']?.toString() ?? '0') ?? 0;
+      int febOldTax = int.tryParse(febData['incometax']?.toString() ?? '0') ?? 0;
       int varTotaldedfeb =
           int.tryParse(febData['totalded']?.toString() ?? '0') ?? 0;
       varTotaldedfeb =
-          isECR ? varTotaldedfeb + varIncometaxfeb : varTotaldedfeb;
+          isECR ? (varTotaldedfeb - febOldTax + varIncometaxfeb) : varTotaldedfeb;
       int varNetsalaryfeb =
           int.tryParse(febData['netsalary']?.toString() ?? '0') ?? 0;
       varNetsalaryfeb =
-          isECR ? varNetsalaryfeb - varIncometaxfeb : varNetsalaryfeb;
+          isECR ? (varNetsalaryfeb + febOldTax - varIncometaxfeb) : varNetsalaryfeb;
 
       // ============================= arrearqtr4 ==============================
       int varBparrearqtr4 = int.tryParse('0') ?? 0;
@@ -4481,7 +4482,7 @@ class _ItaxPageState extends State<ItaxPage>
         varOtherqtr2,
         varOtherqtr3,
         varOtherqtr4,
-        varPrevinc
+
       ].fold(0, (sum, value) => sum + value);
       int varDaext1gross = [
         varDaext1qtr1,
@@ -4541,7 +4542,7 @@ class _ItaxPageState extends State<ItaxPage>
         varIncometaxqtr2,
         varIncometaxqtr3,
         varIncometaxqtr4,
-        varPrevtax
+
       ].fold(0, (sum, value) => sum + value);
       int varGisgross = [varGisqtr1, varGisqtr2, varGisqtr3, varGisqtr4]
           .fold(0, (sum, value) => sum + value);
@@ -4608,7 +4609,7 @@ class _ItaxPageState extends State<ItaxPage>
         varDdext4qtr4
       ].fold(0, (sum, value) => sum + value);
       int varTotaldedprev = varPrevtax;
-      int varNetsalaryprev = varPrevinc;
+      int varNetsalaryprev = varPrevinc-varPrevtax;
 
       int varTotaldedgross = [
         varTotaldedqtr1,
@@ -5083,29 +5084,25 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}11").setValue(varUniformmar);
         sheet.getRangeByName("${columns[end]}12").setValue(varUniformapr);
         sheet.getRangeByName("${columns[end]}13").setValue(varUniformmay);
-        sheet
-            .getRangeByName("${columns[end]}14")
+        sheet.getRangeByName("${columns[end]}14")
             .setValue(varUniformarrearqtr1);
         sheet.getRangeByName("${columns[end]}15").setValue(varUniformqtr1);
         sheet.getRangeByName("${columns[end]}16").setValue(varUniformjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varUniformjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varUniformaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varUniformarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varUniformqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varUniformsept);
         sheet.getRangeByName("${columns[end]}22").setValue(varUniformoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varUniformnov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varUniformarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varUniformqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varUniformdec);
         sheet.getRangeByName("${columns[end]}27").setValue(varUniformjan);
         sheet.getRangeByName("${columns[end]}28").setValue(varUniformfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varUniformarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -5146,22 +5143,19 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}16").setValue(varNursingjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varNursingjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varNursingaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varNursingarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varNursingqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varNursingsept);
         sheet.getRangeByName("${columns[end]}22").setValue(varNursingoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varNursingnov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varNursingarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varNursingqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varNursingdec);
         sheet.getRangeByName("${columns[end]}27").setValue(varNursingjan);
         sheet.getRangeByName("${columns[end]}28").setValue(varNursingfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varNursingarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -5298,22 +5292,19 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}16").setValue(varMedicaljun);
         sheet.getRangeByName("${columns[end]}17").setValue(varMedicaljul);
         sheet.getRangeByName("${columns[end]}18").setValue(varMedicalaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varMedicalarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varMedicalqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varMedicalsept);
         sheet.getRangeByName("${columns[end]}22").setValue(varMedicaloct);
         sheet.getRangeByName("${columns[end]}23").setValue(varMedicalnov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varMedicalarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varMedicalqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varMedicaldec);
         sheet.getRangeByName("${columns[end]}27").setValue(varMedicaljan);
         sheet.getRangeByName("${columns[end]}28").setValue(varMedicalfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varMedicalarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -5395,29 +5386,25 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}11").setValue(varWashingmar);
         sheet.getRangeByName("${columns[end]}12").setValue(varWashingapr);
         sheet.getRangeByName("${columns[end]}13").setValue(varWashingmay);
-        sheet
-            .getRangeByName("${columns[end]}14")
+        sheet.getRangeByName("${columns[end]}14")
             .setValue(varWashingarrearqtr1);
         sheet.getRangeByName("${columns[end]}15").setValue(varWashingqtr1);
         sheet.getRangeByName("${columns[end]}16").setValue(varWashingjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varWashingjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varWashingaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varWashingarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varWashingqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varWashingsept);
         sheet.getRangeByName("${columns[end]}22").setValue(varWashingoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varWashingnov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varWashingarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varWashingqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varWashingdec);
         sheet.getRangeByName("${columns[end]}27").setValue(varWashingjan);
         sheet.getRangeByName("${columns[end]}28").setValue(varWashingfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varWashingarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -5747,22 +5734,19 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}16").setValue(varNpsempjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varNpsempjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varNpsempaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varNpsemparrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varNpsempqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varNpsempsept);
         sheet.getRangeByName("${columns[end]}22").setValue(varNpsempoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varNpsempnov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varNpsemparrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varNpsempqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varNpsempdec);
         sheet.getRangeByName("${columns[end]}27").setValue(varNpsempjan);
         sheet.getRangeByName("${columns[end]}28").setValue(varNpsempfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varNpsemparrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -5868,7 +5852,7 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}29").setValue(varSalaryarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue(varSalarytution);
         sheet.getRangeByName("${columns[end]}31").setValue(varSalarybonus);
-        sheet.getRangeByName("${columns[end]}32").setValue("0");
+        sheet.getRangeByName("${columns[end]}32").setValue(varPrevinc);
         sheet.getRangeByName("${columns[end]}33").setValue(varSalaryqtr4);
         sheet.getRangeByName("${columns[end]}34").setValue(varSalarygross);
 
@@ -5926,22 +5910,19 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}11").setValue(varIncometaxmar);
         sheet.getRangeByName("${columns[end]}12").setValue(varIncometaxapr);
         sheet.getRangeByName("${columns[end]}13").setValue(varIncometaxmay);
-        sheet
-            .getRangeByName("${columns[end]}14")
+        sheet.getRangeByName("${columns[end]}14")
             .setValue(varIncometaxarrearqtr1);
         sheet.getRangeByName("${columns[end]}15").setValue(varIncometaxqtr1);
         sheet.getRangeByName("${columns[end]}16").setValue(varIncometaxjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varIncometaxjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varIncometaxaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varIncometaxarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varIncometaxqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varIncometaxsept);
         sheet.getRangeByName("${columns[end]}22").setValue(varIncometaxoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varIncometaxnov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varIncometaxarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varIncometaxqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varIncometaxdec);
@@ -6174,29 +6155,25 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}11").setValue(varSocietymar);
         sheet.getRangeByName("${columns[end]}12").setValue(varSocietyapr);
         sheet.getRangeByName("${columns[end]}13").setValue(varSocietymay);
-        sheet
-            .getRangeByName("${columns[end]}14")
+        sheet.getRangeByName("${columns[end]}14")
             .setValue(varSocietyarrearqtr1);
         sheet.getRangeByName("${columns[end]}15").setValue(varSocietyqtr1);
         sheet.getRangeByName("${columns[end]}16").setValue(varSocietyjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varSocietyjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varSocietyaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varSocietyarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varSocietyqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varSocietysept);
         sheet.getRangeByName("${columns[end]}22").setValue(varSocietyoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varSocietynov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varSocietyarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varSocietyqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varSocietydec);
         sheet.getRangeByName("${columns[end]}27").setValue(varSocietyjan);
         sheet.getRangeByName("${columns[end]}28").setValue(varSocietyfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varSocietyarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -6230,29 +6207,25 @@ class _ItaxPageState extends State<ItaxPage>
         sheet.getRangeByName("${columns[end]}11").setValue(varRecoverymar);
         sheet.getRangeByName("${columns[end]}12").setValue(varRecoveryapr);
         sheet.getRangeByName("${columns[end]}13").setValue(varRecoverymay);
-        sheet
-            .getRangeByName("${columns[end]}14")
+        sheet.getRangeByName("${columns[end]}14")
             .setValue(varRecoveryarrearqtr1);
         sheet.getRangeByName("${columns[end]}15").setValue(varRecoveryqtr1);
         sheet.getRangeByName("${columns[end]}16").setValue(varRecoveryjun);
         sheet.getRangeByName("${columns[end]}17").setValue(varRecoveryjul);
         sheet.getRangeByName("${columns[end]}18").setValue(varRecoveryaug);
-        sheet
-            .getRangeByName("${columns[end]}19")
+        sheet.getRangeByName("${columns[end]}19")
             .setValue(varRecoveryarrearqtr2);
         sheet.getRangeByName("${columns[end]}20").setValue(varRecoveryqtr2);
         sheet.getRangeByName("${columns[end]}21").setValue(varRecoverysept);
         sheet.getRangeByName("${columns[end]}22").setValue(varRecoveryoct);
         sheet.getRangeByName("${columns[end]}23").setValue(varRecoverynov);
-        sheet
-            .getRangeByName("${columns[end]}24")
+        sheet.getRangeByName("${columns[end]}24")
             .setValue(varRecoveryarrearqtr3);
         sheet.getRangeByName("${columns[end]}25").setValue(varRecoveryqtr3);
         sheet.getRangeByName("${columns[end]}26").setValue(varRecoverydec);
         sheet.getRangeByName("${columns[end]}27").setValue(varRecoveryjan);
         sheet.getRangeByName("${columns[end]}28").setValue(varRecoveryfeb);
-        sheet
-            .getRangeByName("${columns[end]}29")
+        sheet.getRangeByName("${columns[end]}29")
             .setValue(varRecoveryarrearqtr4);
         sheet.getRangeByName("${columns[end]}30").setValue('0');
         sheet.getRangeByName("${columns[end]}31").setValue('0');
@@ -6576,47 +6549,35 @@ class _ItaxPageState extends State<ItaxPage>
           sheet.getRangeByName("${columns[end]}11").setValue(varTotaldedmar);
           sheet.getRangeByName("${columns[end]}12").setValue(varTotaldedapr);
           sheet.getRangeByName("${columns[end]}13").setValue(varTotaldedmay);
-          sheet
-              .getRangeByName("${columns[end]}14")
-              .setValue(varTotaldedarrearqtr1);
+          sheet.getRangeByName("${columns[end]}14").setValue(varTotaldedarrearqtr1);
           sheet.getRangeByName("${columns[end]}15").setValue(varTotaldedqtr1);
           sheet.getRangeByName("${columns[end]}16").setValue(varTotaldedjun);
           sheet.getRangeByName("${columns[end]}17").setValue(varTotaldedjul);
           sheet.getRangeByName("${columns[end]}18").setValue(varTotaldedaug);
-          sheet
-              .getRangeByName("${columns[end]}19")
-              .setValue(varTotaldedarrearqtr2);
+          sheet.getRangeByName("${columns[end]}19").setValue(varTotaldedarrearqtr2);
           sheet.getRangeByName("${columns[end]}20").setValue(varTotaldedqtr2);
           sheet.getRangeByName("${columns[end]}21").setValue(varTotaldedsept);
           sheet.getRangeByName("${columns[end]}22").setValue(varTotaldedoct);
           sheet.getRangeByName("${columns[end]}23").setValue(varTotaldednov);
-          sheet
-              .getRangeByName("${columns[end]}24")
-              .setValue(varTotaldedarrearqtr3);
+          sheet.getRangeByName("${columns[end]}24").setValue(varTotaldedarrearqtr3);
           sheet.getRangeByName("${columns[end]}25").setValue(varTotaldedqtr3);
           sheet.getRangeByName("${columns[end]}26").setValue(varTotaldeddec);
           sheet.getRangeByName("${columns[end]}27").setValue(varTotaldedjan);
           sheet.getRangeByName("${columns[end]}28").setValue(varTotaldedfeb);
-          sheet
-              .getRangeByName("${columns[end]}29")
-              .setValue(varTotaldedarrearqtr4);
+          sheet.getRangeByName("${columns[end]}29").setValue(varTotaldedarrearqtr4);
           sheet.getRangeByName("${columns[end]}30").setValue(varTotaldedtution);
           sheet.getRangeByName("${columns[end]}31").setValue(varTotaldedbonus);
-          sheet.getRangeByName("${columns[end]}32").setValue("0");
+          sheet.getRangeByName("${columns[end]}32").setValue(varTotaldedprev);
           sheet.getRangeByName("${columns[end]}33").setValue(varTotaldedqtr4);
           sheet.getRangeByName("${columns[end]}34").setValue(varTotaldedgross);
 
-          sheet
-              .getRangeByName("${columns[end]}11:${columns[end]}14")
+          sheet.getRangeByName("${columns[end]}11:${columns[end]}14")
               .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}16:${columns[end]}19")
+          sheet.getRangeByName("${columns[end]}16:${columns[end]}19")
               .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}21:${columns[end]}24")
+          sheet.getRangeByName("${columns[end]}21:${columns[end]}24")
               .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}26:${columns[end]}32")
+          sheet.getRangeByName("${columns[end]}26:${columns[end]}32")
               .cellStyle = commontextStyle;
 
           List<String> qtrcolumns = ['15', '20', '25', '33'];
@@ -6639,49 +6600,35 @@ class _ItaxPageState extends State<ItaxPage>
           sheet.getRangeByName("${columns[end]}11").setValue(varNetsalarymar);
           sheet.getRangeByName("${columns[end]}12").setValue(varNetsalaryapr);
           sheet.getRangeByName("${columns[end]}13").setValue(varNetsalarymay);
-          sheet
-              .getRangeByName("${columns[end]}14")
-              .setValue(varNetsalaryarrearqtr1);
+          sheet.getRangeByName("${columns[end]}14").setValue(varNetsalaryarrearqtr1);
           sheet.getRangeByName("${columns[end]}15").setValue(varNetsalaryqtr1);
           sheet.getRangeByName("${columns[end]}16").setValue(varNetsalaryjun);
           sheet.getRangeByName("${columns[end]}17").setValue(varNetsalaryjul);
           sheet.getRangeByName("${columns[end]}18").setValue(varNetsalaryaug);
-          sheet
-              .getRangeByName("${columns[end]}19")
-              .setValue(varNetsalaryarrearqtr2);
+          sheet.getRangeByName("${columns[end]}19").setValue(varNetsalaryarrearqtr2);
           sheet.getRangeByName("${columns[end]}20").setValue(varNetsalaryqtr2);
           sheet.getRangeByName("${columns[end]}21").setValue(varNetsalarysept);
           sheet.getRangeByName("${columns[end]}22").setValue(varNetsalaryoct);
           sheet.getRangeByName("${columns[end]}23").setValue(varNetsalarynov);
-          sheet
-              .getRangeByName("${columns[end]}24")
-              .setValue(varNetsalaryarrearqtr3);
+          sheet.getRangeByName("${columns[end]}24").setValue(varNetsalaryarrearqtr3);
           sheet.getRangeByName("${columns[end]}25").setValue(varNetsalaryqtr3);
           sheet.getRangeByName("${columns[end]}26").setValue(varNetsalarydec);
           sheet.getRangeByName("${columns[end]}27").setValue(varNetsalaryjan);
           sheet.getRangeByName("${columns[end]}28").setValue(varNetsalaryfeb);
-          sheet
-              .getRangeByName("${columns[end]}29")
-              .setValue(varNetsalaryarrearqtr4);
-          sheet
-              .getRangeByName("${columns[end]}30")
-              .setValue(varNetsalarytution);
+          sheet.getRangeByName("${columns[end]}29").setValue(varNetsalaryarrearqtr4);
+          sheet.getRangeByName("${columns[end]}30").setValue(varNetsalarytution);
           sheet.getRangeByName("${columns[end]}31").setValue(varNetsalarybonus);
-          sheet.getRangeByName("${columns[end]}32").setValue("0");
+          sheet.getRangeByName("${columns[end]}32").setValue(varNetsalaryprev);
           sheet.getRangeByName("${columns[end]}33").setValue(varNetsalaryqtr4);
           sheet.getRangeByName("${columns[end]}34").setValue(varNetsalarygross);
 
-          sheet
-              .getRangeByName("${columns[end]}11:${columns[end]}14")
+          sheet.getRangeByName("${columns[end]}11:${columns[end]}14")
               .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}16:${columns[end]}19")
+          sheet.getRangeByName("${columns[end]}16:${columns[end]}19")
               .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}21:${columns[end]}24")
+          sheet.getRangeByName("${columns[end]}21:${columns[end]}24")
               .cellStyle = commontextStyle;
-          sheet
-              .getRangeByName("${columns[end]}26:${columns[end]}32")
+          sheet.getRangeByName("${columns[end]}26:${columns[end]}32")
               .cellStyle = commontextStyle;
 
           List<String> qtrcolumns = ['15', '20', '25', '33'];
@@ -6728,19 +6675,19 @@ class _ItaxPageState extends State<ItaxPage>
       }
 
       if (!isECR) {
-        sheet.getRangeByName('A35:C35').merge();
-        sheet.getRangeByName('A35:C35').cellStyle = commontextStyleBold;
-        sheet.getRangeByName('A35:C35').cellStyle.borders.all.lineStyle =
+        sheet.getRangeByName('A36:C36').merge();
+        sheet.getRangeByName('A36:C36').cellStyle = commontextStyleBold;
+        sheet.getRangeByName('A36:C36').cellStyle.borders.all.lineStyle =
             xls.LineStyle.none;
         sheet
-            .getRangeByName('A35')
+            .getRangeByName('A36')
             .setValue('I have Opted NEW / OLD TAX REGIME');
 
-        sheet.getRangeByName('A39:B39').merge();
-        sheet.getRangeByName('A39:B39').cellStyle = commontextStyleBold;
-        sheet.getRangeByName('A39:B39').cellStyle.borders.all.lineStyle =
+        sheet.getRangeByName('A40:B40').merge();
+        sheet.getRangeByName('A40:B40').cellStyle = commontextStyleBold;
+        sheet.getRangeByName('A40:B40').cellStyle.borders.all.lineStyle =
             xls.LineStyle.none;
-        sheet.getRangeByName('A39').setValue('Signature of Employee');
+        sheet.getRangeByName('A40').setValue('Signature of Employee');
       }
     } catch (error) {
       if (mounted) {
@@ -6814,14 +6761,10 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C5").setValue("H.R.A.");
       sheet.getRangeByName("C6").setValue("N.P.A / SPL PAY");
       sheet.getRangeByName("C7").setValue("NURSING ALLOWANCES");
-      sheet
-          .getRangeByName("C8")
-          .setValue("PATIENT CARE ALLOWANCE(WITH ARREAR)");
+      sheet.getRangeByName("C8").setValue("OTHER ALLOWANCE(WITH ARREAR)");
       sheet.getRangeByName("C9").setValue("TA & DA ON TA(WITH ARREAR)");
       sheet.getRangeByName("C10").setValue("NPS EMPLOYER (14%)");
-      sheet
-          .getRangeByName("C11")
-          .setValue("OTHER & UNIFORM,CONTIGENCY,CONVEYANCE ALLOWANCE");
+      sheet.getRangeByName("C11").setValue("OTHER & UNIFORM,CONTIGENCY,CONVEYANCE ALLOWANCE");
 
       sheet.getRangeByName("B12:C12").merge();
       sheet.getRangeByName("B12").setValue("TOTAL GROSS SALARY");

@@ -1983,13 +1983,14 @@ _EcrRow _buildMonthRow(
     values[column.key] = monthKey == null ? 0 : _toInt(monthValues[monthKey]);
   }
 
+  int oldFebTax = _toInt(monthValues['incometax']);
   int totalDed = _toInt(monthValues['totalded']);
   int netSalary = _toInt(monthValues['netsalary']);
 
   if (isFebruary) {
     values['incometax'] = februaryEcrTax;
-    totalDed += februaryEcrTax;
-    netSalary -= februaryEcrTax;
+    totalDed = totalDed - oldFebTax + februaryEcrTax;
+    netSalary = netSalary + oldFebTax - februaryEcrTax;
   }
 
   values['totalded'] = totalDed;
