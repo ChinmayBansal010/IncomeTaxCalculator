@@ -4151,6 +4151,8 @@ class _ItaxPageState extends State<ItaxPage>
 
       int varPrevinc = int.tryParse(arrearData['previnc']?.toString() ?? '0') ?? 0;
       int varPrevtax = int.tryParse(arrearData['prevtax']?.toString() ?? '0') ?? 0;
+      int varTotaldedprev = varPrevtax;
+      int varNetsalaryprev = varPrevinc - varPrevtax;
 
 
       // =============================== qtr4 ===============================
@@ -4379,13 +4381,19 @@ class _ItaxPageState extends State<ItaxPage>
         varTotaldeddec,
         varTotaldedjan,
         varTotaldedfeb,
-        varTotaldedarrearqtr4
+        varTotaldedarrearqtr4,
+        varTotaldedtution,
+        varTotaldedbonus,
+        varTotaldedprev
       ].fold(0, (sum, value) => sum + value);
       int varNetsalaryqtr4 = [
         varNetsalarydec,
         varNetsalaryjan,
         varNetsalaryfeb,
-        varNetsalaryarrearqtr4
+        varNetsalaryarrearqtr4,
+        varNetsalarytution,
+        varNetsalarybonus,
+        varNetsalaryprev
       ].fold(0, (sum, value) => sum + value);
 
       // ============================================= gross total ==========================================
@@ -4608,26 +4616,17 @@ class _ItaxPageState extends State<ItaxPage>
         varDdext4qtr3,
         varDdext4qtr4
       ].fold(0, (sum, value) => sum + value);
-      int varTotaldedprev = varPrevtax;
-      int varNetsalaryprev = varPrevinc-varPrevtax;
-
       int varTotaldedgross = [
         varTotaldedqtr1,
         varTotaldedqtr2,
         varTotaldedqtr3,
         varTotaldedqtr4,
-        varTotaldedtution,
-        varTotaldedbonus,
-        varTotaldedprev
       ].fold(0, (sum, value) => sum + value);
       int varNetsalarygross = [
         varNetsalaryqtr1,
         varNetsalaryqtr2,
         varNetsalaryqtr3,
         varNetsalaryqtr4,
-        varNetsalarytution,
-        varNetsalarybonus,
-        varNetsalaryprev
       ].fold(0, (sum, value) => sum + value);
 
       // ================================= Update Itax Form total value ==================================
