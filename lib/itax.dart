@@ -6758,12 +6758,12 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C3").setValue("BASIC PAY");
       sheet.getRangeByName("C4").setValue("D.A.(WITH ARREAR)");
       sheet.getRangeByName("C5").setValue("H.R.A.");
-      sheet.getRangeByName("C6").setValue("N.P.A / SPL PAY");
-      sheet.getRangeByName("C7").setValue("NURSING ALLOWANCES");
+      sheet.getRangeByName("C6").setValue("N.P.A ");
+      sheet.getRangeByName("C7").setValue("PREVIOUS EMPLOYER INCOME WITH TUTION AND BONUS");
       sheet.getRangeByName("C8").setValue("OTHER ALLOWANCE(WITH ARREAR)");
       sheet.getRangeByName("C9").setValue("TA & DA ON TA(WITH ARREAR)");
       sheet.getRangeByName("C10").setValue("NPS EMPLOYER (14%)");
-      sheet.getRangeByName("C11").setValue("OTHER & UNIFORM,CONTIGENCY,CONVEYANCE ALLOWANCE");
+      sheet.getRangeByName("C11").setValue("UNIFORM,CONTIGENCY,CONVEYANCE ALLOWANCE");
 
       sheet.getRangeByName("B12:C12").merge();
       sheet.getRangeByName("B12").setValue("TOTAL GROSS SALARY");
@@ -6801,7 +6801,7 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C24").setValue("HOUSE LOAN PRINCIPAL");
       sheet
           .getRangeByName("C25")
-          .setValue("5 YEARS(FIXED DEPOSIT/TIME DEPOSITE SCHEME)");
+          .setValue("5 YEARS(FIXED DEPOSIT/TIME DEPOSIT SCHEME)");
       sheet.getRangeByName("C26").setValue("NSC");
       sheet.getRangeByName("C27").setValue("80C");
       sheet.getRangeByName("C28").setValue("NPS 80CCD(1)");
@@ -6866,14 +6866,24 @@ class _ItaxPageState extends State<ItaxPage>
       int varHra = int.tryParse(itfData['thra']?.toString() ?? '0') ?? 0;
       sheet.getRangeByName("D5").setValue(varHra);
       sheet.getRangeByName("D6").setValue(
-          (int.tryParse(itfData['tnpa']?.toString() ?? '0') ?? 0) +
-              (int.tryParse(itfData['tsplpay']?.toString() ?? '0') ?? 0));
+          int.tryParse(itfData['tnpa']?.toString() ?? '0') ?? 0);
       sheet
           .getRangeByName("D7")
-          .setValue(int.tryParse(itfData['tnursing']?.toString() ?? '0') ?? 0);
+          .setValue(int.tryParse(itfData['tother']?.toString() ?? '0') ?? 0);
       sheet
           .getRangeByName("D8")
-          .setValue(int.tryParse(itfData['tpca']?.toString() ?? '0') ?? 0);
+          .setValue((int.tryParse(itfData['tpca']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tsplpay']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tot']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tcycle']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tnight']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['ttb']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['twashing']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tdirt']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tmedical']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tnursing']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tannual']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tpg']?.toString() ?? '0') ?? 0));
       sheet.getRangeByName("D9").setValue(
           (int.tryParse(itfData['tta']?.toString() ?? '0') ?? 0) +
               (int.tryParse(itfData['tdaonta']?.toString() ?? '0') ?? 0));
@@ -6881,7 +6891,7 @@ class _ItaxPageState extends State<ItaxPage>
           .getRangeByName("D10")
           .setValue(int.tryParse(itfData['tnpsemp']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D11").setValue(
-          (int.tryParse(itfData['tother']?.toString() ?? '0') ?? 0) +
+
               (int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0) +
               (int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0) +
               (int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0));
