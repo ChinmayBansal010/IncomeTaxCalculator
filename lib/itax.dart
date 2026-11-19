@@ -1635,6 +1635,7 @@ class _ItaxPageState extends State<ItaxPage>
 
       sheet.getRangeByName("A34").setValue("GROSS TOTAL");
       sheet.getRangeByName("A34").cellStyle = formlastrowStyle!;
+      sheet.getRangeByName("A34").rowHeight = 30.60;
 
       // =============================== mar ===============================
       int varBpmar = int.tryParse(marData['bp']?.toString() ?? '0') ?? 0;
