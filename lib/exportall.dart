@@ -11,6 +11,22 @@ import 'package:universal_html/html.dart' as html;
 
 final database = FirebaseDatabase.instance.ref().child(sharedData.userPlace);
 
+String formatOtherVal(dynamic otherVal, dynamic customListRaw) {
+  final baseVal = (otherVal != null && otherVal.toString() != 'null') ? otherVal.toString() : '';
+  if (customListRaw is List && customListRaw.isNotEmpty) {
+    final customStrs = <String>[];
+    for (var c in customListRaw) {
+      if (c is Map && c['name'] != null && c['name'].toString().isNotEmpty) {
+        customStrs.add("${c['name']}: ${c['amount'] ?? 0}");
+      }
+    }
+    if (customStrs.isNotEmpty) {
+      return baseVal.isEmpty ? customStrs.join(', ') : "$baseVal (${customStrs.join(', ')})";
+    }
+  }
+  return baseVal;
+}
+
 Future<Map<String, Map<String, dynamic>>> fetchMainData() async {
   try {
     final mainSnap = await database.child("maindata").once();
@@ -262,22 +278,6 @@ Future<Map<String, dynamic>> fetcharrearData() async {
         "previnc": "Previous Employer Income",
         "prevtax": "Previous Employer Tax",
       };
-
-      String formatOtherVal(dynamic otherVal, dynamic customListRaw) {
-        final baseVal = (otherVal != null && otherVal.toString() != 'null') ? otherVal.toString() : '';
-        if (customListRaw is List && customListRaw.isNotEmpty) {
-          final customStrs = <String>[];
-          for (var c in customListRaw) {
-            if (c is Map && c['name'] != null && c['name'].toString().isNotEmpty) {
-              customStrs.add("${c['name']}: ${c['amount'] ?? 0}");
-            }
-          }
-          if (customStrs.isNotEmpty) {
-            return baseVal.isEmpty ? customStrs.join(', ') : "$baseVal (${customStrs.join(', ')})";
-          }
-        }
-        return baseVal;
-      }
 
       final mappedData = <String, Map<String, dynamic>>{};
       arrData.forEach((key, value) {
