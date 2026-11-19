@@ -365,6 +365,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            final isMobile = MediaQuery.of(context).size.width < 600;
             double currentTotal = 0;
             for (var entry in otherCustomEntries) {
               currentTotal += double.tryParse(entry.amountController.text.trim()) ?? 0;
@@ -385,7 +386,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                 ],
               ),
               content: SizedBox(
-                width: 500,
+                width: isMobile ? double.infinity : 500,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -402,6 +403,91 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                         ...otherCustomEntries.asMap().entries.map((itemMap) {
                           final idx = itemMap.key;
                           final entry = itemMap.value;
+                          if (isMobile) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12.0),
+                              padding: const EdgeInsets.all(12.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: entry.nameController,
+                                          decoration: InputDecoration(
+                                            labelText: "Field Name",
+                                            hintText: "Enter deduction name",
+                                            isDense: true,
+                                            filled: true,
+                                            fillColor: Colors.white,
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                          onChanged: (_) {
+                                            setDialogState(() {});
+                                            _recalculateOtherTotal();
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444)),
+                                        tooltip: "Delete Entry",
+                                        onPressed: () {
+                                          setDialogState(() {
+                                            entry.dispose();
+                                            otherCustomEntries.removeAt(idx);
+                                          });
+                                          _recalculateOtherTotal();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  TextField(
+                                    controller: entry.amountController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: "Amount",
+                                      isDense: true,
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      prefixText: "₹ ",
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onTap: () {
+                                      if (entry.amountController.text == '0') {
+                                        entry.amountController.text = '';
+                                        setDialogState(() {});
+                                        _recalculateOtherTotal();
+                                      }
+                                    },
+                                    onChanged: (value) {
+                                      String newValue = value;
+                                      if (newValue.length > 1 && newValue.startsWith('0')) {
+                                        newValue = newValue.replaceFirst(RegExp(r'^0+'), '');
+                                        if (newValue.isEmpty) newValue = '0';
+                                      }
+                                      if (entry.amountController.text != newValue) {
+                                        final cursorPosition = TextSelection.collapsed(offset: newValue.length);
+                                        entry.amountController.value = TextEditingValue(
+                                          text: newValue,
+                                          selection: cursorPosition,
+                                        );
+                                      }
+                                      setDialogState(() {});
+                                      _recalculateOtherTotal();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12.0),
                             child: Row(
@@ -432,7 +518,26 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                       isDense: true,
                                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
-                                    onChanged: (_) {
+                                    onTap: () {
+                                      if (entry.amountController.text == '0') {
+                                        entry.amountController.text = '';
+                                        setDialogState(() {});
+                                        _recalculateOtherTotal();
+                                      }
+                                    },
+                                    onChanged: (value) {
+                                      String newValue = value;
+                                      if (newValue.length > 1 && newValue.startsWith('0')) {
+                                        newValue = newValue.replaceFirst(RegExp(r'^0+'), '');
+                                        if (newValue.isEmpty) newValue = '0';
+                                      }
+                                      if (entry.amountController.text != newValue) {
+                                        final cursorPosition = TextSelection.collapsed(offset: newValue.length);
+                                        entry.amountController.value = TextEditingValue(
+                                          text: newValue,
+                                          selection: cursorPosition,
+                                        );
+                                      }
                                       setDialogState(() {});
                                       _recalculateOtherTotal();
                                     },
