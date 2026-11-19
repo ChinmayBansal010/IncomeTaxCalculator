@@ -4,6 +4,29 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/date_utils.dart';
 import 'package:incometax/shared.dart';
 
+class CustomMonthOtherEntry {
+  String id;
+  TextEditingController nameController;
+  TextEditingController amountController;
+
+  CustomMonthOtherEntry({
+    required this.id,
+    required String name,
+    required String amount,
+  })  : nameController = TextEditingController(text: name),
+        amountController = TextEditingController(text: amount);
+
+  void dispose() {
+    nameController.dispose();
+    amountController.dispose();
+  }
+
+  Map<String, String> toMap() => {
+        'name': nameController.text.trim(),
+        'amount': amountController.text.trim(),
+      };
+}
+
 class MonthDataPage extends StatefulWidget {
   final String biometricId;
   final String shortMonth;
@@ -99,6 +122,8 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
   final TextEditingController medController = TextEditingController();
   final TextEditingController waterController = TextEditingController();
   final TextEditingController otherController = TextEditingController();
+
+  List<CustomMonthOtherEntry> otherCustomEntries = [];
   final TextEditingController ddext1Controller = TextEditingController();
   final TextEditingController ddext2Controller = TextEditingController();
   final TextEditingController ddext3Controller = TextEditingController();
@@ -219,7 +244,24 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     wfController.text = monthData['wf']?.toString() ?? '';
     medController.text = monthData['med'] ?? '';
     waterController.text = monthData['water']?.toString() ?? '';
+    
+    otherCustomEntries.clear();
+    if (monthData['othercustom'] != null && monthData['othercustom'] is List) {
+      for (var item in monthData['othercustom']) {
+        if (item is Map) {
+          otherCustomEntries.add(CustomMonthOtherEntry(
+            id: DateTime.now().microsecondsSinceEpoch.toString() + UniqueKey().toString(),
+            name: item['name']?.toString() ?? '',
+            amount: item['amount']?.toString() ?? '0',
+          ));
+        }
+      }
+    }
     otherController.text = monthData['other']?.toString() ?? '';
+    if (otherCustomEntries.isNotEmpty) {
+      _recalculateOtherTotal();
+    }
+
     ddext1Controller.text = monthData['ddext1']?.toString() ?? '';
     ddext2Controller.text = monthData['ddext2']?.toString() ?? '';
     ddext3Controller.text = monthData['ddext3']?.toString() ?? '';
@@ -245,6 +287,9 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
 
   @override
   void dispose() {
+    for (var e in otherCustomEntries) {
+      e.dispose();
+    }
     _focusNodes.forEach((_, node) => node.dispose());
     _focusNodes.clear();
     _zeroSectionFieldKeys.clear();
@@ -298,6 +343,173 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
     totaldedController.dispose();
     netsalaryController.dispose();
     super.dispose();
+  }
+
+  void _recalculateOtherTotal() {
+    double total = 0;
+    for (var entry in otherCustomEntries) {
+      total += double.tryParse(entry.amountController.text.trim()) ?? 0;
+    }
+    final intTotal = total.round();
+    if (mounted) {
+      setState(() {
+        otherController.text = intTotal.toString();
+        monthData['other'] = intTotal.toString();
+      });
+    }
+  }
+
+  void _showCustomOtherDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            double currentTotal = 0;
+            for (var entry in otherCustomEntries) {
+              currentTotal += double.tryParse(entry.amountController.text.trim()) ?? 0;
+            }
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: const [
+                  Icon(Icons.playlist_add_rounded, color: Color(0xFF2563EB)),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      "Custom Other Allowances / Deductions",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 500,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (otherCustomEntries.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            "No custom fields added yet. Click '+ Add Custom Field' below.",
+                            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                          ),
+                        )
+                      else
+                        ...otherCustomEntries.asMap().entries.map((itemMap) {
+                          final idx = itemMap.key;
+                          final entry = itemMap.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                    controller: entry.nameController,
+                                    decoration: InputDecoration(
+                                      labelText: "Field Name",
+                                      isDense: true,
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onChanged: (_) {
+                                      setDialogState(() {});
+                                      _recalculateOtherTotal();
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  flex: 1,
+                                  child: TextField(
+                                    controller: entry.amountController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: "Amount",
+                                      isDense: true,
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onChanged: (_) {
+                                      setDialogState(() {});
+                                      _recalculateOtherTotal();
+                                    },
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444)),
+                                  onPressed: () {
+                                    setDialogState(() {
+                                      entry.dispose();
+                                      otherCustomEntries.removeAt(idx);
+                                    });
+                                    _recalculateOtherTotal();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEFF6FF),
+                          foregroundColor: const Color(0xFF2563EB),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () {
+                          setDialogState(() {
+                            otherCustomEntries.add(
+                              CustomMonthOtherEntry(
+                                id: DateTime.now().microsecondsSinceEpoch.toString() + UniqueKey().toString(),
+                                name: '',
+                                amount: '0',
+                              ),
+                            );
+                          });
+                          _recalculateOtherTotal();
+                        },
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text("Add Custom Field"),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Total Other Amount:", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                            Text(
+                              "₹ ${currentTotal == currentTotal.roundToDouble() ? currentTotal.round() : currentTotal}",
+                              style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF2563EB), fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("Done", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> fetchMonthData() async {
@@ -959,7 +1171,7 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
                                 _FormFieldSpec(fieldKey: 'wf', controller: wfController, widget: AnimatedInputField(label: "WIDOW WELFARE FUND", controller: wfController, icon: Icons.volunteer_activism_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('wf'), onChanged: (val) => _onFieldChanged('wf', val))),
                                 _FormFieldSpec(fieldKey: 'med', controller: medController, widget: AnimatedInputField(label: "MCD-EHS", controller: medController, icon: Icons.health_and_safety_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('med'), onChanged: (val) => _onFieldChanged('med', val))),
                                 _FormFieldSpec(fieldKey: 'water', controller: waterController, widget: AnimatedInputField(label: "WATER CHARGES", controller: waterController, icon: Icons.water_drop_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('water'), onChanged: (val) => _onFieldChanged('water', val))),
-                                _FormFieldSpec(fieldKey: 'other', controller: otherController, widget: AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded, keyboardType: TextInputType.number, focusNode: _getFocusNode('other'), onChanged: (val) => _onFieldChanged('other', val))),
+                                _FormFieldSpec(fieldKey: 'other', controller: otherController, widget: AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded, readOnly: true, onTap: () => _showCustomOtherDialog(context), suffixIcon: IconButton(icon: const Icon(Icons.playlist_add_rounded, color: Color(0xFF2563EB)), tooltip: "Manage Custom Other Entries", onPressed: () => _showCustomOtherDialog(context)), focusNode: _getFocusNode('other'))),
                                 _FormFieldSpec(
                                   fieldKey: 'gpf',
                                   controller: gpfController,
@@ -1424,6 +1636,8 @@ class _MonthDataPageState extends State<MonthDataPage> with SingleTickerProvider
         monthData.remove('manual_overrides');
       }
 
+      monthData['othercustom'] = otherCustomEntries.map((e) => e.toMap()).toList();
+
       return Map<String, dynamic>.from(monthData);
     } catch (error) {
       final String message = "Error: $error";
@@ -1633,6 +1847,8 @@ class AnimatedInputField extends StatefulWidget {
   final bool enabled;
   final ValueChanged<String>? onChanged;
   final FocusNode? focusNode;
+  final VoidCallback? onTap;
+  final Widget? suffixIcon;
 
   const AnimatedInputField({
     super.key,
@@ -1645,6 +1861,8 @@ class AnimatedInputField extends StatefulWidget {
     this.enabled = true,
     this.onChanged,
     this.focusNode,
+    this.onTap,
+    this.suffixIcon,
   });
 
   @override
@@ -1700,7 +1918,9 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                 inputFormatters: widget.inputFormatters,
                 controller: widget.controller,
                 onTap: () {
-                  if (!isEffectivelyReadOnly &&
+                  if (widget.onTap != null) {
+                    widget.onTap!();
+                  } else if (!isEffectivelyReadOnly &&
                       widget.keyboardType == TextInputType.number &&
                       widget.controller.text == '0') {
                     widget.controller.text = '';
@@ -1726,9 +1946,9 @@ class _AnimatedInputFieldState extends State<AnimatedInputField> {
                         : (_isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8)),
                     size: isMobile ? 16 : 20,
                   ),
-                  suffixIcon: isEffectivelyReadOnly
+                  suffixIcon: widget.suffixIcon ?? (isEffectivelyReadOnly
                       ? Icon(Icons.lock_outline_rounded, color: const Color(0xFFCBD5E1), size: isMobile ? 14 : 18)
-                      : null,
+                      : null),
                   contentPadding: EdgeInsets.symmetric(
                     vertical: isMobile ? 10 : 18,
                     horizontal: isMobile ? 10 : 20,

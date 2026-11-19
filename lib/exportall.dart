@@ -186,10 +186,15 @@ Future<Map<String?, dynamic>> fetchMonthData(String month) async {
       monthMap.forEach((key, value) {
         if (value is Map) {
           final innerMap = Map<String, dynamic>.from(value);
-          final labeledMap = {
-            for (var k in orderedKeys)
-              labelMap[k] ?? k: (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : ''
-          };
+          final labeledMap = <String, dynamic>{};
+          for (var k in orderedKeys) {
+            final label = labelMap[k] ?? k;
+            if (k == 'other') {
+              labeledMap[label] = formatOtherVal(innerMap[k], innerMap['othercustom']);
+            } else {
+              labeledMap[label] = (innerMap[k] != null && innerMap[k].toString() != 'null') ? innerMap[k] : '';
+            }
+          }
           mappedData[key] = labeledMap;
         }
       });

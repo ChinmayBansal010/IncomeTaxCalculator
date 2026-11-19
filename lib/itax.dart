@@ -1290,7 +1290,7 @@ class _ItaxPageState extends State<ItaxPage>
 
     final xls.Style totalrowStyle = workbook.styles.add('totalrowStyle');
     totalrowStyle.fontName = 'Calibri';
-    totalrowStyle.fontSize = 10;
+    totalrowStyle.fontSize = 11;
     totalrowStyle.bold = true;
     totalrowStyle.fontColor = '#000000';
     totalrowStyle.backColor = '#FABF8F';
@@ -1314,7 +1314,7 @@ class _ItaxPageState extends State<ItaxPage>
 
     final xls.Style specialcolStyle = workbook.styles.add('specialcolStyle');
     specialcolStyle.fontName = 'Calibri';
-    specialcolStyle.fontSize = 10;
+    specialcolStyle.fontSize = 11;
     specialcolStyle.bold = true;
     specialcolStyle.fontColor = '#000000';
     specialcolStyle.backColor = '#B9ECE0';
@@ -1340,7 +1340,7 @@ class _ItaxPageState extends State<ItaxPage>
     final xls.Style specialtotalrowStyle =
         workbook.styles.add('specialtotalrowStyle');
     specialtotalrowStyle.fontName = 'Calibri';
-    specialtotalrowStyle.fontSize = 10;
+    specialtotalrowStyle.fontSize = 11;
     specialtotalrowStyle.bold = true;
     specialtotalrowStyle.fontColor = '#000000';
     specialtotalrowStyle.backColor = '#FABF8F';
@@ -1550,16 +1550,16 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName('B6').setValue(mainpgData['npsno']);
       sheet.getRangeByName('B6:C6').merge();
 
-      sheet.getRangeByName('D6').setValue("LEVEL");
+      sheet.getRangeByName('D6').setValue("PLACE OF DUTY");
       sheet.getRangeByName('D6:E6').merge();
-      sheet.getRangeByName('F6').setValue(mainpgData['level']);
-      sheet.getRangeByName('F6:G6').merge();
+      sheet.getRangeByName('F6').setValue(mainpgData['place']);
+      sheet.getRangeByName('F6:K6').merge();
 
-      sheet.getRangeByName('H6').setValue("");
-      sheet.getRangeByName('H6:K6').merge();
+     //sheet.getRangeByName('H6').setValue("");
+     //sheet.getRangeByName('H6:K6').merge();
 
-      sheet.getRangeByName('A7').setValue("PLACE OF DUTY");
-      sheet.getRangeByName('B7').setValue(mainpgData['place']);
+      sheet.getRangeByName('A7').setValue("LEVEL");
+      sheet.getRangeByName('B7').setValue(mainpgData['level']);
       sheet.getRangeByName('B7:K7').merge();
 
       sheet.getRangeByName('A8').setValue("ADDRESS");
