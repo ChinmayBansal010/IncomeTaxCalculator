@@ -103,12 +103,17 @@ class DeductionAllPage {
 
 
   Future<void> initializeData() async {
+    gis2 = 0;
+    gpf2 = 0;
+    atccd12 = 0;
+    atccd22 = 0;
+    taexem2 = 0;
     await Future.wait(months.map((month) => fetchMonthData(month)));
+    await fetchArrData();
     gis = gis2.toString();
     gpf = gpf2.toString();
     atccd1 = atccd12.toString();
     convcontuniform = taexem2.toString();
-    await fetchArrData();
     await saveData();
   }
 
@@ -121,15 +126,15 @@ class DeductionAllPage {
         Map<dynamic, dynamic> monthData = snapshot.value as Map<dynamic, dynamic>;
 
         // Parse values with default 0 if parsing fails
-        final nps = int.tryParse(monthData['nps'] ?? '0') ?? 0;
-        final bp = int.tryParse(monthData['bp'] ?? '0') ?? 0;
-        final da = int.tryParse(monthData['da'] ?? '0') ?? 0;
-        final npa = int.tryParse(monthData['npa'] ?? '0') ?? 0;
-        final gisValue = int.tryParse(monthData['gis'] ?? '0') ?? 0;
-        final gpfValue = int.tryParse(monthData['gpf'] ?? '0') ?? 0;
-        final drive = int.tryParse(monthData['drive'] ?? '0') ?? 0;
-        final conv = int.tryParse(monthData['conv'] ?? '0') ?? 0;
-        final uniform = int.tryParse(monthData['uniform'] ?? '0') ?? 0;
+        final nps = int.tryParse(monthData['nps']?.toString() ?? '0') ?? 0;
+        final bp = int.tryParse(monthData['bp']?.toString() ?? '0') ?? 0;
+        final da = int.tryParse(monthData['da']?.toString() ?? '0') ?? 0;
+        final npa = int.tryParse(monthData['npa']?.toString() ?? '0') ?? 0;
+        final gisValue = int.tryParse(monthData['gis']?.toString() ?? '0') ?? 0;
+        final gpfValue = int.tryParse(monthData['gpf']?.toString() ?? '0') ?? 0;
+        final drive = int.tryParse(monthData['drive']?.toString() ?? '0') ?? 0;
+        final conv = int.tryParse(monthData['conv']?.toString() ?? '0') ?? 0;
+        final uniform = int.tryParse(monthData['uniform']?.toString() ?? '0') ?? 0;
 
         // Update fields conditionally
         if (nps > 0) {
@@ -156,13 +161,35 @@ class DeductionAllPage {
       if (snapshot.exists) {
         Map<dynamic, dynamic> arrData = snapshot.value as Map<dynamic, dynamic>;
         // Parse the values once and check for null
-        final mmtution = int.tryParse(arrData['mmtution'] ?? '0') ?? 0;
-        final jatution = int.tryParse(arrData['jatution'] ?? '0') ?? 0;
-        final sntution = int.tryParse(arrData['sntution'] ?? '0') ?? 0;
-        final dftution = int.tryParse(arrData['dftution'] ?? '0') ?? 0;
+        final mmtution = int.tryParse(arrData['mmtution']?.toString() ?? '0') ?? 0;
+        final jatution = int.tryParse(arrData['jatution']?.toString() ?? '0') ?? 0;
+        final sntution = int.tryParse(arrData['sntution']?.toString() ?? '0') ?? 0;
+        final dftution = int.tryParse(arrData['dftution']?.toString() ?? '0') ?? 0;
 
         // Set isCea based on the sum of values
         isCea = (mmtution + jatution + sntution + dftution) > 0;
+
+        final mmconv = int.tryParse(arrData['mmconv']?.toString() ?? '0') ?? 0;
+        final mmuniform = int.tryParse(arrData['mmuniform']?.toString() ?? '0') ?? 0;
+        final mmdrive = int.tryParse(arrData['mmdrive']?.toString() ?? '0') ?? 0;
+
+        final jaconv = int.tryParse(arrData['jaconv']?.toString() ?? '0') ?? 0;
+        final jauniform = int.tryParse(arrData['jauniform']?.toString() ?? '0') ?? 0;
+        final jadrive = int.tryParse(arrData['jadrive']?.toString() ?? '0') ?? 0;
+
+        final snconv = int.tryParse(arrData['snconv']?.toString() ?? '0') ?? 0;
+        final snuniform = int.tryParse(arrData['snuniform']?.toString() ?? '0') ?? 0;
+        final sndrive = int.tryParse(arrData['sndrive']?.toString() ?? '0') ?? 0;
+
+        final dfconv = int.tryParse(arrData['dfconv']?.toString() ?? '0') ?? 0;
+        final dfuniform = int.tryParse(arrData['dfuniform']?.toString() ?? '0') ?? 0;
+        final dfdrive = int.tryParse(arrData['dfdrive']?.toString() ?? '0') ?? 0;
+
+        final arrTaxExem = mmconv + mmuniform + mmdrive +
+                           jaconv + jauniform + jadrive +
+                           snconv + snuniform + sndrive +
+                           dfconv + dfuniform + dfdrive;
+        taexem2 += arrTaxExem;
       }
     } catch (e) {
       return;

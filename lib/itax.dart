@@ -6763,7 +6763,7 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("C8").setValue("OTHER ALLOWANCE(WITH ARREAR)");
       sheet.getRangeByName("C9").setValue("TA & DA ON TA(WITH ARREAR)");
       sheet.getRangeByName("C10").setValue("NPS EMPLOYER (14%)");
-      sheet.getRangeByName("C11").setValue("UNIFORM,CONTIGENCY,CONVEYANCE ALLOWANCE");
+      sheet.getRangeByName("C11").setValue("CONVEYANCE, CONTIGENCY & UNIFORM ALLOWANCE");
 
       sheet.getRangeByName("B12:C12").merge();
       sheet.getRangeByName("B12").setValue("TOTAL GROSS SALARY");
@@ -6847,9 +6847,9 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("B50").setValue("80EE");
       sheet
           .getRangeByName("B51")
-          .setValue("CONVEYANCE AND CONTIGENCY EXEMPTED");
+          .setValue("CONVEYANCE, CONTIGENCY & UNIFORM EXEMPTED");
       sheet.getRangeByName("B52").setValue("MEDICAL ALLOWANCE");
-      sheet.getRangeByName("B53").setValue("OTHER AND UNIFORM EXEMPTED");
+      sheet.getRangeByName("B53").setValue("OTHER EXEMPTED");
 
       for (int i = 3; i <= 18; i++) {
         sheet.getRangeByName("D$i").cellStyle = commontextStyle;
@@ -7027,14 +7027,14 @@ class _ItaxPageState extends State<ItaxPage>
           .getRangeByName("D50")
           .setValue(int.tryParse(dedData['80ee']?.toString() ?? '0') ?? 0);
       sheet.getRangeByName("D51").setValue(
-          (int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0) +
+          (int.tryParse(itfData['tconv']?.toString() ?? '0') ?? 0)  +
+              (int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0) +
               (int.tryParse(itfData['tdrive']?.toString() ?? '0') ?? 0));
       sheet
           .getRangeByName("D52")
           .setValue(int.tryParse(dedData['ma']?.toString() ?? '0') ?? 0);
-      sheet.getRangeByName("D53").setValue(
-          (int.tryParse(dedData['other']?.toString() ?? '0') ?? 0) +
-              (int.tryParse(itfData['tuniform']?.toString() ?? '0') ?? 0));
+      sheet.getRangeByName("D53").setValue
+          (int.tryParse(dedData['other']?.toString() ?? '0') ?? 0);
 
       for (int i = 3; i <= 18; i++) {
         xls.Range rangeValue = sheet.getRangeByName("D$i");
@@ -7283,10 +7283,10 @@ class _ItaxPageState extends State<ItaxPage>
       sheet.getRangeByName("D15").cellStyle = commontextStyleBold;
       sheet
           .getRangeByName("E16")
-          .setValue("U/S 80D (Mode of payment other than Cash)");
+          .setValue("U/S 80D");
       sheet
           .getRangeByName("E17")
-          .setValue("Mediclaim for parents Rs.50000/- 80DP");
+          .setValue("U/S 80DP Mediclaim for parents Rs.50000/");
       sheet.getRangeByName("E18").setValue("U/S 80 DPS(Rs.50000/-)");
       sheet.getRangeByName("E19").setValue("U/S 80 CCD (1B)");
       sheet

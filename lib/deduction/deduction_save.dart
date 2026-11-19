@@ -2,6 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:incometax/shared.dart';
 
+class CustomOtherEntry {
+  String id;
+  TextEditingController nameController;
+  TextEditingController amountController;
+
+  CustomOtherEntry({
+    required this.id,
+    required String name,
+    required String amount,
+  })  : nameController = TextEditingController(text: name),
+        amountController = TextEditingController(text: amount);
+
+  void dispose() {
+    nameController.dispose();
+    amountController.dispose();
+  }
+
+  Map<String, String> toMap() => {
+        'name': nameController.text.trim(),
+        'amount': amountController.text.trim(),
+      };
+}
+
 class DeductionUpdatePage extends StatefulWidget {
   final String biometricId;
   final String name;
@@ -140,6 +163,8 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
   final ext4Controller = TextEditingController();
   final ext5Controller = TextEditingController();
 
+  List<CustomOtherEntry> otherCustomEntries = [];
+
   int gis = 0, gpf = 0, atccd1 = 0, atccd2 = 0, taxexem = 0;
   bool isCea = false;
   bool isLoading = true;
@@ -169,6 +194,12 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
   }
 
   Future<void> _initializeData() async {
+    gis = 0;
+    gpf = 0;
+    atccd1 = 0;
+    atccd2 = 0;
+    taxexem = 0;
+
     await Future.wait(months.map((month) => fetchMonthData(month)));
     await fetchArrData();
 
@@ -208,16 +239,30 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
     reliefController.text = widget.relief;
     ateeController.text = widget.atee;
     rpaidController.text = widget.rpaid;
-    convcontuniformController.text = widget.convcontuniform;
+    convcontuniformController.text = taxexem.toString();
     maController.text = widget.ma;
-    otherController.text = widget.other;
-    totalsavController.text = widget.totalsav;
-    maxsavController.text = widget.maxsav;
     htypeController = widget.htype;
     rentController.text = widget.rent;
     ext3Controller.text = widget.ext3;
     ext4Controller.text = widget.ext4;
     ext5Controller.text = widget.ext5;
+
+    try {
+      DatabaseEvent dedEvent = await bioRef.child('deddata').child(widget.biometricId).once();
+      if (dedEvent.snapshot.exists && dedEvent.snapshot.value is Map) {
+        Map<dynamic, dynamic> dedData = dedEvent.snapshot.value as Map<dynamic, dynamic>;
+        _parseCustomEntriesFromData(dedData);
+      }
+    } catch (_) {}
+
+    if (otherCustomEntries.isNotEmpty) {
+      _recalculateOtherTotal();
+    } else {
+      otherController.text = widget.other;
+    }
+
+    totalsavController.text = widget.totalsav;
+    maxsavController.text = widget.maxsav;
 
     if (mounted) {
       setState(() {
@@ -229,6 +274,9 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
 
   @override
   void dispose() {
+    for (var e in otherCustomEntries) {
+      e.dispose();
+    }
     _entranceController.dispose();
     biometricIdController.dispose();
     nameController.dispose();
@@ -323,12 +371,34 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
       DataSnapshot snapshot = event.snapshot;
       if (snapshot.exists) {
         Map<dynamic, dynamic> arrData = snapshot.value as Map<dynamic, dynamic>;
-        final mmtution = int.tryParse(arrData['mmtution'] ?? '0') ?? 0;
-        final jatution = int.tryParse(arrData['jatution'] ?? '0') ?? 0;
-        final sntution = int.tryParse(arrData['sntution'] ?? '0') ?? 0;
-        final dftution = int.tryParse(arrData['dftution'] ?? '0') ?? 0;
+        final mmtution = int.tryParse(arrData['mmtution']?.toString() ?? '0') ?? 0;
+        final jatution = int.tryParse(arrData['jatution']?.toString() ?? '0') ?? 0;
+        final sntution = int.tryParse(arrData['sntution']?.toString() ?? '0') ?? 0;
+        final dftution = int.tryParse(arrData['dftution']?.toString() ?? '0') ?? 0;
 
         isCea = (mmtution + jatution + sntution + dftution) > 0;
+
+        final mmconv = int.tryParse(arrData['mmconv']?.toString() ?? '0') ?? 0;
+        final mmuniform = int.tryParse(arrData['mmuniform']?.toString() ?? '0') ?? 0;
+        final mmdrive = int.tryParse(arrData['mmdrive']?.toString() ?? '0') ?? 0;
+
+        final jaconv = int.tryParse(arrData['jaconv']?.toString() ?? '0') ?? 0;
+        final jauniform = int.tryParse(arrData['jauniform']?.toString() ?? '0') ?? 0;
+        final jadrive = int.tryParse(arrData['jadrive']?.toString() ?? '0') ?? 0;
+
+        final snconv = int.tryParse(arrData['snconv']?.toString() ?? '0') ?? 0;
+        final snuniform = int.tryParse(arrData['snuniform']?.toString() ?? '0') ?? 0;
+        final sndrive = int.tryParse(arrData['sndrive']?.toString() ?? '0') ?? 0;
+
+        final dfconv = int.tryParse(arrData['dfconv']?.toString() ?? '0') ?? 0;
+        final dfuniform = int.tryParse(arrData['dfuniform']?.toString() ?? '0') ?? 0;
+        final dfdrive = int.tryParse(arrData['dfdrive']?.toString() ?? '0') ?? 0;
+
+        final arrTaxExem = mmconv + mmuniform + mmdrive +
+                           jaconv + jauniform + jadrive +
+                           snconv + snuniform + sndrive +
+                           dfconv + dfuniform + dfdrive;
+        taxexem += arrTaxExem;
       }
     } catch (e) {
       if (mounted) {
@@ -337,6 +407,190 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
         );
       }
     }
+  }
+
+  void _parseCustomEntriesFromData(Map<dynamic, dynamic> data) {
+    for (var e in otherCustomEntries) {
+      e.dispose();
+    }
+    otherCustomEntries.clear();
+    if (data['othercustom'] != null && data['othercustom'] is List) {
+      for (var item in data['othercustom']) {
+        if (item is Map) {
+          otherCustomEntries.add(CustomOtherEntry(
+            id: DateTime.now().microsecondsSinceEpoch.toString() + UniqueKey().toString(),
+            name: item['name']?.toString() ?? '',
+            amount: item['amount']?.toString() ?? '0',
+          ));
+        }
+      }
+    }
+  }
+
+  void _recalculateOtherTotal() {
+    double total = 0;
+    for (var entry in otherCustomEntries) {
+      total += double.tryParse(entry.amountController.text.trim()) ?? 0;
+    }
+    final intTotal = total.round();
+    if (mounted) {
+      setState(() {
+        otherController.text = intTotal.toString();
+      });
+    }
+  }
+
+  void _showCustomOtherDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            double currentTotal = 0;
+            for (var entry in otherCustomEntries) {
+              currentTotal += double.tryParse(entry.amountController.text.trim()) ?? 0;
+            }
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: const [
+                  Icon(Icons.playlist_add_rounded, color: Color(0xFF2563EB)),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      "Custom Other Exemptions",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 500,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (otherCustomEntries.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            "No custom fields added yet. Click '+ Add Custom Field' below.",
+                            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                          ),
+                        )
+                      else
+                        ...otherCustomEntries.asMap().entries.map((itemMap) {
+                          final idx = itemMap.key;
+                          final entry = itemMap.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                    controller: entry.nameController,
+                                    decoration: InputDecoration(
+                                      labelText: "Field Name",
+                                      isDense: true,
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onChanged: (_) {
+                                      setDialogState(() {});
+                                      _recalculateOtherTotal();
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  flex: 1,
+                                  child: TextField(
+                                    controller: entry.amountController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: "Amount",
+                                      isDense: true,
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onChanged: (_) {
+                                      setDialogState(() {});
+                                      _recalculateOtherTotal();
+                                    },
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444)),
+                                  onPressed: () {
+                                    setDialogState(() {
+                                      entry.dispose();
+                                      otherCustomEntries.removeAt(idx);
+                                    });
+                                    _recalculateOtherTotal();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEFF6FF),
+                          foregroundColor: const Color(0xFF2563EB),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () {
+                          setDialogState(() {
+                            otherCustomEntries.add(
+                              CustomOtherEntry(
+                                id: DateTime.now().microsecondsSinceEpoch.toString() + UniqueKey().toString(),
+                                name: '',
+                                amount: '0',
+                              ),
+                            );
+                          });
+                          _recalculateOtherTotal();
+                        },
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text("Add Custom Field"),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Total Other Amount:", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                            Text(
+                              "₹ ${currentTotal == currentTotal.roundToDouble() ? currentTotal.round() : currentTotal}",
+                              style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF2563EB), fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("Done", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   bool _validateValue(TextEditingController controller, String value) {
@@ -436,6 +690,7 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
         'taexem': convcontuniformController.text,
         'ma': maController.text,
         'other': otherController.text,
+        'othercustom': otherCustomEntries.map((e) => e.toMap()).toList(),
         '80ccd2': atccd2Controller.text,
         'totalsav': totalsavController.text,
         'maxsav': maxsavController.text,
@@ -689,9 +944,19 @@ class DeductionUpdatePageState extends State<DeductionUpdatePage> with SingleTic
                                 _AnimatedInputField(label: "80U", controller: atuController, icon: Icons.accessible_rounded),
                                 _AnimatedInputField(label: "80E", controller: ateController, icon: Icons.school_rounded),
                                 _AnimatedInputField(label: "80EE", controller: ateeController, icon: Icons.home_rounded),
-                                _AnimatedInputField(label: "CONVEYANCE & CONTIGENCY", controller: convcontuniformController, icon: Icons.directions_car_rounded),
+                                _AnimatedInputField(label: "UNIFORM, CONVEYANCE & CONTIGENCY", controller: convcontuniformController, icon: Icons.directions_car_rounded, readOnly: true),
                                 _AnimatedInputField(label: "MEDICAL ALLOWANCE", controller: maController, icon: Icons.medication_rounded),
-                                _AnimatedInputField(label: "OTHER", controller: otherController, icon: Icons.more_horiz_rounded),
+                                _AnimatedInputField(
+                                  label: "OTHER",
+                                  controller: otherController,
+                                  icon: Icons.more_horiz_rounded,
+                                  onTap: () => _showCustomOtherDialog(context),
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(Icons.playlist_add_rounded, color: Color(0xFF2563EB)),
+                                    tooltip: "Manage Custom Other Entries",
+                                    onPressed: () => _showCustomOtherDialog(context),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -872,6 +1137,8 @@ class _AnimatedInputField extends StatefulWidget {
   final IconData icon;
   final bool readOnly;
   final Function(String)? onChanged;
+  final VoidCallback? onTap;
+  final Widget? suffixIcon;
 
   const _AnimatedInputField({
     required this.label,
@@ -879,6 +1146,8 @@ class _AnimatedInputField extends StatefulWidget {
     required this.icon,
     this.readOnly = false,
     this.onChanged,
+    this.onTap,
+    this.suffixIcon,
   });
 
   @override
@@ -930,7 +1199,9 @@ class _AnimatedInputFieldState extends State<_AnimatedInputField> {
                 controller: widget.controller,
                 keyboardType: TextInputType.number,
                 onTap: () {
-                  if (!widget.readOnly && widget.controller.text == '0') {
+                  if (widget.onTap != null) {
+                    widget.onTap!();
+                  } else if (!widget.readOnly && widget.controller.text == '0') {
                     widget.controller.text = '';
                     if (widget.onChanged != null) {
                       widget.onChanged!('');
@@ -954,6 +1225,7 @@ class _AnimatedInputFieldState extends State<_AnimatedInputField> {
                         : (_isHovered ? const Color(0xFF2563EB) : const Color(0xFF94A3B8)),
                     size: isMobile ? 16 : 20,
                   ),
+                  suffixIcon: widget.suffixIcon,
                   contentPadding: EdgeInsets.symmetric(
                     vertical: isMobile ? 10 : 18,
                     horizontal: isMobile ? 10 : 20,
